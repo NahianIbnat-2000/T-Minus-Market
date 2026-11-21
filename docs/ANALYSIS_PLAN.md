@@ -24,3 +24,4 @@ abnormal returns are computed is a plan change and must be logged in the change 
 | Date | Version | Change | Results seen? |
 | --- | --- | --- | --- |
 | 2026-11-21 | 1.0 | Plan frozen at end of Phase 1 | No |
+| 2026-11-21 | 1.0 | Phase 2 run (05_event_study.py). No settings changed. Confounding-news check for provider failures added (docs/CONFOUNDING_NEWS.md); no events removed | Yes |
