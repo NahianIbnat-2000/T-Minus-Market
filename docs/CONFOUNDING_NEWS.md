@@ -24,5 +24,32 @@ which is also an external check on the price data.
 - **VV17 is the largest loss (-16.3%)** and came two months after Vega's return to flight,
   as its second failure in three launches. Repeated failure may be priced as a reliability
   signal; with four events this is a description, not a test.
-- **Rival events:** not yet checked. Do the same check for the largest rival moves before the
-  site describes them individually.
+
+# Confounding-news check: largest rival moves
+
+Checked 21 Nov 2026 for the 8 rival firm-events with the largest |CAR[0,+1]|. These cannot be
+removed from the primary test (plan section 8). They are flagged for the site and for an
+exploratory sensitivity analysis (labelled exploratory, because it was designed after results).
+
+| Failure (rival of) | Ticker | Day 0 | CAR[0,+1] | Same-window news | Verdict | Sources |
+| --- | --- | --- | --- | --- | --- | --- |
+| Firefly Alpha, 22 Dec 2023 | RKLB | 2023-12-22 | +25.27% | Rocket Lab won a US government (Space Development Agency) contract worth up to $515m; shares up about 20% at the open that day | **Confounded** (large positive firm news) | [Motley Fool](https://www.fool.com/investing/2023/12/22/why-rocket-lab-stock-is-going-to-the-moon-today); [Benzinga](https://benzinga.com/news/23/12/36363533/why-rocket-lab-usa-stock-is-blasting-higher) |
+| Kairos, 18 Dec 2024 | AVIO.MI | 2024-12-18 | +14.51% | ESA signed EUR 350m of contracts with Avio (Vega E development, Vega C launch rate); release 18 Dec 20:02 CET, after the Milan close, so it hits day +1 | **Confounded** (large positive firm news) | [Avio regulatory release](https://www.emarketstorage.it/sites/default/files/comunicati/2024-12/20241218_158732.pdf) |
+| Firefly Alpha, 29 Apr 2025 | RKLB | 2025-04-29 | -7.45% | No firm-specific news found; RKLB fell while the market rose. Q1 results came 8 May, outside the window | Not confounded (none found) | [Zacks via Finviz](https://finviz.com/news/39365/rocket-lab-usa-inc-rklb-stock-sinks-as-market-gains-what-you-should-know) |
+| RS1, 10 Jan 2023 | RKLB | 2023-01-11 | +7.33% (CAR[-1,+3] +23.17%) | No firm-specific news found in the window. The first US Electron launch was 24 Jan, outside the window | Not confounded (none found); unusually large drift | [Motley Fool](https://www.fool.com/investing/2023/02/11/rocket-lab-launched-its-first-us-rocket-what-next) |
+| Kairos, 18 Dec 2024 | RKLB | 2024-12-18 | -7.31% | No firm-specific news found on 18-19 Dec. December 2024 trading was volatile after a large run-up, with insider sales earlier in the month | Not confounded (none found) | [Motley Fool](https://www.fool.com/investing/2024/12/08/why-rocket-lab-stock-sank-this-week) |
+| Astra Rocket 3.3, 12 Jun 2022 | AVIO.MI | 2022-06-13 | -7.25% | No Avio-specific news found on 13-14 Jun 2022 | Not confounded (none found) | n/a |
+| PSLV-DL, 12 Jan 2026 | FLY | 2026-01-12 | -6.98% | Lead-plaintiff deadline in a securities class action against Firefly fell on 12 Jan 2026; stock highly volatile after a strong start to 2026. Market-adjusted fallback model | **Possibly confounded** (weak) | [Levi & Korsinsky via Finviz](https://finviz.com/news/268191/shareholders-of-firefly-aerospace-inc-should-contact-levi-korsinsky-before-january-12-2026-to-discuss-your-rights-fly); [Benzinga via Finviz](https://finviz.com/news/274103/space-stocks-rip-into-2026-with-firefly-in-the-lead) |
+| Spectrum, 30 Mar 2025 | RKLB | 2025-03-31 | -6.49% | Broad tech and space-stock selloff that day (Nasdaq down more than the S&P 500; Planet Labs and AST SpaceMobile also down about 4%), attributed by the press to macro news. The S&P 500 benchmark does not remove a tech or space factor | **Sector move** (not firm news; benchmark limitation) | [Motley Fool via Finviz](https://finviz.com/news/13588/why-rocket-lab-planet-labs-and-ast-spacemobile-stocks-all-dropped-on-monday) |
+
+## What this means for the rival result
+
+- The **two largest positive rival moves are both contract announcements**, not reactions to the
+  competitor's failure. They pull the primary mean up. This explains the skew in the results:
+  only 8 of 22 cluster CARs are positive, yet the mean is slightly positive.
+- Rough arithmetic only (not a test): removing those two firm-events from the 42 would move the
+  mean rival CAR[0,+1] from about +0.3% to about -0.7%. A proper exploratory re-estimate with
+  the same test should be run and labelled exploratory.
+- The 31 Mar 2025 case shows a limit of the design: a broad-market benchmark does not absorb a
+  same-day move in tech or space stocks. A sector benchmark is a candidate for a future version
+  of the plan, not a change to v1.0.
