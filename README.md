@@ -9,22 +9,26 @@ Launch data: GCAT (J. McDowell, planet4589.org/space/gcat), CC-BY.
 
 ---
 
-## Phase 4: website (current)
+## Website (Phases 4 and 5)
 
-The whole website is ONE file: `site/index.html`. It holds the styles, the code and the data
-(derived statistics only), so it opens by double-click, works offline and can be hosted anywhere.
-No npm and no build server are needed.
+Three static pages, all built by one command, ready for GitHub Pages (branch master, folder root):
+
+| File | What it is |
+| --- | --- |
+| `index.html` | The article: one-page summary with the key numbers, method, and links (the front door) |
+| `site/index.html` | The interactive report: five stages and four tools (Failure Timeline, Expected vs Actual, Event Study Lab, Placebo Simulator) |
+| `plan.html` | The analysis plan and change log, rendered from `docs/ANALYSIS_PLAN.md` |
 
 ```
 python pipeline/07_export_site_data.py   # results -> site/data/*.json
-python pipeline/08_build_html.py         # site/src + site/data -> site/index.html
+python pipeline/08_build_html.py         # -> index.html, site/index.html, plan.html, .nojekyll
 ```
 
-Edit the source in `site/src/` (code, text, styles) and `site/template.html` (page frame), then
-re-run step 08. Never edit `site/index.html` by hand; it is overwritten on every build.
-
-Every number on the page comes from the embedded data. A test fails if a result number is typed
-into the narrative code. Optional checks with Node.js: `cd site && npm test`.
+Every number on every page comes from `site/data/` (derived statistics only). Edit text and code in
+`site/src/`, the report frame in `site/template.html`, the article in `pipeline/landing.py`, and links in
+`site/site_meta.json` (set `repo_url` only once the repository is public; put the paper at
+`paper/t-minus-markets.pdf` and the article links it automatically). Never edit the generated HTML by hand.
+Optional checks with Node.js: `cd site && npm test`.
 
 ## Phase 3: website data (complete)
 

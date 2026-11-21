@@ -29,3 +29,8 @@ abnormal returns are computed is a plan change and must be logged in the change 
 | 2026-11-21 | 1.0 | Phase 3: site export (step 07) and browser module; derived statistics only (no raw returns). No analysis change | Yes |
 | 2026-11-21 | 1.0 | Phase 4: website skeleton (five stages, anomaly cards, printed-figure charts); text generated from results. No analysis change | Yes |
 | 2026-11-21 | 1.0 | Website rebuilt as one self-contained file (step 08, site/index.html); D3 and Vite removed; Methods moved into the page. Presentation only, no analysis change | Yes |
+| 2026-11-21 | 1.0 | Website display fixes: provider chart anchored at T-1 close (values match cards); RKLB day -5 founder share-sale news noted (docs/CONFOUNDING_NEWS.md); card header and date format. Presentation only, no analysis change | Yes |
+| 2026-11-21 | 1.0 | Phase 5 tool 1: Event Study Lab (re-runs the prespecified rival test on reader-chosen subsets; non-default choices labelled exploratory). Step 07 exports min_rival_clusters from config. No analysis change | Yes |
+| 2026-11-21 | 1.0 | Phase 5 tool 2: Placebo Simulator (replays the R9 draws stored in results.json; same two-sided rule as analysis.py). No analysis change | Yes |
+| 2026-11-21 | 1.0 | Phase 5 tool 3: Failure Timeline (all failures in three lanes, filter and search, detail card). Exclusion codes shown in plain language. Site test scanner rewritten as a tokenizer (it missed nested template strings). No analysis change | Yes |
+| 2026-11-21 | 1.0 | Phase 5 tool 4: Expected vs Actual explorer (simulated example, labelled). Step 08 also builds the root article (index.html) and plan.html for GitHub Pages; links in site/site_meta.json. No analysis change | Yes |

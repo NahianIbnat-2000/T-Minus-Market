@@ -12,7 +12,7 @@ export function anomalyCard(rec, cs, index) {
   const robust = rec.windows.robust.car;
   const no = String(index).padStart(2, "0");
   return `<li class="anomaly" aria-labelledby="anomaly-${no}">
-    <header><span class="no">ANOMALY REPORT No. ${no}</span><span class="stamp" aria-hidden="true">ANOMALY</span></header>
+    <header><span class="no">REPORT No.&nbsp;${no}</span><span class="stamp" aria-hidden="true">ANOMALY</span></header>
     <h3 id="anomaly-${no}">${escapeHtml(rec.vehicle)}, ${date(rec.day0)}</h3>
     <dl>
       <dt>Launch</dt><dd class="mono">${escapeHtml(rec.launch_tag)}</dd>

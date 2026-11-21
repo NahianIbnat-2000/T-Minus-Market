@@ -193,11 +193,26 @@ export function selectRecords(records, opts = {}) {
     !(dropFallback && r.model !== "market_model"));
 }
 
-/** Cumulative abnormal return path (for charts), from the exported daily ARs. */
+/**
+ * Cumulative abnormal return path, anchored at 0 at the close of T-1 (like a price index = 100 that day).
+ * For t >= 0: sum of AR over [0, t], so T+1 equals CAR[0,+1] and T+20 equals CAR[0,+20].
+ * For t < 0: minus the sum of AR over [t+1, -1], so news before the failure shows as a move INTO T-1.
+ * The first point is at t = from - 1 (the close before day `from`).
+ */
 export function carPath(record, from = -5) {
-  let c = 0;
-  return record.path.filter((p) => p.t >= from).map((p) => {
-    if (p.ar !== null) c += p.ar;
-    return { t: p.t, car: p.ar === null ? null : c };
-  });
+  const ar = new Map(record.path.map((p) => [p.t, p.ar]));
+  const last = Math.max(...record.path.map((p) => p.t));
+  const out = [];
+  let back = 0, ok = true;
+  for (let t = -1; t >= from - 1; t--) {
+    if (t < -1) { const a = ar.get(t + 1); if (a === null || a === undefined) ok = false; else back += a; }
+    out.unshift({ t, car: ok ? 0 - back : null });
+  }
+  let c = 0; ok = true;
+  for (let t = 0; t <= last; t++) {
+    const a = ar.get(t);
+    if (a === null || a === undefined) ok = false; else c += a;
+    out.push({ t, car: ok ? c : null });
+  }
+  return out;
 }

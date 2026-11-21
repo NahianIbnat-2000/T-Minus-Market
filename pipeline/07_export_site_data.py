@@ -87,7 +87,7 @@ def main(site_data: Path = SITE_DATA):
         "project": "T-Minus Markets", "author": "Nahian Ibnat",
         "plan_version": res.get("plan_version"), "results_run_utc": res.get("run_utc"),
         "exported_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "windows": C.EVENT_WINDOWS, "path_range": [-5, 20], "returns": C.RETURN_TYPE,
+        "windows": C.EVENT_WINDOWS, "path_range": [-5, 20], "min_rival_clusters": C.GATE_MIN_RIVAL_EVENTS, "returns": C.RETURN_TYPE,
         "sources": {"launches": C.GCAT_CITATION, "prices": "Yahoo Finance via yfinance (used locally only)"},
         "data_policy": "Only derived statistics are published: CARs, CAR variances, abnormal returns, "
                        "residual volatility and CAR correlations. No raw prices, raw returns, alphas or betas.",

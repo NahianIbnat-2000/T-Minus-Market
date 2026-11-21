@@ -84,6 +84,19 @@ def bundle(entry: Path) -> str:
     return '"use strict";\n' + "\n".join(out)
 
 
+def build_pages(site_data: Path = SITE / "data", root_out: Path = ROOT) -> list[Path]:
+    """Root article (index.html) and plan page (plan.html) for GitHub Pages."""
+    import landing
+    data = {k: json.loads((site_data / f).read_text(encoding="utf-8")) for k, f in DATA_FILES.items()}
+    meta = json.loads((SITE / "site_meta.json").read_text(encoding="utf-8"))
+    css = "\n".join((SRC / "styles" / f).read_text(encoding="utf-8") for f in STYLES + ["landing.css"])
+    a, p = root_out / "index.html", root_out / "plan.html"
+    a.write_text(landing.article(data, meta, ROOT, css), encoding="utf-8")
+    p.write_text(landing.plan_page(ROOT, meta, css), encoding="utf-8")
+    (root_out / ".nojekyll").touch()
+    return [a, p]
+
+
 def build(site_data: Path = SITE / "data", out: Path = SITE / "index.html") -> Path:
     missing = [f for f in DATA_FILES.values() if not (site_data / f).exists()]
     if missing:
@@ -103,5 +116,10 @@ def build(site_data: Path = SITE / "data", out: Path = SITE / "index.html") -> P
 
 
 if __name__ == "__main__":
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
     p = build()
-    print(f"Wrote {p.relative_to(ROOT)} ({p.stat().st_size / 1024:.0f} kB). Open it in any browser.")
+    print(f"Wrote {p.relative_to(ROOT)} ({p.stat().st_size / 1024:.0f} kB): the interactive report.")
+    for q in build_pages():
+        print(f"Wrote {q.relative_to(ROOT)} ({q.stat().st_size / 1024:.0f} kB).")
+    print("Open index.html (the article) in any browser.")

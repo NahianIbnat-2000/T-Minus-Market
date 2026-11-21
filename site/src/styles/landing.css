@@ -1,0 +1,35 @@
+/* Root article page and plan page (static, no JavaScript) */
+.article { max-width: 46rem; padding-top: var(--space-5); padding-bottom: var(--space-6); }
+.article section { margin: var(--space-6) 0 0; }
+.article h2 { font-size: var(--step-2); margin-bottom: var(--space-3); }
+.article p, .article li { font-size: var(--step-0); line-height: 1.6; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); border-top: var(--inkline); border-bottom: var(--hairline); margin-top: 0 !important; }
+.tile { padding: var(--space-3) var(--space-3) var(--space-3) 0; border-right: var(--hairline); }
+.tile:last-child { border-right: 0; }
+.tile + .tile { padding-left: var(--space-3); }
+.tile-num { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800; font-size: var(--step-2); line-height: 1.1; }
+.tile.loss .tile-num { color: var(--signal-text); }
+.tile.gain .tile-num { color: var(--gain); }
+.tile p { font-size: var(--step--1) !important; color: var(--muted); margin: var(--space-2) 0 0; line-height: 1.45 !important; }
+.abstract p:first-of-type { font-size: var(--step-1); line-height: 1.5; }
+.cta { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.btn { font-family: var(--font-mono); font-size: var(--step--1); text-decoration: none; background: var(--ink); color: var(--paper);
+  border: var(--inkline); padding: var(--space-2) var(--space-3); }
+.btn.ghost { background: var(--paper); color: var(--ink); }
+.btn:hover, .btn:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
+.read-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: var(--space-3); }
+.read-card { display: flex; flex-direction: column; border: var(--inkline); padding: var(--space-3) var(--space-4); text-decoration: none; color: var(--ink); background: var(--paper); }
+a.read-card:hover, a.read-card:focus-visible { background: var(--paper-deep); outline: 2px solid var(--signal); outline-offset: 2px; }
+.read-card h3 { font-size: var(--step-1); margin: var(--space-1) 0; }
+.read-card p { font-size: var(--step--1) !important; margin: 0 0 var(--space-3); flex: 1; }
+.rc-kicker { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--signal-text); }
+.rc-go { font-family: var(--font-mono); font-size: var(--step--1); border-top: var(--hairline); padding-top: var(--space-2); }
+.rc-go::after { content: " \2192"; }
+.muted-card { border-style: dashed; border-color: var(--muted); color: var(--muted); }
+.muted-card .rc-kicker { color: var(--muted); }
+.method { padding-left: 1.1rem; }
+.method li { margin-bottom: var(--space-2); }
+.mono { font-family: var(--font-mono); font-size: var(--step--1) !important; }
+.plan table { font-size: var(--step--1); }
+.table-wrap { overflow-x: auto; }
+.masthead .kicker a { color: inherit; }

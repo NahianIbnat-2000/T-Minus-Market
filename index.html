@@ -1,6 +1,385 @@
 <!doctype html>
-<meta charset="utf-8">
-<title>T-Minus Markets | Nahian Ibnat</title>
-<meta http-equiv="refresh" content="0; url=site/">
-<link rel="canonical" href="site/">
-<p><a href="site/">Open T-Minus Markets</a></p>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>T-Minus Markets: when a rocket blows up, who loses money?</title>
+<meta name="description" content="Event study of 138 orbital launch failures: the rocket&#x27;s maker loses −8.8% to −16.3% in two days; listed competitors show no detectable reaction (+0.28%, p = 0.40)."><meta name="author" content="Nahian Ibnat">
+<meta property="og:type" content="article"><meta property="og:title" content="T-Minus Markets: when a rocket blows up, who loses money?">
+<meta property="og:description" content="Event study of 138 orbital launch failures: the rocket&#x27;s maker loses −8.8% to −16.3% in two days; listed competitors show no detectable reaction (+0.28%, p = 0.40)."><meta property="og:url" content="https://nahianibnat-2000.github.io/T-Minus-Market/">
+<meta name="twitter:card" content="summary"><link rel="canonical" href="https://nahianibnat-2000.github.io/T-Minus-Market/">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,600..800&family=DM+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400&display=swap">
+<style>
+/* T-Minus Markets design tokens: 1960s-70s mission archive.
+   Contrast on --paper (WCAG 2.2): ink 14.7, mission-blue 7.2, muted 6.2, signal-text 5.8 (all text-safe);
+   signal 3.8 (graphics and large text only), rule 1.5 (decorative lines only). */
+:root {
+  --paper: #F3EEE4;
+  --paper-deep: #EBE4D6;      /* panels, table stripes */
+  --ink: #1C1C1C;
+  --muted: #5E574C;           /* secondary text */
+  --rule: #C9C1B3;            /* hairlines, grid */
+  --signal: #D9452B;          /* failures, losses: marks and large text only */
+  --signal-text: #A8321C;     /* losses in body-size text */
+  --gain: #1F4E8C;            /* gains: marks and text */
+
+  --font-head: "Archivo", "Arial Narrow", sans-serif;
+  --font-body: "Source Serif 4", Georgia, serif;
+  --font-mono: "DM Mono", ui-monospace, "Courier New", monospace;
+  --head-stretch: 125%;       /* Archivo expanded width */
+
+  --step--1: clamp(0.83rem, 0.8rem + 0.15vw, 0.9rem);
+  --step-0: clamp(1.05rem, 1rem + 0.25vw, 1.2rem);
+  --step-1: clamp(1.3rem, 1.2rem + 0.5vw, 1.6rem);
+  --step-2: clamp(1.7rem, 1.4rem + 1.2vw, 2.4rem);
+  --step-3: clamp(2.2rem, 1.6rem + 2.6vw, 4rem);
+
+  --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 1rem; --space-4: 1.5rem;
+  --space-5: 2.5rem;  --space-6: 4rem;   --space-7: 6rem;
+
+  --measure: 66ch;            /* reading width */
+  --page: 72rem;              /* grid width */
+  --hairline: 1px solid var(--rule);
+  --inkline: 1.5px solid var(--ink);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--paper); color: var(--ink); scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
+body {
+  margin: 0; font-family: var(--font-body); font-size: var(--step-0); line-height: 1.6;
+  font-optical-sizing: auto; text-rendering: optimizeLegibility;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+h1, h2, h3, .head {
+  font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800;
+  line-height: 1.08; letter-spacing: -0.01em; margin: 0 0 var(--space-3);
+}
+h1 { font-size: var(--step-3); }
+h2 { font-size: var(--step-2); }
+h3 { font-size: var(--step-1); font-weight: 700; }
+p { margin: 0 0 var(--space-3); max-width: var(--measure); }
+a { color: var(--gain); text-underline-offset: 0.15em; }
+strong { font-weight: 700; }
+
+.mono, code, .num { font-family: var(--font-mono); font-size: 0.92em; font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+.loss { color: var(--signal-text); }
+.gain { color: var(--gain); }
+
+:focus-visible { outline: 3px solid var(--gain); outline-offset: 3px; }
+
+.skip-link {
+  position: absolute; left: -999px; top: 0; padding: var(--space-2) var(--space-3);
+  background: var(--ink); color: var(--paper); z-index: 100;
+}
+.skip-link:focus { left: var(--space-3); top: var(--space-3); }
+
+.visually-hidden {
+  position: absolute !important; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+.wrap { max-width: var(--page); margin: 0 auto; padding: 0 var(--space-4); }
+
+/* Swiss grid: 12 columns, text sits in 2-9, notes in 10-12 */
+.grid { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: var(--space-4); }
+.col-text { grid-column: 1 / span 8; }
+.col-wide { grid-column: 1 / -1; }
+.col-note { grid-column: 9 / -1; }
+@media (max-width: 52rem) {
+  .grid { grid-template-columns: 1fr; }
+  .col-text, .col-wide, .col-note { grid-column: 1 / -1; }
+}
+
+table { border-collapse: collapse; width: 100%; font-size: var(--step--1); }
+th, td { text-align: left; padding: var(--space-2) var(--space-3); border-bottom: var(--hairline); vertical-align: top; }
+th { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 700; font-size: 0.78rem;
+     text-transform: uppercase; letter-spacing: 0.06em; border-bottom: var(--inkline); }
+td.num, th.num { text-align: right; }
+
+/* ------------------------------------------------ masthead */
+.masthead { border-bottom: var(--inkline); padding: var(--space-5) 0 var(--space-4); }
+.masthead .kicker {
+  font-family: var(--font-mono); font-size: var(--step--1); letter-spacing: 0.12em; text-transform: uppercase;
+  display: flex; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap;
+  border-bottom: var(--hairline); padding-bottom: var(--space-2); margin-bottom: var(--space-5);
+}
+.masthead h1 { max-width: 18ch; }
+.masthead .dek { font-size: var(--step-1); max-width: 40ch; line-height: 1.35; }
+.byline { font-family: var(--font-mono); font-size: var(--step--1); color: var(--muted); }
+
+/* ------------------------------------------------ stage indicator (countdown) */
+.stage-nav {
+  position: sticky; top: 0; z-index: 50; background: var(--paper);
+  border-bottom: var(--hairline);
+}
+.stage-nav ol {
+  list-style: none; margin: 0 auto; padding: 0 var(--space-4); max-width: var(--page);
+  display: flex; gap: 0; overflow-x: auto;
+}
+.stage-nav a {
+  display: block; padding: var(--space-3) var(--space-3); text-decoration: none; color: var(--muted);
+  font-family: var(--font-mono); font-size: var(--step--1); white-space: nowrap;
+  border-bottom: 3px solid transparent;
+}
+.stage-nav a .t { color: var(--ink); font-weight: 500; margin-right: 0.4em; }
+.stage-nav a[aria-current="step"] { color: var(--ink); border-bottom-color: var(--ink); }
+.stage-nav a:hover { color: var(--ink); }
+
+/* ------------------------------------------------ stages */
+.stage { padding: var(--space-7) 0 var(--space-6); border-bottom: var(--hairline); }
+.stage-label {
+  font-family: var(--font-mono); font-size: var(--step--1); letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: var(--space-3);
+  display: flex; gap: var(--space-3); align-items: baseline;
+}
+.stage-label .t { font-size: var(--step-1); color: var(--ink); letter-spacing: 0; }
+.stage h2 { max-width: 22ch; }
+.lead { font-size: var(--step-1); line-height: 1.4; max-width: 42ch; }
+
+.callout {
+  border-left: 4px solid var(--ink); padding: var(--space-2) var(--space-4); margin: var(--space-4) 0;
+  max-width: var(--measure); background: var(--paper-deep);
+}
+.callout .label { font-family: var(--font-mono); font-size: var(--step--1); text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--muted); display: block; margin-bottom: var(--space-1); }
+
+.placeholder-tool {
+  border: 1.5px dashed var(--rule); padding: var(--space-5) var(--space-4); margin: var(--space-5) 0;
+  font-family: var(--font-mono); font-size: var(--step--1); color: var(--muted); text-align: center;
+}
+
+/* ------------------------------------------------ key figures row */
+.figures-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  border-top: var(--inkline); border-bottom: var(--hairline); margin: var(--space-5) 0; }
+.figures-row > div { padding: var(--space-3) var(--space-3) var(--space-4); border-right: var(--hairline); }
+.figures-row > div:last-child { border-right: none; }
+.figures-row .big { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800;
+  font-size: var(--step-2); display: block; line-height: 1.1; }
+.figures-row .cap { font-size: var(--step--1); color: var(--muted); }
+
+/* ------------------------------------------------ Mission Anomaly Report card */
+.anomaly-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: var(--space-4); margin: var(--space-5) 0; list-style: none; padding: 0; }
+.anomaly {
+  position: relative; background: var(--paper); border: var(--inkline);
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  font-size: var(--step--1); line-height: 1.45;
+}
+.anomaly header { display: flex; justify-content: space-between; align-items: baseline;
+  border-bottom: var(--hairline); padding-bottom: var(--space-2); margin-bottom: var(--space-3); }
+.anomaly .no { font-family: var(--font-mono); letter-spacing: 0.08em; white-space: nowrap; }
+.anomaly .stamp {
+  font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800; font-size: 0.72rem;
+  letter-spacing: 0.14em; color: var(--signal); border: 2px solid var(--signal); padding: 0.05rem 0.4rem;
+  transform: rotate(-3deg); display: inline-block;
+}
+.anomaly h3 { font-size: var(--step-0); margin-bottom: var(--space-1); }
+.anomaly dl { display: grid; grid-template-columns: auto 1fr; gap: 0.15rem var(--space-3); margin: var(--space-3) 0; }
+.anomaly dt { font-family: var(--font-mono); text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.08em; color: var(--muted); }
+.anomaly dd { margin: 0; }
+.anomaly .finding { border-top: var(--hairline); padding-top: var(--space-3); }
+.anomaly .finding .big { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800; font-size: var(--step-2); }
+.anomaly .flag { margin-top: var(--space-2); font-style: italic; color: var(--muted); }
+
+/* ------------------------------------------------ printed figures */
+figure.plate { margin: var(--space-5) 0; }
+figure.plate .plate-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3);
+  border-top: var(--inkline); padding-top: var(--space-2); margin-bottom: var(--space-3); }
+figure.plate .plate-no { font-family: var(--font-mono); font-size: var(--step--1); letter-spacing: 0.1em; }
+figure.plate .plate-title { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 700; font-size: var(--step-0); }
+figure.plate svg { width: 100%; height: auto; display: block; overflow: visible; }
+figure.plate figcaption { font-size: var(--step--1); color: var(--muted); border-top: var(--hairline);
+  padding-top: var(--space-2); margin-top: var(--space-2); max-width: var(--measure); }
+figure.plate details { margin-top: var(--space-2); font-size: var(--step--1); }
+figure.plate summary { cursor: pointer; font-family: var(--font-mono); }
+
+svg .axis line, svg .axis path { stroke: var(--ink); stroke-width: 1; shape-rendering: crispEdges; }
+svg .axis text { font-family: var(--font-mono); font-size: 11px; fill: var(--ink); }
+svg .grid-line { stroke: var(--rule); stroke-width: 1; shape-rendering: crispEdges; }
+svg .zero-line { stroke: var(--ink); stroke-width: 1; }
+svg .day0-line { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 3 3; }
+svg .series { fill: none; stroke-width: 1.6; }
+svg .series.loss { stroke: var(--signal); }
+svg .series.gain { stroke: var(--gain); }
+svg .series.neutral { stroke: var(--ink); }
+svg .ci-band { stroke: none; }
+svg .label { font-family: var(--font-mono); font-size: 11px; fill: var(--ink); }
+svg .label.muted { fill: var(--muted); }
+svg .dot { stroke: var(--paper); stroke-width: 1; }
+
+/* draw-on animation for CAR lines (the one allowed animation) */
+@keyframes draw { from { stroke-dashoffset: var(--len); } to { stroke-dashoffset: 0; } }
+svg .series.draw { stroke-dasharray: var(--len); animation: draw 1.2s ease-out both; }
+
+/* ------------------------------------------------ footer */
+.site-foot { padding: var(--space-6) 0; font-size: var(--step--1); color: var(--muted); }
+.site-foot .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: var(--space-4); }
+.site-foot h3 { font-size: var(--step-0); color: var(--ink); }
+
+/* ------------------------------------------------ interactive tools */
+.tool { border: var(--inkline); background: var(--paper); padding: var(--space-4); margin: var(--space-5) 0; }
+.tool-head { border-bottom: var(--hairline); padding-bottom: var(--space-3); margin-bottom: var(--space-4); }
+.tool-kicker { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--signal-text); }
+.tool-head h3 { margin: var(--space-1) 0; }
+.tool-head p { margin: 0; color: var(--muted); }
+.lab-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: var(--space-3) var(--space-4); align-items: start; }
+.lab-form fieldset { border: 0; padding: 0; margin: 0; }
+.lab-form legend { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: var(--space-2); }
+.lab-opt { display: block; font-size: var(--step--1); margin: 0.2rem 0; cursor: pointer; }
+.lab-opt input { accent-color: var(--ink); margin-right: 0.35rem; }
+.lab-count { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); }
+.lab-reset { grid-column: 1 / -1; justify-self: start; font-family: var(--font-mono); font-size: var(--step--1);
+  background: var(--paper); color: var(--ink); border: var(--inkline); padding: var(--space-1) var(--space-3); cursor: pointer; }
+.lab-reset:hover, .lab-reset:focus-visible { background: var(--ink); color: var(--paper); }
+.lab-out { border-top: var(--hairline); margin-top: var(--space-4); padding-top: var(--space-4); }
+.lab-status { font-family: var(--font-mono); font-size: var(--step--1); padding: var(--space-2) var(--space-3); margin: 0 0 var(--space-3); }
+.lab-status.main { border-left: 3px solid var(--ink); background: var(--paper-deep); }
+.lab-status.explore { border-left: 3px solid var(--signal); background: var(--paper-deep); color: var(--signal-text); }
+.lab-big { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-3); }
+.lab-num { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800; font-size: var(--step-3); line-height: 1; }
+.lab-unit { color: var(--muted); font-size: var(--step--1); }
+.lab-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: var(--space-3); margin: var(--space-4) 0; }
+.lab-stats dt { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.lab-stats dd { margin: 0; font-family: var(--font-mono); }
+.lab-strip { margin: var(--space-4) 0 0; }
+.lab-strip figcaption { font-size: var(--step--1); color: var(--muted); }
+.lab-empty { font-style: italic; color: var(--muted); }
+.lab-band { fill: var(--paper-deep); }
+.lab-mean { stroke: var(--ink); stroke-width: 2.5; }
+.sim-controls { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-3); }
+.sim-controls button { font-family: var(--font-mono); font-size: var(--step--1); background: var(--ink); color: var(--paper);
+  border: var(--inkline); padding: var(--space-1) var(--space-3); cursor: pointer; }
+.sim-controls button.ghost { background: var(--paper); color: var(--ink); }
+.sim-controls button:hover, .sim-controls button:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
+.sim-ghost { fill: none; stroke: var(--rule); stroke-dasharray: 2 2; }
+.sim-bar { fill: var(--muted); fill-opacity: 0.55; stroke: var(--muted); }
+.sim-bar.beyond { fill: var(--signal); fill-opacity: 0.8; stroke: var(--signal); }
+.sim-actual { stroke: var(--ink); stroke-width: 2; }
+.sim-last { fill: var(--ink); }
+.sim-note { font-size: var(--step--1); color: var(--muted); margin-top: var(--space-3); }
+.tl-form { display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-5); align-items: flex-end; margin-bottom: var(--space-3); }
+.tl-form fieldset { border: 0; padding: 0; margin: 0; }
+.tl-form legend { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: var(--space-2); }
+.tl-search { display: flex; flex-direction: column; gap: var(--space-1); font-family: var(--font-mono); font-size: 0.72rem;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.tl-search input { font-family: var(--font-body); font-size: var(--step--1); padding: var(--space-1) var(--space-2);
+  border: var(--inkline); background: var(--paper); color: var(--ink); min-width: 14rem; text-transform: none; letter-spacing: 0; }
+.tl-key { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 50%; vertical-align: -0.05rem; margin-right: 0.3rem; }
+.tl-key.tl-provider, .tl-mark.tl-provider { fill: var(--signal); background: var(--signal); }
+.tl-key.tl-rival, .tl-mark.tl-rival { fill: var(--gain); background: var(--gain); }
+.tl-key.tl-none { background: transparent; border: 1.5px solid var(--muted); }
+.tl-mark.tl-none { fill: var(--paper); stroke: var(--muted); stroke-width: 1.2; }
+.tl-mark { cursor: pointer; }
+.tl-mark:focus { outline: none; stroke: var(--ink); stroke-width: 2.5; }
+.tl-mark.sel { stroke: var(--ink); stroke-width: 2.5; }
+.tl-count, .tl-hint { font-family: var(--font-mono); font-size: var(--step--1); color: var(--muted); }
+.tl-card { max-width: 30rem; margin-top: var(--space-3); }
+.tl-card h4 { font-family: var(--font-head); font-stretch: var(--head-stretch); font-size: var(--step-0); margin: 0 0 var(--space-1); }
+.ex-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: var(--space-3) var(--space-4); margin-bottom: var(--space-3); }
+.ex-ctl { display: flex; flex-direction: column; gap: var(--space-1); font-size: var(--step--1); }
+.ex-ctl output { font-family: var(--font-mono); font-weight: 500; }
+.ex-ctl input[type=range] { accent-color: var(--ink); width: 100%; }
+.ex-charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: var(--space-4); }
+.ex-dot { fill: var(--muted); fill-opacity: 0.35; }
+.ex-fit { stroke: var(--ink); stroke-width: 2; }
+.ex-gap { stroke: var(--signal); stroke-width: 2; stroke-dasharray: 4 3; }
+.ex-exp { fill: var(--paper); stroke: var(--ink); stroke-width: 2; }
+.ex-act { fill: var(--signal); }
+.ex-act-bar { fill: var(--ink); }
+.ex-exp-bar { fill: none; stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
+.ex-ab-bar { fill: var(--signal); }
+
+/* Root article page and plan page (static, no JavaScript) */
+.article { max-width: 46rem; padding-top: var(--space-5); padding-bottom: var(--space-6); }
+.article section { margin: var(--space-6) 0 0; }
+.article h2 { font-size: var(--step-2); margin-bottom: var(--space-3); }
+.article p, .article li { font-size: var(--step-0); line-height: 1.6; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); border-top: var(--inkline); border-bottom: var(--hairline); margin-top: 0 !important; }
+.tile { padding: var(--space-3) var(--space-3) var(--space-3) 0; border-right: var(--hairline); }
+.tile:last-child { border-right: 0; }
+.tile + .tile { padding-left: var(--space-3); }
+.tile-num { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800; font-size: var(--step-2); line-height: 1.1; }
+.tile.loss .tile-num { color: var(--signal-text); }
+.tile.gain .tile-num { color: var(--gain); }
+.tile p { font-size: var(--step--1) !important; color: var(--muted); margin: var(--space-2) 0 0; line-height: 1.45 !important; }
+.abstract p:first-of-type { font-size: var(--step-1); line-height: 1.5; }
+.cta { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.btn { font-family: var(--font-mono); font-size: var(--step--1); text-decoration: none; background: var(--ink); color: var(--paper);
+  border: var(--inkline); padding: var(--space-2) var(--space-3); }
+.btn.ghost { background: var(--paper); color: var(--ink); }
+.btn:hover, .btn:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
+.read-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: var(--space-3); }
+.read-card { display: flex; flex-direction: column; border: var(--inkline); padding: var(--space-3) var(--space-4); text-decoration: none; color: var(--ink); background: var(--paper); }
+a.read-card:hover, a.read-card:focus-visible { background: var(--paper-deep); outline: 2px solid var(--signal); outline-offset: 2px; }
+.read-card h3 { font-size: var(--step-1); margin: var(--space-1) 0; }
+.read-card p { font-size: var(--step--1) !important; margin: 0 0 var(--space-3); flex: 1; }
+.rc-kicker { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--signal-text); }
+.rc-go { font-family: var(--font-mono); font-size: var(--step--1); border-top: var(--hairline); padding-top: var(--space-2); }
+.rc-go::after { content: " \2192"; }
+.muted-card { border-style: dashed; border-color: var(--muted); color: var(--muted); }
+.muted-card .rc-kicker { color: var(--muted); }
+.method { padding-left: 1.1rem; }
+.method li { margin-bottom: var(--space-2); }
+.mono { font-family: var(--font-mono); font-size: var(--step--1) !important; }
+.plan table { font-size: var(--step--1); }
+.table-wrap { overflow-x: auto; }
+.masthead .kicker a { color: inherit; }
+
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to the article</a>
+<header class="masthead"><div class="wrap">
+  <div class="kicker"><span>T-Minus Markets</span><span>Research article · Event study</span></div>
+  <h1>When a rocket blows up, who loses money, and does anyone win?</h1>
+  <p class="dek">How stock markets react to orbital launch failures, 2000 to 2026.</p>
+  <p class="byline">Nahian Ibnat · Independent research · Updated Nov 2026 · Analysis plan v1.0</p>
+</div></header>
+<main id="main" class="wrap article">
+  <section class="tiles" aria-label="Key findings"><div class="tile loss"><div class="tile-num">−8.8% to −16.3%</div><p>two-day abnormal return of the rocket&#x27;s maker: a loss in each of the 4 listed cases</p></div><div class="tile gain"><div class="tile-num">+0.28%</div><p>average two-day reaction of listed competitors; 95% interval −1.62% to +2.18%, p = 0.40</p></div><div class="tile neutral"><div class="tile-num">61st</div><p>percentile of the real competitor result among 1000 random sets of ordinary trading days</p></div></section>
+
+  <section class="abstract"><h2>In short</h2><p>When an orbital rocket fails, does the stock market punish only the company that built it, or the whole launch industry? Using 138 orbital launch failures from 2000 to 2026, this study measures abnormal stock returns over the two trading days after each failure became public. In the 4 cases where the rocket&#x27;s maker was listed, its shares fell by between 8.8% and 16.3% after allowing for the market. Listed competitors moved by +0.28% on average (95% interval −1.62% to +2.18%; p = 0.40), which is not statistically detectable with 22 independent events. The evidence fits a simple reading: investors treat a failure as bad news for the firm that flew the rocket, not as news about the industry. Every analysis choice was fixed in a written plan before any stock reaction was measured.</p>
+    <p class="cta"><a class="btn" href="site/">Open the interactive report</a> <a class="btn ghost" href="plan.html">Read the analysis plan</a></p></section>
+
+  <section><h2>Why this question</h2>
+  <p>Orbital launch is a small industry with a handful of listed firms, and every launch is a public, all-or-nothing test. A failure destroys hardware and a customer's satellite, so the rocket's maker should lose value. The open question is the competitors. If investors read a failure as a reminder that spaceflight is risky for everyone, rival launch stocks fall too: contagion. If they expect customers to switch to a rocket that works, rivals rise: competitive gain. The two stories point in opposite directions, so only data can say which one investors act on.</p>
+  <p>The same question appears wherever one firm's bad news may spread to similar firms: bank failures, product recalls, sovereign debt crises. Launch failures are useful because they are sudden, public and easy to date.</p></section>
+
+  <section><h2>What the data say</h2>
+  <p>For the rocket's maker, the answer is the same in every case: shares fell over the two days after the failure became public, after allowing for the market. With 4 cases, these are case studies, not an industry average.</p>
+  <p>For competitors, the average reaction is not statistically detectable: +0.28% over two days, from 24 failures, 3 companies and 22 independent events. "Not detectable" is not the same as "no effect", but the interval tells us average reactions much larger than its ends, in either direction, are unlikely. 12 of 12 prespecified robustness checks reach the same conclusion. An exploratory check added after the results, which leaves out two days when competitors announced large contracts, gives −0.70% (95% interval −1.80% to +0.39%); it is labelled as such everywhere.</p>
+  <p>Read economically, a launch failure looks like a firm-specific shock. Investors do not seem to rewrite their view of the industry, and there is no sign that competitors are expected to win business quickly.</p></section>
+
+  <section aria-label="Read the work"><h2>Read the work</h2>
+  <div class="read-grid">
+    <a class="read-card" href="site/"><span class="rc-kicker">Interactive</span><h3>The report</h3>
+      <p>Five countdown stages from the question to the checks, with four tools: Failure Timeline, Expected vs Actual, Event Study Lab and Placebo Simulator.</p><span class="rc-go">Open the report</span></a>
+    <div class="read-card muted-card"><span class="rc-kicker">In preparation</span><h3>Working paper</h3><p>The full write-up is being drafted. The interactive report already contains every result.</p></div>
+    <a class="read-card" href="plan.html"><span class="rc-kicker">Preregistered</span><h3>Analysis plan</h3>
+      <p>The rules fixed before any stock reaction was measured, and a dated log of 11 entries since.</p><span class="rc-go">Read the plan</span></a>
+    <div class="read-card muted-card"><span class="rc-kicker">On request</span><h3>Code and pipeline</h3><p>A tested Python pipeline from raw launch records to every published number. Available on request.</p></div>
+  </div></section>
+
+  <section><h2>How it was done</h2>
+  <ul class="method">
+    <li><strong>Sample.</strong> Orbital launch failures since 2000 from GCAT (J. McDowell), linked by hand to listed makers and to listed competitors of a similar size selling to the same customers.</li>
+    <li><strong>Measure.</strong> Abnormal return: the stock's actual return minus what a market model, fitted on about a year of earlier data, predicts from its home market index.</li>
+    <li><strong>Test.</strong> A standardized event-study test (Boehmer, Musumeci and Poulsen) adjusted for failures that hit several competitors at once (Kolari and Pynnönen), with cluster-robust intervals.</li>
+    <li><strong>Checks.</strong> Other test statistics, a wider window, timing and sample changes, leaving out one firm at a time, and a placebo using random ordinary days.</li>
+    <li><strong>Rules.</strong> The plan was frozen and committed before results; anything added later is labelled exploratory. Only derived statistics are published, never stock prices.</li>
+  </ul></section>
+
+  <section class="cite"><h2>Cite</h2>
+  <p class="mono">Ibnat, N. (2026). When a rocket blows up, who loses money, and does anyone win? An event study of orbital launch failures. T-Minus Markets. https://nahianibnat-2000.github.io/T-Minus-Market/</p></section>
+</main>
+<footer class="site-foot"><div class="wrap cols">
+  <div><h3>Author</h3><p>Nahian Ibnat. Economics, data and finance. <a href="https://nahianibnat-2000.github.io/">Portfolio</a> · <a href="https://www.linkedin.com/in/nahian-ibnat">LinkedIn</a></p></div>
+  <div><h3>Sources</h3><p>Launch data: GCAT, J. McDowell, CC-BY. Prices: Yahoo Finance, used only to compute statistics.</p></div>
+  <div><h3>Note</h3><p>Research, not investment advice.</p></div>
+</div></footer>
+</body>
+</html>

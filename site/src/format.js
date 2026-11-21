@@ -41,7 +41,8 @@ export function date(iso) {
   if (!iso) return "n/a";
   const d = new Date(String(iso).slice(0, 10) + "T00:00:00Z");
   if (Number.isNaN(d.getTime())) return String(iso);
-  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+  const M = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${d.getUTCDate()} ${M[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
 }
 
 /** CSS class for a signed value, paired with a sign in the text. */

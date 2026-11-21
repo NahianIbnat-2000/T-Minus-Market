@@ -21,28 +21,34 @@ function plate({ title, svg, caption, table }) {
 const finite = (a) => a.filter(Number.isFinite);
 
 /** Cumulative abnormal return paths. series: [{label, points:[{t, car}], tone}] */
-export function carPathsPlate({ title, series, caption, from = -5, to = 20 }) {
+export function carPathsPlate({ title, series, caption, from = -5, to = 20, notes = [] }) {
   const W = 720, H = 340, m = { t: 16, r: 150, b: 34, l: 52 };
   const vals = finite(series.flatMap((s) => s.points.map((p) => p.car)));
   const [y0, y1] = niceDomain(Math.min(0, ...vals) - 0.01, Math.max(0, ...vals) + 0.01, 6);
   const y = linear([y0, y1], [H - m.b, m.t]);
-  const x = linear([from, to], [m.l, W - m.r]);
+  const x = linear([from - 1, to], [m.l, W - m.r]);
   const yt = niceTicks(y0, y1, 6);
-  let s = svgOpen(W, H, `${title}. Cumulative abnormal return by trading day relative to the failure.`);
+  let s = svgOpen(W, H, `${title}. Cumulative abnormal return by trading day relative to the failure, set to zero at the close before the failure.`);
   for (const t of yt) s += line(m.l, y(t), W - m.r, y(t), "grid-line");
-  s += line(m.l, y(0), W - m.r, y(0), "zero-line") + line(x(0), m.t, x(0), H - m.b, "day0-line");
+  s += line(m.l, y(0), W - m.r, y(0), "zero-line") + line(x(-0.5), m.t, x(-0.5), H - m.b, "day0-line");
   s += axisBottom(x, H - m.b, [-5, -1, 0, 1, 3, 5, 10, 15, 20].filter((t) => t >= from && t <= to), tLabel, m.l, W - m.r);
   s += axisLeft(y, m.l, yt, (v) => pct(v, 0), m.t, H - m.b);
   const labels = [];
   for (const ser of series) {
-    const pts = ser.points.filter((p) => p.t >= from && p.t <= to && p.car !== null);
+    const pts = ser.points.filter((p) => p.t >= from - 1 && p.t <= to && p.car !== null);
     s += path(pts.map((p) => [x(p.t), y(p.car)]), `series ${ser.tone || "neutral"} draw`).replace("<path", '<path style="--len: 2000"');
     const last = pts[pts.length - 1];
     if (last) labels.push({ y: y(last.car), x: x(last.t), text: `${ser.label} ${pct(last.car)}` });
   }
   labels.sort((a, b) => a.y - b.y);                       // keep end labels from overlapping
-  for (let i = 1; i < labels.length; i++) labels[i].y = Math.max(labels[i].y, labels[i - 1].y + 13);
+  for (let i = 1; i < labels.length; i++) labels[i].y = Math.max(labels[i].y, labels[i - 1].y + 16);
   for (const l of labels) s += text(l.x + 6, l.y + 4, l.text);
+  for (const n of notes) {                                   // small numbered marker on a line
+    const p = series.find((q) => q.label === n.series)?.points.find((q) => q.t === n.t);
+    if (!p || p.car === null) continue;
+    s += `<circle cx="${x(p.t).toFixed(2)}" cy="${y(p.car).toFixed(2)}" r="9" fill="none" stroke="#1C1C1C" stroke-width="1"/>`;
+    s += text(x(p.t) - 4, y(p.car) + 22, n.mark, "label");
+  }
   s += "</svg>";
   const at = (ser, t) => ser.points.find((p) => p.t === t)?.car ?? null;
   const table = `<table><thead><tr><th>Series</th><th class="num">CAR to ${tLabel(1)}</th><th class="num">CAR to ${tLabel(3)}</th><th class="num">CAR to ${tLabel(20)}</th></tr></thead><tbody>${

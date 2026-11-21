@@ -6,9 +6,11 @@ import { carPath } from "../stats/eventstudy.js";
 import { escapeHtml, pct } from "../format.js";
 import * as T from "./text.js";
 import { methodsSection } from "./methods.js";
+import { labHtml } from "../tools/lab.js";
+import { placeboToolHtml } from "../tools/placebo.js";
+import { timelineHtml } from "../tools/timeline.js";
+import { explainerHtml } from "../tools/explainer.js";
 
-const placeholder = (what, phase) =>
-  `<div class="placeholder-tool" role="note">${escapeHtml(what)} arrives in ${escapeHtml(phase)}.</div>`;
 
 export function renderReport(data) {
   resetPlates();
@@ -32,22 +34,26 @@ export function renderReport(data) {
     ${T.failuresText(c)}
     ${yearBarsPlate({ title: "Orbital launch failures per year", failures,
       caption: `Outline: all orbital launch failures (GCAT success score below 0.75), ${c.firstYear} to ${c.lastYear}. Solid: failures that enter the study. Source: GCAT (J. McDowell), CC-BY.` })}
-    ${placeholder("The interactive Failure Timeline", "Phase 5")}</div></section>`;
+    ${timelineHtml(data)}</div></section>`;
 
   const t1 = `<section class="stage" id="t-1" aria-labelledby="h-t-1"><div class="wrap">
     ${T.stageLabel("T−1", "The Method")}
     <h2 id="h-t-1">How do you measure a surprise?</h2>
     ${T.methodText()}
-    ${placeholder("The Expected vs Actual explorer (with a clearly labelled simulated example)", "Phase 5")}</div></section>`;
+    ${explainerHtml()}</div></section>`;
 
   const providerPaths = providers.map((r) => ({ label: `${r.vehicle} (${r.ticker})`, tone: "loss", points: carPath(r, -5) }));
+  // Case note, sourced in docs/CONFOUNDING_NEWS.md: founder share-sale filing on day -5 of the Electron failure.
+  const providerNotes = providers.filter((r) => r.ticker === "RKLB" && r.vehicle === "Electron")
+    .map((r) => ({ series: `${r.vehicle} (${r.ticker})`, t: -5, mark: "a" }));
   const t0 = `<section class="stage" id="t0" aria-labelledby="h-t0"><div class="wrap">
     ${T.stageLabel("T0", "The Reaction")}
     <h2 id="h-t0">What the market did</h2>
     ${T.providerText(cases)}
     <ul class="anomaly-grid">${providers.map((r, i) => anomalyCard(r, caseFor(r), i + 1)).join("")}</ul>
-    ${carPathsPlate({ title: "The rocket's maker: cumulative abnormal return", series: providerPaths,
-      caption: "Cumulative abnormal return (market model, simple returns) from five trading days before to twenty after each failure. T0 is the first session after the failure became public. Each line is one case; they are not averaged." })}
+    ${carPathsPlate({ title: "The rocket's maker: cumulative abnormal return", series: providerPaths, notes: providerNotes,
+      caption: "Cumulative abnormal return (market model, simple returns), set to zero at the close before the failure (T\u22121), so the value at T+1 is the two-day result on each card. Moves to the left of the dotted line happened before the failure was public. Each line is one case; they are not averaged."
+        + (providerNotes.length ? " (a) Five trading days before the Electron failure, Rocket Lab fell after its founder filed to sell shares. This news is unrelated to the launch and falls outside the measured windows." : "") })}
     ${T.rivalText(results.primary, e1)}
     ${intervalPlate({ title: "Competitors: average two-day reaction (T0 to T+1)",
       rows: [
@@ -56,7 +62,7 @@ export function renderReport(data) {
         ...(e1 ? [{ label: "Without two contract-news days", mean: e1.mean_car, lo: e1.ci_low, hi: e1.ci_high, note: "exploratory, chosen after results" }] : []),
       ],
       caption: `Mean cumulative abnormal return of listed competitors over T0 to T+1, with 95% intervals (cluster-robust). Rival sample: ${results.primary.n_failures} failures, ${results.primary.n_firm_events} firm-events, ${results.primary.n_clusters} independent events. Dots are blue above zero and red below; the sign is also given in the table.` })}
-    ${placeholder("The Event Study Lab (re-run the test on any subset)", "Phase 5")}</div></section>`;
+    ${labHtml(data)}</div></section>`;
 
   const pl = results.placebo;
   const t1p = `<section class="stage" id="t+1" aria-labelledby="h-t1p"><div class="wrap">
@@ -69,7 +75,7 @@ export function renderReport(data) {
     ${T.robustnessTable(robust)}
     ${T.flagsList(rivals)}
     ${T.limitsText(c)}
-    ${placeholder("The Placebo Simulator", "Phase 5")}</div></section>`;
+    ${placeboToolHtml(data)}</div></section>`;
 
   return t3 + t2 + t1 + t0 + t1p + methodsSection(data);
 }

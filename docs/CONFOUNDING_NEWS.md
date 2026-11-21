@@ -53,3 +53,9 @@ exploratory sensitivity analysis (labelled exploratory, because it was designed 
 - The 31 Mar 2025 case shows a limit of the design: a broad-market benchmark does not absorb a
   same-day move in tech or space stocks. A sector benchmark is a candidate for a future version
   of the plan, not a change to v1.0.
+
+## Pre-event news (outside the measured windows)
+
+| Firm | Failure | Day | Date | News | Effect on results |
+| --- | --- | --- | --- | --- | --- |
+| RKLB | Electron, 19 Sep 2023 | -5 | 12 Sep 2023 | Founder filed to sell about $22M of shares; RKLB closed about 12% lower (TipRanks; Seeking Alpha, 12 Sep 2023) | None on [0,+1] or [-1,+3]; the estimation window ends at day -30. Shown as note (a) on the website's provider chart |
