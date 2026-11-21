@@ -9,7 +9,23 @@ Launch data: GCAT (J. McDowell, planet4589.org/space/gcat), CC-BY.
 
 ---
 
-## Phase 3: website data (current)
+## Phase 4: website (current)
+
+The site lives in `site/` (Vite, vanilla JavaScript, D3). It reads `site/data/`, written by step 07.
+
+```bash
+cd site
+npm install          # once
+npm test             # site unit tests (formatting, no hand-typed numbers in the text)
+npm run dev          # preview at the address it prints (Ctrl+C to stop)
+npm run build        # production build into site/dist/
+```
+
+Every number on the page is read from `site/data/` when the page loads. A test fails if a
+result number is typed into the narrative code. Commit `site/data/` (derived statistics only)
+so the site can be built for GitHub Pages.
+
+## Phase 3: website data (complete)
 
 After steps 05 and 06:
 

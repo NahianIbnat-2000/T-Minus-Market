@@ -1,0 +1,119 @@
+/* ------------------------------------------------ masthead */
+.masthead { border-bottom: var(--inkline); padding: var(--space-5) 0 var(--space-4); }
+.masthead .kicker {
+  font-family: var(--font-mono); font-size: var(--step--1); letter-spacing: 0.12em; text-transform: uppercase;
+  display: flex; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap;
+  border-bottom: var(--hairline); padding-bottom: var(--space-2); margin-bottom: var(--space-5);
+}
+.masthead h1 { max-width: 18ch; }
+.masthead .dek { font-size: var(--step-1); max-width: 40ch; line-height: 1.35; }
+.byline { font-family: var(--font-mono); font-size: var(--step--1); color: var(--muted); }
+
+/* ------------------------------------------------ stage indicator (countdown) */
+.stage-nav {
+  position: sticky; top: 0; z-index: 50; background: var(--paper);
+  border-bottom: var(--hairline);
+}
+.stage-nav ol {
+  list-style: none; margin: 0 auto; padding: 0 var(--space-4); max-width: var(--page);
+  display: flex; gap: 0; overflow-x: auto;
+}
+.stage-nav a {
+  display: block; padding: var(--space-3) var(--space-3); text-decoration: none; color: var(--muted);
+  font-family: var(--font-mono); font-size: var(--step--1); white-space: nowrap;
+  border-bottom: 3px solid transparent;
+}
+.stage-nav a .t { color: var(--ink); font-weight: 500; margin-right: 0.4em; }
+.stage-nav a[aria-current="step"] { color: var(--ink); border-bottom-color: var(--ink); }
+.stage-nav a:hover { color: var(--ink); }
+
+/* ------------------------------------------------ stages */
+.stage { padding: var(--space-7) 0 var(--space-6); border-bottom: var(--hairline); }
+.stage-label {
+  font-family: var(--font-mono); font-size: var(--step--1); letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: var(--space-3);
+  display: flex; gap: var(--space-3); align-items: baseline;
+}
+.stage-label .t { font-size: var(--step-1); color: var(--ink); letter-spacing: 0; }
+.stage h2 { max-width: 22ch; }
+.lead { font-size: var(--step-1); line-height: 1.4; max-width: 42ch; }
+
+.callout {
+  border-left: 4px solid var(--ink); padding: var(--space-2) var(--space-4); margin: var(--space-4) 0;
+  max-width: var(--measure); background: var(--paper-deep);
+}
+.callout .label { font-family: var(--font-mono); font-size: var(--step--1); text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--muted); display: block; margin-bottom: var(--space-1); }
+
+.placeholder-tool {
+  border: 1.5px dashed var(--rule); padding: var(--space-5) var(--space-4); margin: var(--space-5) 0;
+  font-family: var(--font-mono); font-size: var(--step--1); color: var(--muted); text-align: center;
+}
+
+/* ------------------------------------------------ key figures row */
+.figures-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  border-top: var(--inkline); border-bottom: var(--hairline); margin: var(--space-5) 0; }
+.figures-row > div { padding: var(--space-3) var(--space-3) var(--space-4); border-right: var(--hairline); }
+.figures-row > div:last-child { border-right: none; }
+.figures-row .big { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800;
+  font-size: var(--step-2); display: block; line-height: 1.1; }
+.figures-row .cap { font-size: var(--step--1); color: var(--muted); }
+
+/* ------------------------------------------------ Mission Anomaly Report card */
+.anomaly-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: var(--space-4); margin: var(--space-5) 0; list-style: none; padding: 0; }
+.anomaly {
+  position: relative; background: var(--paper); border: var(--inkline);
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  font-size: var(--step--1); line-height: 1.45;
+}
+.anomaly header { display: flex; justify-content: space-between; align-items: baseline;
+  border-bottom: var(--hairline); padding-bottom: var(--space-2); margin-bottom: var(--space-3); }
+.anomaly .no { font-family: var(--font-mono); letter-spacing: 0.1em; }
+.anomaly .stamp {
+  font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800; font-size: 0.72rem;
+  letter-spacing: 0.14em; color: var(--signal); border: 2px solid var(--signal); padding: 0.05rem 0.4rem;
+  transform: rotate(-3deg); display: inline-block;
+}
+.anomaly h3 { font-size: var(--step-0); margin-bottom: var(--space-1); }
+.anomaly dl { display: grid; grid-template-columns: auto 1fr; gap: 0.15rem var(--space-3); margin: var(--space-3) 0; }
+.anomaly dt { font-family: var(--font-mono); text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.08em; color: var(--muted); }
+.anomaly dd { margin: 0; }
+.anomaly .finding { border-top: var(--hairline); padding-top: var(--space-3); }
+.anomaly .finding .big { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800; font-size: var(--step-2); }
+.anomaly .flag { margin-top: var(--space-2); font-style: italic; color: var(--muted); }
+
+/* ------------------------------------------------ printed figures */
+figure.plate { margin: var(--space-5) 0; }
+figure.plate .plate-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3);
+  border-top: var(--inkline); padding-top: var(--space-2); margin-bottom: var(--space-3); }
+figure.plate .plate-no { font-family: var(--font-mono); font-size: var(--step--1); letter-spacing: 0.1em; }
+figure.plate .plate-title { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 700; font-size: var(--step-0); }
+figure.plate svg { width: 100%; height: auto; display: block; overflow: visible; }
+figure.plate figcaption { font-size: var(--step--1); color: var(--muted); border-top: var(--hairline);
+  padding-top: var(--space-2); margin-top: var(--space-2); max-width: var(--measure); }
+figure.plate details { margin-top: var(--space-2); font-size: var(--step--1); }
+figure.plate summary { cursor: pointer; font-family: var(--font-mono); }
+
+svg .axis line, svg .axis path { stroke: var(--ink); stroke-width: 1; shape-rendering: crispEdges; }
+svg .axis text { font-family: var(--font-mono); font-size: 11px; fill: var(--ink); }
+svg .grid-line { stroke: var(--rule); stroke-width: 1; shape-rendering: crispEdges; }
+svg .zero-line { stroke: var(--ink); stroke-width: 1; }
+svg .day0-line { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 3 3; }
+svg .series { fill: none; stroke-width: 1.6; }
+svg .series.loss { stroke: var(--signal); }
+svg .series.gain { stroke: var(--gain); }
+svg .series.neutral { stroke: var(--ink); }
+svg .ci-band { stroke: none; }
+svg .label { font-family: var(--font-mono); font-size: 11px; fill: var(--ink); }
+svg .label.muted { fill: var(--muted); }
+svg .dot { stroke: var(--paper); stroke-width: 1; }
+
+/* draw-on animation for CAR lines (the one allowed animation) */
+@keyframes draw { from { stroke-dashoffset: var(--len); } to { stroke-dashoffset: 0; } }
+svg .series.draw { stroke-dasharray: var(--len); animation: draw 1.2s ease-out both; }
+
+/* ------------------------------------------------ footer */
+.site-foot { padding: var(--space-6) 0; font-size: var(--step--1); color: var(--muted); }
+.site-foot .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: var(--space-4); }
+.site-foot h3 { font-size: var(--step-0); color: var(--ink); }
