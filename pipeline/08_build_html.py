@@ -95,12 +95,45 @@ def build_pages(site_data: Path = SITE / "data", root_out: Path = ROOT) -> list[
     p.write_text(landing.plan_page(ROOT, meta, css), encoding="utf-8")
     (root_out / ".nojekyll").touch()
     out = [a, p]
+    cs_css = "\n".join((SRC / "styles" / f).read_text(encoding="utf-8") for f in STYLES + ["landing.css", "casestudy.css"])
+    import casestudy
+    import casestudy_tex
+    pdf, cs = root_out / "case-study.pdf", root_out / "case-study.html"
+    has_tex = casestudy_tex.find_engine() is not None
+    html_cs = casestudy.build(data, meta, ROOT, cs_css, pdf.name if (has_tex or pdf.exists()) else None)
+    cs.write_text(html_cs, encoding="utf-8")
+    out.append(cs)
+    try:
+        tex = casestudy_tex.build_tex(html_cs, data, meta, root_out / "casestudy")
+        out.append(tex)
+        if casestudy_tex.compile_pdf(tex, pdf):
+            out.append(pdf)
+    except ImportError:
+        print("Skipped the LaTeX case study: run  pip install matplotlib  first (it draws the figures).")
     try:                                            # link-preview image; optional
         import og_image
         out.append(og_image.make(landing.facts(data), root_out / "og.png", landing.pct, landing.pval))
     except ImportError:
         print("Skipped og.png (link-preview image): run  pip install matplotlib  to make it.")
     return out
+
+
+def static_summary(data: dict) -> str:
+    """Key results as plain HTML, shown when JavaScript is off (the interactive report needs it)."""
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import landing as L
+    f = L.facts(data)
+    p, e = f["prim"], L.e
+    rows = "".join(f"<tr><td>{e(c['vehicle'])}, {e(L.day(c['day0']))}</td><td>{e(c['firm'])}</td><td>{e(L.pct(c['car_primary']))}</td></tr>"
+                   for c in data["results"].get("provider_case_series") or [])
+    return (f"<h2>Key results (static summary)</h2><p>This interactive report needs JavaScript for its charts and tools. "
+            f"The full text is in the <a href=\"../case-study.html\">working paper</a> and the <a href=\"../index.html\">article</a>.</p>"
+            f"<p>Listed competitors: average two-day abnormal return {e(L.pct(p['mean_car'], 2))} (95% interval {e(L.pct(p['ci_low'], 2))} to "
+            f"{e(L.pct(p['ci_high'], 2))}; p = {e(L.pval(p['p']))}), from {p['n_failures']} failures, {p['n_firms']} firms and "
+            f"{p['n_clusters']} independent events.</p>"
+            f"<table><caption>The rocket's maker: two-day abnormal return</caption><thead><tr><th>Failure</th><th>Listed maker</th>"
+            f"<th>CAR T0 to T+1</th></tr></thead><tbody>{rows}</tbody></table>")
 
 
 def build(site_data: Path = SITE / "data", out: Path = SITE / "index.html") -> Path:
@@ -112,8 +145,10 @@ def build(site_data: Path = SITE / "data", out: Path = SITE / "index.html") -> P
     style = "\n".join((SRC / "styles" / f).read_text(encoding="utf-8") for f in STYLES)
     script = bundle(SRC / "main.js").replace("</script", "<\\/script")
     info = f"built {datetime.now(timezone.utc).isoformat(timespec='seconds')}, plan v{data['manifest'].get('plan_version')}"
+    noscript = static_summary(data)
     html = (SITE / "template.html").read_text(encoding="utf-8")
-    for key, val in (("{{STYLE}}", style), ("{{DATA}}", data_json), ("{{SCRIPT}}", script), ("{{BUILD_INFO}}", info)):
+    for key, val in (("{{STYLE}}", style), ("{{DATA}}", data_json), ("{{SCRIPT}}", script), ("{{BUILD_INFO}}", info),
+                     ("{{NOSCRIPT}}", noscript)):
         if key not in html:
             raise ValueError(f"template is missing {key}")
         html = html.replace(key, val)

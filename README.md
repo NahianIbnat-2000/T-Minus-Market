@@ -11,13 +11,16 @@ Launch data: GCAT (J. McDowell, planet4589.org/space/gcat), CC-BY.
 
 ## Website (Phases 4 and 5)
 
-Three static pages, all built by one command, ready for GitHub Pages (branch master, folder root):
+Static pages, all built by one command, ready for GitHub Pages (branch master, folder root):
 
 | File | What it is |
 | --- | --- |
 | `index.html` | The article: one-page summary with the key numbers, method, and links (the front door) |
 | `site/index.html` | The interactive report: five stages and four tools (Failure Timeline, Expected vs Actual, Event Study Lab, Placebo Simulator) |
 | `plan.html` | The analysis plan and change log, rendered from `docs/ANALYSIS_PLAN.md` |
+| `case-study.html` | The case study: full write-up with research questions, figures, earlier work, limits, FAQ and references |
+| `case-study.pdf` | The case study typeset with LaTeX (Times New Roman 12 pt), from the same text as the web page. Needs a LaTeX install (MiKTeX on Windows); without one, step 08 still writes `casestudy/` for Overleaf |
+| `casestudy/` | `case-study.tex` and its four figures (vector PDFs) |
 | `og.png` | Link-preview image for LinkedIn (needs matplotlib; skipped if missing) |
 
 ```
@@ -26,9 +29,8 @@ python pipeline/08_build_html.py         # -> index.html, site/index.html, plan.
 ```
 
 Every number on every page comes from `site/data/` (derived statistics only). Edit text and code in
-`site/src/`, the report frame in `site/template.html`, the article in `pipeline/landing.py`, and links in
-`site/site_meta.json` (set `repo_url` only once the repository is public; put the paper at
-`paper/t-minus-markets.pdf` and the article links it automatically). Never edit the generated HTML by hand.
+`site/src/`, the report frame in `site/template.html`, the article in `pipeline/landing.py`, the case study in `pipeline/casestudy.py`, and links in
+`site/site_meta.json` (set `repo_url` only once the repository is public). Never edit the generated HTML by hand.
 Optional checks with Node.js: `cd site && npm test`.
 
 ## Phase 3: website data (complete)
@@ -171,3 +173,20 @@ any abnormal return is computed.
 | Independence | Failures sharing a firm within 5 sessions form one cluster |
 | Gate | Providers: >= 10 independent failures AND MDE <= 5% (t-based). Rivals: >= 8 independent clusters with a Tier 1/2 rival |
 | If the gate fails | Publish as a documented case series |
+
+## Reproduction and verification
+
+| Step | Command | Needs |
+| --- | --- | --- |
+| 1-4 | `python pipeline/01_ingest_launches.py` ... `04_check_coverage.py` | internet (GCAT, Yahoo) |
+| 5 | `python pipeline/05_event_study.py` | prices (local only) |
+| 6 | `python pipeline/06_confounding_sensitivity.py` | prices; exploratory |
+| 9 | `python pipeline/09_audit_exploratory.py` | prices; exploratory (R9b) |
+| 7 | `python pipeline/07_export_site_data.py` | derived statistics only |
+| 8 | `python pipeline/08_build_html.py` | matplotlib; LaTeX for the PDF |
+| check | `python audit/verify_published.py` | published data only; recomputes every statistic independently |
+| tests | `python -m pytest tests` and `cd site && npm test` | |
+
+Prices are never published (Yahoo licensing). Anyone can verify every test statistic, interval and p-value from
+the published derived data with `audit/verify_published.py`; re-estimating the CARs themselves needs the prices.
+`data/processed/firm_event_cars.csv` holds alphas and betas and is never committed.

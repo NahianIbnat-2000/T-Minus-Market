@@ -190,3 +190,4 @@ svg .series.draw { stroke-dasharray: var(--len); animation: draw 1.2s ease-out b
 .ex-act-bar { fill: var(--ink); }
 .ex-exp-bar { fill: none; stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
 .ex-ab-bar { fill: var(--signal); }
+.small-note { font-size: var(--step--1); color: var(--muted); }

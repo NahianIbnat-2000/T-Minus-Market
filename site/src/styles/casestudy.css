@@ -1,0 +1,56 @@
+/* Case study page: screen and A4 print */
+.cs { max-width: 48rem; }
+.cs h3 { font-size: var(--step-1); margin: var(--space-5) 0 var(--space-2); }
+.cs-head .byline a { color: inherit; }
+.inshort { border: var(--inkline); background: var(--paper-deep); padding: var(--space-3) var(--space-4); margin-top: var(--space-4); }
+.inshort h2 { font-size: var(--step-0); font-family: var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 var(--space-2); }
+.inshort ul { margin: 0; padding-left: 1.1rem; }
+.inshort li { margin-bottom: var(--space-1); }
+.toc { margin-top: var(--space-5); border-top: var(--hairline); border-bottom: var(--hairline); padding: var(--space-3) 0; }
+.toc h2 { font-size: var(--step-0); font-family: var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 var(--space-2); }
+.toc ol { columns: 2; column-gap: var(--space-5); margin: 0; padding-left: 1.3rem; font-size: var(--step--1); }
+.cs table { width: 100%; border-collapse: collapse; font-size: var(--step--1); margin: var(--space-3) 0; }
+.cs th { text-align: left; font-family: var(--font-mono); font-weight: 500; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--muted); border-bottom: var(--inkline); padding: var(--space-1) var(--space-2) var(--space-1) 0; }
+.cs td { border-bottom: var(--hairline); padding: var(--space-2) var(--space-2) var(--space-2) 0; vertical-align: top; line-height: 1.45; }
+.cs td .num { font-family: var(--font-mono); white-space: nowrap; }
+.cs table.rq td:first-child { font-family: var(--font-mono); font-weight: 500; }
+.cs-fig { margin: var(--space-4) 0; border-top: var(--inkline); padding-top: var(--space-2); }
+.cs-figtitle { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 700; font-size: var(--step-0); margin-bottom: var(--space-2); }
+.cs-figtitle span { font-family: var(--font-mono); font-weight: 500; color: var(--muted); font-stretch: normal; }
+.cs-cap { font-size: var(--step--1); color: var(--muted); margin-top: var(--space-1); line-height: 1.45; }
+.faq dt { font-weight: 700; margin-top: var(--space-3); }
+.faq dd { margin: var(--space-1) 0 0; }
+.notes ol, .refs { font-size: var(--step--1); line-height: 1.5; }
+.refs li { margin-bottom: var(--space-1); }
+sup a { text-decoration: none; font-family: var(--font-mono); font-size: 0.7em; }
+.signoff { font-size: var(--step--1); color: var(--muted); border-top: var(--hairline); padding-top: var(--space-3); margin-top: var(--space-6); }
+
+@page { size: A4; margin: 16mm 15mm 16mm 15mm; }
+@media print {
+  .screen-only { display: none !important; }
+  html { font-size: 10pt; background: #fff; }
+  .cs p, .cs li, .cs dd, .cs .dek { max-width: none; }
+  body { background: #fff; }
+  .skip-link, .site-foot { display: none !important; }
+  .masthead { padding-top: 0; }
+  .masthead h1 { font-size: 22pt; }
+  .cs { max-width: none; padding: 0; }
+  .cs section { margin-top: 14pt; }
+  .cs h2 { font-size: 14pt; break-after: avoid; }
+  .cs h3 { font-size: 11.5pt; break-after: avoid; }
+  .cs-fig, .cs table, .inshort, .faq dt, .faq dd { break-inside: avoid; }
+  .cs a { color: inherit; text-decoration: none; }
+  .toc ol { columns: 2; }
+}
+.abstract-sec { border-top: var(--inkline); border-bottom: var(--hairline); padding: var(--space-3) 0; margin-top: var(--space-4); }
+.abstract-sec h2 { font-size: var(--step-0); font-family: var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 var(--space-2); }
+.keywords { font-size: var(--step--1); color: var(--muted); }
+.eq { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); margin: var(--space-3) 0; padding: var(--space-2) var(--space-3);
+  background: var(--paper-deep); font-family: var(--font-body); overflow-x: auto; }
+.eq-body { white-space: nowrap; }
+.eq-no { font-family: var(--font-mono); color: var(--muted); }
+.ov { text-decoration: overline; font-style: italic; }
+.tcap { font-size: var(--step--1); margin: var(--space-4) 0 0; }
+.cs table.small { font-size: 0.78rem; }
+.cs table.small td { padding: 0.25rem 0.4rem 0.25rem 0; }

@@ -22,6 +22,11 @@ export function renderReport(data) {
   const caseFor = (r) => cases.find((x) => x.launch_tag === r.launch_tag && x.ticker === r.ticker);
   const e1 = results.exploratory_confounding?.results?.find((r) => r.id === "E1");
   const robust = (results.robustness || []).filter((r) => !/sign test/.test(r.name));
+  const rivRec = (data.firmEvents || []).filter((r) => r.group === "rival");
+  const byFirm = {};
+  for (const r of rivRec) (byFirm[r.firm] ||= new Set()).add(r.cluster);
+  const topF = Object.entries(byFirm).sort((a, b) => b[1].size - a[1].size)[0];
+  const conc = { firms: Object.keys(byFirm).length, top: topF ? topF[0] : "", topAll: !!topF && topF[1].size === new Set(rivRec.map((r) => r.cluster)).size };
 
   const t3 = `<section class="stage" id="t-3" aria-labelledby="h-t-3"><div class="wrap">
     ${T.stageLabel("T−3", "The Question")}
@@ -54,7 +59,7 @@ export function renderReport(data) {
     ${carPathsPlate({ title: "The rocket's maker: cumulative abnormal return", series: providerPaths, notes: providerNotes,
       caption: "Cumulative abnormal return (market model, simple returns), set to zero at the close before the failure (T\u22121), so the value at T+1 is the two-day result on each card. Moves to the left of the dotted line happened before the failure was public. Each line is one case; they are not averaged."
         + (providerNotes.length ? " (a) Five trading days before the Electron failure, Rocket Lab fell after its founder filed to sell shares. This news is unrelated to the launch and falls outside the measured windows." : "") })}
-    ${T.rivalText(results.primary, e1)}
+    ${T.rivalText(results.primary, e1, conc)}
     ${intervalPlate({ title: "Competitors: average two-day reaction (T0 to T+1)",
       rows: [
         { label: "Main result (prespecified)", mean: results.primary.mean_car, lo: results.primary.ci_low, hi: results.primary.ci_high, emphasis: true, note: "confirmatory" },
@@ -68,11 +73,12 @@ export function renderReport(data) {
   const t1p = `<section class="stage" id="t+1" aria-labelledby="h-t1p"><div class="wrap">
     ${T.stageLabel("T+1", "Is It Real?")}
     <h2 id="h-t1p">Could it just be luck?</h2>
-    ${T.placeboText(pl)}
+    ${T.placeboText(pl, results.exploratory_audit?.placebo_shared)}
     ${pl?.distribution ? placeboPlate({ title: "Real failures against ordinary days", distribution: pl.distribution, actual: pl.actual_mean_car,
       caption: `Each bar counts random draws of ordinary trading days (${pl.draws} draws, fixed seed ${pl.seed}) by their average two-day abnormal return for the competitor sample. The line marks the real failures (${pct(pl.actual_mean_car, 2)}).` }) : ""}
     <h3>The same question, checked ${robust.length} ways</h3>
     ${T.robustnessTable(robust)}
+    ${T.robustnessSummary(robust)}
     ${T.flagsList(rivals)}
     ${T.limitsText(c)}
     ${placeboToolHtml(data)}</div></section>`;

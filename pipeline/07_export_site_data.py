@@ -67,6 +67,33 @@ def failures_table(cov: pd.DataFrame) -> list[dict]:
     return out
 
 
+def sample_funnel(cov, records) -> dict:
+    """Counts for the sample-construction funnel, from the pipeline's own interim files (no typed numbers)."""
+    from collections import Counter
+
+    def nrows(name):
+        f = C.INTERIM / name
+        return int(len(pd.read_csv(f))) if f.exists() else None
+
+    fail = cov[cov["outcome"] == "failure"]
+    dropped = fail[fail["usable"] != True] if "usable" in fail else fail.iloc[0:0]
+    riv = [r for r in records if r["group"] == "rival"]
+    prov = [r for r in records if r["group"] != "rival"]
+    return {
+        "launch_attempts": nrows("orbital_launches.csv"),
+        "failures": nrows("failures.csv"),
+        "pad_explosions": nrows("ground_anomalies.csv"),
+        "failures_with_any_listed_firm": int(fail["launch_tag"].nunique()),
+        "failure_firm_events_mapped": int(len(fail)),
+        "failure_firm_events_dropped": ({str(k): int(v) for k, v in Counter(dropped["coverage_reason"].fillna("other")).items()}
+                                        if "coverage_reason" in dropped else {}),
+        "provider_cases": len(prov), "provider_firms": len({r["ticker"] for r in prov}),
+        "rival_failures": len({r["launch_tag"] for r in riv}), "rival_firm_events": len(riv),
+        "rival_firms": len({r["ticker"] for r in riv}), "rival_clusters": len({r["cluster"] for r in riv}),
+        "rival_firm_events_by_firm": dict(Counter(r["firm"] for r in riv)),
+    }
+
+
 def main(site_data: Path = SITE_DATA):
     s5 = _step05()
     cov, returns_by, benches, _ = s5.load()
@@ -92,6 +119,7 @@ def main(site_data: Path = SITE_DATA):
         "data_policy": "Only derived statistics are published: CARs, CAR variances, abnormal returns, "
                        "residual volatility and CAR correlations. No raw prices, raw returns, alphas or betas.",
         "parity_tolerances": TOLERANCES,
+        "sample": sample_funnel(cov, records),
     }, indent=2))
     n_r = sum(r["group"] == "rival" for r in records)
     print(f"Exported {n_r} rival and {len(records) - n_r} provider firm-events to {site_data}")

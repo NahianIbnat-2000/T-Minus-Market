@@ -182,3 +182,77 @@ def exploratory(rival_fes, provider_fail_fes, provider_success_fes, first_flight
         r["p_holm"] = a
         r["label"] += " [exploratory]"
     return res
+
+
+def placebo_shared(fes: list[FirmEvent], rows, returns_by: dict, bench_for, failure_day0s: dict, n_draws=1000,
+                   seed=C.RANDOM_SEED) -> dict:
+    """R9b (EXPLORATORY, added after the 22 Nov 2026 audit): placebo with ONE shared pseudo-date per cluster.
+
+    R9 draws an independent random day for every firm-event, which breaks the same-day co-movement of
+    rivals hit by one failure and so understates the spread of the placebo averages. Here each draw
+    picks one calendar date per cluster; every firm-event in that cluster uses the first eligible
+    session of its own exchange on or after that date. Eligibility per firm-event is the same as R9.
+    A benchmark for context, not an exact permutation test.
+    """
+    rng = np.random.default_rng(seed)
+    members = {}
+    for fe in fes:
+        row = rows[(rows["launch_tag"] == fe.launch_tag) & (rows["ticker"] == fe.ticker)].iloc[0]
+        sessions = pd.DatetimeIndex(get_calendar(row["exchange"]).sessions)
+        sessions = sessions.tz_localize(None) if sessions.tz is not None else sessions
+        r = returns_by[row["ticker"]].set_index("date")["ret"]
+        ls = row.get("listing_start")
+        first = max(r.index.min(), pd.Timestamp(ls)) if pd.notna(ls) and str(ls) != "" else r.index.min()
+        valid = sessions[(sessions > first) & (sessions <= r.index.max())]
+        idx = np.arange(len(valid))
+        ok = (idx >= 260) & (idx < len(valid) - 2)
+        bad = set()
+        for d in failure_day0s.get(row["ticker"], []):
+            if d in valid:
+                k = valid.get_loc(d)
+                bad.update(range(k - 10, k + 11))
+        cand = pd.DatetimeIndex([valid[i] for i in idx[ok] if i not in bad])
+        members.setdefault(fe.cluster, []).append((fe, row, cand))
+    plans, n_common = [], 0
+    for cl, mem in members.items():
+        common = mem[0][2]
+        for _, _, c in mem[1:]:
+            common = common.intersection(c)
+        if len(common):
+            n_common += 1
+            dates = common
+        else:                                   # no calendar date eligible for all: use the union, map forward
+            dates = mem[0][2]
+            for _, _, c in mem[1:]:
+                dates = dates.union(c)
+        plans.append((dates, mem))
+    actual = np.nanmean([car(fe, PRIMARY)[0] for fe in fes])
+    means, cache = np.empty(n_draws), {}
+    for d in range(n_draws):
+        vals = []
+        for dates, mem in plans:
+            pick = dates[rng.integers(0, len(dates))]
+            for fe, row, cand in mem:
+                k = cand.searchsorted(pick)
+                if k >= len(cand):
+                    vals.append(np.nan)
+                    continue
+                day = cand[k]
+                key = (row["ticker"], day)
+                if key not in cache:
+                    r2 = row.copy()
+                    r2["day0"] = day
+                    f2 = build_firm_event(r2, returns_by[row["ticker"]], bench_for(row["exchange"]), rel_range=(0, 1))
+                    cache[key] = car(f2, PRIMARY)[0] if f2 is not None else np.nan
+                vals.append(cache[key])
+        means[d] = np.nanmean(vals)
+    pct = float(np.mean(means <= actual) * 100)
+    lo, hi = np.percentile(means, [2.5, 97.5])
+    p_two = float(2 * min(np.mean(means <= actual), np.mean(means >= actual)))
+    return {"name": "R9b placebo, shared date per cluster [exploratory]", "actual_mean_car": float(actual), "draws": n_draws,
+            "seed": seed, "placebo_mean": float(means.mean()), "placebo_sd": float(means.std(ddof=1)),
+            "placebo_2.5pct": float(lo), "placebo_97.5pct": float(hi), "actual_percentile": pct, "two_sided_share": p_two,
+            "monte_carlo_se": float(np.sqrt(max(p_two * (1 - p_two), 1e-12) / n_draws)),
+            "clusters": len(plans), "clusters_with_common_date": n_common,
+            "note": "exploratory, added after the audit; one pseudo-date per cluster; benchmark, not a permutation test",
+            "distribution": means.tolist()}

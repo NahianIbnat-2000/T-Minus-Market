@@ -2,6 +2,7 @@
 // Rule: no number is typed here. Every figure comes from results.json, firm_events.json
 // or failures.json, so the text cannot drift from the analysis.
 import { ci, date, escapeHtml, num, pct, pval, signClass, verdict } from "../format.js";
+import { tPpf } from "../stats/eventstudy.js";
 
 const listJoin = (a) => (a.length <= 1 ? a.join("") : `${a.slice(0, -1).join(", ")} and ${a[a.length - 1]}`);
 
@@ -56,25 +57,54 @@ export function providerText(cases) {
   <p>With only ${cases.length} events, these are case studies, not an industry-wide average. They are shown one by one below.</p>`;
 }
 
-export function rivalText(primary, e1) {
+/** Smallest average effect detectable with 80% power at the 5% level, from the published cluster-robust interval. */
+export function mde(p) {
+  if (p.ci_low === null || p.ci_low === undefined || !p.n_clusters) return null;
+  const df = p.n_clusters - 1;
+  const se = (p.ci_high - p.ci_low) / (2 * tPpf(0.975, df));
+  return (tPpf(0.975, df) + tPpf(0.8, df)) * se;
+}
+
+export function rivalText(primary, e1, conc) {
   const p = primary;
   let s = `
   <h3>The competitors</h3>
   <p>When a rival's rocket failed, listed small-launch companies moved by <strong class="${signClass(p.mean_car)}">${pct(p.mean_car, 2)}</strong> on average over two days (95% interval ${ci(p.ci_low, p.ci_high, 2)}; p = ${pval(p.p)}). This reaction ${verdict(p.p)}. It is based on ${p.n_failures} failures, ${p.n_firms} companies and ${p.n_clusters} independent events.</p>`;
   if (p.p >= 0.05) {
-    s += `<p>"Not detectable" is not the same as "no effect". The interval still tells us something: average reactions much larger than its ends, in either direction, are unlikely.</p>`;
+    const m = mde(p);
+    s += `<p>"Not detectable" is not the same as "no effect". Average reactions much larger than the interval's ends, in either direction, are unlikely${
+      m ? `, but with this sample an average effect smaller than about ${pct(m, 1, false)} would usually go undetected (80% power)` : ""}. So the data do not show that competitors are unaffected.</p>`;
+  }
+  s += `<p class="small-note">The interval is cluster-robust and centred on the simple average; the p-value comes from the prespecified standardized test, which gives less weight to volatile stocks. They answer slightly different questions.</p>`;
+  if (conc && conc.firms) {
+    s += `<p>The evidence comes from ${conc.firms} listed firms${conc.topAll ? `, and ${escapeHtml(conc.top)} is in every one of the ${p.n_clusters} independent events` : ""}. It describes these firms, not the launch industry as a whole.</p>`;
   }
   if (e1) {
-    s += `<div class="callout"><span class="label">Exploratory check, added after the results</span>Two of the largest rival moves fell on days when the same companies announced large new contracts. Leaving those two out, the average becomes <strong class="${signClass(e1.mean_car)}">${pct(e1.mean_car, 2)}</strong> (95% interval ${ci(e1.ci_low, e1.ci_high, 2)}; p = ${pval(e1.p)}). Because this check was designed after seeing the data, it cannot replace the main result above.</div>`;
+    s += `<div class="callout"><span class="label">Exploratory check, added after the results</span>Some of the largest rival moves fell on days when the same companies announced large new contracts. Leaving those out, the average becomes <strong class="${signClass(e1.mean_car)}">${pct(e1.mean_car, 2)}</strong> (95% interval ${ci(e1.ci_low, e1.ci_high, 2)}; p = ${pval(e1.p)}). A few large moves can shift a simple average this much. Because this check was designed after seeing the data, it cannot replace the main result above.</div>`;
   }
   return s;
 }
 
 // ------------------------------------------------------------------ T+1
-export function placeboText(pl) {
+export function placeboText(pl, plShared) {
   if (!pl) return "";
-  return `
-  <p>One way to judge a result is to compare it with ordinary days. We picked ${pl.draws} sets of random trading days for the same companies, away from any failure, and measured the same two-day average each time. The real failures sit at the <strong>${num(pl.actual_percentile, 0)}th percentile</strong> of that spread. This is a sense check, not a formal test: random days are not perfectly comparable to launch days.</p>`;
+  let s = `
+  <p>One way to judge a result is to compare it with ordinary days. We picked ${pl.draws} sets of random trading days for the same companies, away from any failure, and measured the same two-day average each time. The real failures sit at the <strong>${num(pl.actual_percentile, 0)}th percentile</strong> of that spread. This is a sense check, not a formal test: random days are not perfectly comparable to launch days, and the percentile is not the probability that the result is real.</p>
+  <p class="small-note">This prespecified placebo gives each company its own random day. Real failures hit several rivals on the same day, so the placebo spread is somewhat too narrow.</p>`;
+  if (plShared) {
+    s += `<div class="callout"><span class="label">Exploratory check, added after an audit</span>Repeating the placebo with one shared random day per failure cluster puts the real result at the <strong>${num(plShared.actual_percentile, 0)}th percentile</strong> (${plShared.draws} draws). It sits next to the prespecified placebo, not instead of it.</div>`;
+  }
+  return s;
+}
+
+/** One sentence on what the robustness checks do and do not show. */
+export function robustnessSummary(rows) {
+  const r = rows.filter((x) => x.p !== null && x.p !== undefined);
+  if (!r.length) return "";
+  const sig = r.filter((x) => x.p < 0.05).length;
+  const lo = Math.min(...r.map((x) => x.mean_car)), hi = Math.max(...r.map((x) => x.mean_car));
+  return `<p>${sig === 0 ? "None of these checks detects" : `${sig} of these checks detect`} a significant average at the 5% level${
+    lo < 0 && hi > 0 ? `, but the estimates range from ${pct(lo, 2)} to ${pct(hi, 2)}: the direction and size of the average are not stable, only the lack of a detectable effect is` : ""}.</p>`;
 }
 
 export function robustnessTable(rows) {
