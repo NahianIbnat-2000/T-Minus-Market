@@ -1,4 +1,4 @@
-"""Root article page (index.html) and the rendered analysis plan (plan.html), for GitHub Pages.
+"""Root article page (index.html) for GitHub Pages.
 
 Both are plain static HTML (no JavaScript), so link previews and search engines can read them.
 Every number comes from site/data/*.json (written by step 07); nothing is typed by hand.
@@ -151,8 +151,6 @@ def article(data: dict, meta: dict, root: Path, css: str) -> str:
                  if repo else
                  '<div class="read-card muted-card"><span class="rc-kicker">On request</span><h3>Code and pipeline</h3>'
                  '<p>A tested Python pipeline from raw launch records to every published number. Available on request.</p></div>')
-    changes = len(re.findall(r"^\| \d{4}-\d{2}-\d{2} \|", (root / "docs" / "ANALYSIS_PLAN.md").read_text(encoding="utf-8"), re.M)) \
-        if (root / "docs" / "ANALYSIS_PLAN.md").exists() else 0
     tiles = [
         ((f"{pct(f['case_hi'])} to {pct(f['case_lo'])}", f"two-day abnormal return of the rocket's maker: a loss in each of the {f['n_cases']} listed cases", "loss")
          if all_fell else
@@ -178,13 +176,13 @@ def article(data: dict, meta: dict, root: Path, css: str) -> str:
   <div class="kicker"><span>T-Minus Markets</span><span>Research article · Event study</span></div>
   <h1>When a rocket blows up, who loses money, and does anyone win?</h1>
   <p class="dek">How stock markets react to orbital launch failures, {e(span)}.</p>
-  <p class="byline">{e(meta.get('author', 'Nahian Ibnat'))} · Independent research · Updated {e(updated)} · Analysis plan v{e(str(m.get('plan_version')))}</p>
+  <p class="byline">{e(meta.get('author', 'Nahian Ibnat'))} · Independent research · Updated {e(updated)}</p>
 </div></header>
 <main id="main" class="wrap article">
   <section class="tiles" aria-label="Key findings">{tiles_html}</section>
 
   <section class="abstract"><h2>In short</h2><p>{e(abstract)}</p>
-    <p class="cta"><a class="btn" href="site/index.html">Open the interactive report</a> <a class="btn ghost" href="case-study.html">Read the working paper</a> <a class="btn ghost" href="plan.html">Analysis plan</a></p></section>
+    <p class="cta"><a class="btn" href="site/index.html">Open the interactive report</a> <a class="btn ghost" href="case-study.html">Read the working paper</a></p></section>
 
   <section><h2>Why this question</h2>
   <p>Orbital launch is a small industry with a handful of listed firms, and every launch is a public, all-or-nothing test. A failure destroys hardware and a customer's satellite, so the rocket's maker should lose value. The open question is the competitors. If investors read a failure as a reminder that spaceflight is risky for everyone, rival launch stocks fall too: contagion. If they expect customers to switch to a rocket that works, rivals rise: competitive gain. The two stories point in opposite directions, so only data can say which one investors act on.</p>
@@ -211,8 +209,6 @@ def article(data: dict, meta: dict, root: Path, css: str) -> str:
     <a class="read-card" href="site/index.html"><span class="rc-kicker">Interactive</span><h3>The report</h3>
       <p>Five countdown stages from the question to the checks, with four tools: Failure Timeline, Expected vs Actual, Event Study Lab and Placebo Simulator.</p><span class="rc-go">Open the report</span></a>
     {paper_card}
-    <a class="read-card" href="plan.html"><span class="rc-kicker">Prespecified</span><h3>Analysis plan</h3>
-      <p>The rules committed to the public repository before any stock reaction was measured, and a dated log of {changes} entries since. Not an independent registry.</p><span class="rc-go">Read the plan</span></a>
     {code_card}
   </div>
   {evidence}</section>
@@ -223,7 +219,7 @@ def article(data: dict, meta: dict, root: Path, css: str) -> str:
     <li><strong>Measure.</strong> Abnormal return: the stock's actual return minus what a market model, fitted on about a year of earlier data, predicts from its home market index.</li>
     <li><strong>Test.</strong> A standardized event-study test (Boehmer, Musumeci and Poulsen) adjusted for failures that hit several competitors at once (Kolari and Pynnönen); the 95% interval is a separate cluster-robust interval around the simple average.</li>
     <li><strong>Checks.</strong> Other test statistics, a wider window, timing and sample changes, leaving out one firm at a time, and a placebo using random ordinary days.</li>
-    <li><strong>Rules.</strong> The plan was prespecified and committed to the public repository before results (commit hashes are in the plan); it was not filed with an independent registry. Anything added later is labelled exploratory. Only derived statistics are published, never stock prices.</li>
+    <li><strong>Rules.</strong> The rules were fixed and committed to the public repository before results (commit record in the working paper, Appendix G); they were not filed with an independent registry. Anything added later is labelled exploratory. Only derived statistics are published, never stock prices.</li>
   </ul></section>
 
   <section class="cite"><h2>Cite</h2>
@@ -238,55 +234,3 @@ def article(data: dict, meta: dict, root: Path, css: str) -> str:
             f"listed competitors show no detectable reaction ({pct(p['mean_car'], 2)}, p = {pval(p['p'])}).")
     image = (meta["live_url"].rstrip("/") + "/og.png") if meta.get("live_url") else None
     return _shell("T-Minus Markets: when a rocket blows up, who loses money?", desc, meta.get("live_url"), body, css, meta.get("live_url"), image)
-
-
-def md_to_html(md: str) -> str:
-    """Tiny Markdown subset for the plan: headings, paragraphs, pipe tables, lists, `code`, **bold**, links."""
-    def inline(s):
-        s = e(s)
-        s = re.sub(r"`([^`]+)`", r"<code>\1</code>", s)
-        s = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", s)
-        s = re.sub(r"\[([^\]]+)\]\((https?://[^)\s]+)\)", r'<a href="\2">\1</a>', s)
-        s = re.sub(r'(?<!href=")(https?://[^\s<]+)', r'<a href="\1">\1</a>', s)
-        return s
-    out, para, lines, i = [], [], md.splitlines(), 0
-    def flush():
-        if para:
-            out.append(f"<p>{inline(' '.join(para))}</p>"); para.clear()
-    while i < len(lines):
-        ln = lines[i].rstrip()
-        if not ln.strip():
-            flush(); i += 1; continue
-        h = re.match(r"^(#{1,4})\s+(.*)", ln)
-        if h:
-            flush(); lvl = len(h.group(1)) + 1; out.append(f"<h{lvl}>{inline(h.group(2))}</h{lvl}>"); i += 1; continue
-        if ln.startswith("|"):
-            flush(); rows = []
-            while i < len(lines) and lines[i].startswith("|"):
-                rows.append([c.strip() for c in lines[i].strip().strip("|").split("|")]); i += 1
-            head, body = rows[0], [r for r in rows[1:] if not all(re.fullmatch(r":?-{3,}:?", c) for c in r)]
-            out.append("<div class='table-wrap'><table><thead><tr>" + "".join(f"<th>{inline(c)}</th>" for c in head) + "</tr></thead><tbody>"
-                       + "".join("<tr>" + "".join(f"<td>{inline(c)}</td>" for c in r) + "</tr>" for r in body) + "</tbody></table></div>")
-            continue
-        if re.match(r"^\s*[-*] ", ln):
-            flush(); items = []
-            while i < len(lines) and re.match(r"^\s*[-*] ", lines[i]):
-                items.append(re.sub(r"^\s*[-*] ", "", lines[i])); i += 1
-            out.append("<ul>" + "".join(f"<li>{inline(x)}</li>" for x in items) + "</ul>"); continue
-        para.append(ln.strip()); i += 1
-    flush()
-    return "\n".join(out)
-
-
-def plan_page(root: Path, meta: dict, css: str) -> str:
-    md = (root / "docs" / "ANALYSIS_PLAN.md").read_text(encoding="utf-8")
-    body = f"""<header class="masthead"><div class="wrap">
-  <div class="kicker"><span><a href="index.html">T-Minus Markets</a></span><span>Analysis plan</span></div>
-  <p class="byline"><a href="index.html">Back to the article</a> · <a href="site/index.html">Interactive report</a></p>
-</div></header>
-<main id="main" class="wrap article plan">
-{md_to_html(md)}
-<p class="byline">This page is generated from docs/ANALYSIS_PLAN.md in the project repository. The change log records every change after the plan was frozen, with the date and whether results had been seen.</p>
-</main>"""
-    return _shell("T-Minus Markets: analysis plan and change log",
-                  "The analysis plan fixed before any stock reaction was measured, with a dated change log.", None, body, css)

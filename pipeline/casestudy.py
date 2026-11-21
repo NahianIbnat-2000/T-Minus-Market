@@ -362,7 +362,7 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
         + ("no detectable reaction." if not detect else "a detectable reaction."),
         (f"<strong>Uncertainty:</strong> effects of about {pct(pw['mde80'], 1, False)} either way could go undetected; " if pw else "<strong>Uncertainty:</strong> ")
         + ("the sign depends on weighting." if sign_flips else "see section 7."),
-        "<strong>Status:</strong> working paper for feedback; plan prespecified in git, not independently registered.",
+        "<strong>Status:</strong> working paper for feedback; rules fixed in git before results, not independently registered.",
     ]
 
     # ---------------- tables
@@ -420,6 +420,17 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
                 "MM" if r["model"] == "market_model" else "MA", e(r.get("disclosure_confidence") or ""), e((r.get("flag") or {}).get("verdict", "").replace("_", " ")),
                 f'<span class="num">{pct(r["windows"]["primary"]["car"], 2)}</span>', f'<span class="num">{pct(r["windows"]["primary"]["var"] ** 0.5, 2, False)}</span>']
                for r in sorted(riv, key=lambda r: (r["day0"], r["ticker"]))]
+    freeze_rows = []
+    pf = root / "docs" / "ANALYSIS_PLAN.md"
+    if pf.exists():
+        txt = pf.read_text(encoding="utf-8")
+        if "## Freeze record" in txt:
+            blk = txt.split("## Freeze record", 1)[1].split("\n## ", 1)[0]
+            for ln in blk.splitlines():
+                cells = [c.strip() for c in ln.strip().strip("|").split("|")]
+                if ln.startswith("|") and len(cells) == 3 and cells[1].startswith("`"):
+                    freeze_rows.append([e(cells[0].replace("Plan v1.0 with the locked table", "Rules fixed").replace("plan v1.0 frozen", "rules frozen")),
+                                        f"<code>{e(cells[1].strip('`'))}</code>", e(cells[2])])
     why = Counter()
     for x in fails:
         if not (x.get("in_rival_test") or x.get("in_provider_case_series")):
@@ -437,8 +448,7 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
     conf_forest += [(short.get(r["id"], r["id"]), r["mean_car"], r["ci_low"], r["ci_high"], "explore") for r in conf]
 
     links = [("The article (one-page summary)", "index.html", "Key numbers and links"),
-             ("Interactive report", "site/index.html", "Five stages and four interactive tools"),
-             ("Analysis plan and change log", "plan.html", "Rules fixed before results, and every later change")]
+             ("Interactive report", "site/index.html", "Five stages and four interactive tools")]
     if blob:
         links += [("Feasibility report", blob + "reports/04_feasibility_report.md", "Sample and minimum detectable effects, before results"),
                   ("Results report", blob + "reports/05_results.md", "All prespecified results"),
@@ -447,7 +457,7 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
                   ("Code and pipeline", meta["repo_url"], "Python pipeline, tests and reproduction guide")]
     pdf_row = ("This paper as PDF", pdf_name, "Typeset version (LaTeX)") if pdf_name else None
     nav = " · ".join(f'<a href="{e(h)}">{e(l)}</a>' for l, h in
-                     [("Article", "index.html"), ("Interactive report", "site/index.html"), ("Analysis plan", "plan.html")]
+                     [("Article", "index.html"), ("Interactive report", "site/index.html")]
                      + ([("Code", meta["repo_url"])] if meta.get("repo_url") else []))
     nav += (f' <span class="screen-only">· <a href="{e(pdf_name)}">PDF</a></span>' if pdf_name else "")
     contents = ["Introduction", "Institutional background", "Related literature", "Data and sample construction", "Empirical methodology",
@@ -483,14 +493,14 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
 
 <section id="s1"><h2>1. Introduction</h2>
 <p>When a rocket fails, the company that built it loses hardware, often a customer's satellite, and usually months of flights while the cause is investigated. Its competitors face a less obvious outcome. Investors may read the failure as a reminder that spaceflight is risky for every provider, which lowers rivals' values (contagion), or they may expect customers to move to providers whose rockets work, which raises them (competitive gain). The two channels push in opposite directions, so the net reaction of rivals is an empirical question.</p>
-<p>This paper measures both reactions with a short-window event study. Launch failures suit the method: they are sudden, public, precisely timed, and unrelated to the rivals' own decisions. The confirmatory hypothesis (H2) is that the average two-day abnormal return of listed rivals is zero. All rules were fixed in a written plan committed to the project repository before any abnormal return was computed.</p>
+<p>This paper measures both reactions with a short-window event study. Launch failures suit the method: they are sudden, public, precisely timed, and unrelated to the rivals' own decisions. The confirmatory hypothesis (H2) is that the average two-day abnormal return of listed rivals is zero. All rules were fixed and committed to the project repository before any abnormal return was computed (Appendix G).</p>
 <p>The answer is limited by the sample. Only {f['n_rival_firms']} listed launch firms qualify as direct rivals at the time of a failure, so the study observes {f['n_clusters']} independent rival events{f", every one of which involves {e(f['top_firm'])}" if top_all else ""}. {"The average reaction is not distinguishable from zero, but the interval is wide enough to contain economically meaningful losses and gains." if not detect else "The average reaction is distinguishable from zero."} The contribution is therefore a carefully documented, reproducible estimate with honest uncertainty, rather than a general claim about the launch industry.</p>
 <p>Section 2 describes the industry; section 3 relates the study to earlier work; sections 4 and 5 describe data and methods; sections 6 to 8 report results, robustness and confounding news; sections 9 to 11 discuss, list limitations and conclude.</p></section>
 
 <section id="s2"><h2>2. Institutional background</h2>
 <p><strong>A concentrated market.</strong> Orbital launch is supplied by a small number of providers, many of them state agencies, state-owned firms or privately held companies. Launch contracts are usually signed years ahead, and a satellite is designed for a particular rocket, so customers cannot switch providers quickly. This limits how much business a rival can win in the days after a failure.</p>
 <p><strong>Reliability.</strong> New rockets fail more often than mature ones, and a failure normally grounds the vehicle until an investigation is complete. For the maker, the loss includes the hardware, possible penalties or re-flights, delay of other launches and reputation.</p>
-<p><strong>Ownership and listing.</strong> Few launch companies have been publicly traded with launch as a major business. Large aerospace groups that build rockets are diversified, so a launch failure is a small part of their value; the plan therefore counts them only when launch is a major part of the business. The listed pure-play or launch-heavy firms in the sample listed only in the last decade, so the sample of listed rival events starts late. SpaceX listed in June 2026 and has too little price history to enter.</p>
+<p><strong>Ownership and listing.</strong> Few launch companies have been publicly traded with launch as a major business. Large aerospace groups that build rockets are diversified, so a launch failure is a small part of their value; the study therefore counts them only when launch is a major part of the business. The listed pure-play or launch-heavy firms in the sample listed only in the last decade, so the sample of listed rival events starts late. SpaceX listed in June 2026 and has too little price history to enter.</p>
 <p><strong>Disclosure.</strong> Most launches are broadcast live, so a failure becomes public at launch time. Where a failure is confirmed later, the first public company statement dates the event.</p></section>
 
 <section id="s3"><h2>3. Related literature</h2>
@@ -547,7 +557,7 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
 </section>
 
 <section id="s8"><h2>8. Confounding news</h2>
-<p>An event study attributes every unusual return in the window to the event. If a firm announces something else on the same days, its reaction mixes the two. The news around the largest rival reactions was therefore checked against public sources. Flagged reactions stay in the confirmatory test, because the plan does not allow removing events after results are seen.</p>
+<p>An event study attributes every unusual return in the window to the event. If a firm announces something else on the same days, its reaction mixes the two. The news around the largest rival reactions was therefore checked against public sources. Flagged reactions stay in the confirmatory test, because the rules fixed in advance do not allow removing events after results are seen.</p>
 {_ttable(num, "Rival reactions with other news in the window", ["Firm", "Failure", "CAR", "Verdict", "News"], flag_rows) if flag_rows else ""}
 <p>The exploratory specifications below drop the flagged reactions. Dropping the {len(e1.get('dropped') or []) if e1 else 0} contract-news days changes the average from {pct(p['mean_car'], 2)} to {pct(e1['mean_car'], 2) if e1 else 'n/a'}{f", but the median moves only from {pct(w['median'], 2)} to {pct(w_e1['median'], 2)}: the change comes from removing {nw(n_e1)} large {e1_sign + " " if e1_sign else ""}move{"s" if n_e1 != 1 else ""}, not from a shift in the typical reaction" if w and w_e1 else ""}. The standardized test barely moves (p = {pval(e1['p']) if e1 else 'n/a'}), because it gives less weight to the volatile stocks behind those moves. The exploratory estimates are not more correct than the prespecified one: the choice of what to drop was made after seeing the data.</p>
 {_ttable(num, "Confounding-news sensitivity (exploratory)", ["Specification", "Average", "95% interval", "p", "Median", "Reactions", "Clusters"], conf_rows)}
@@ -569,7 +579,7 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
 <li><strong>Survivorship.</strong> Listed launch firms that later delisted (Orbital Sciences/Orbital ATK, Astra, Virgin Orbit) are missing because the free price source does not carry them.</li>
 <li><strong>External validity.</strong> The population is historically eligible, publicly traded launch-service competitors with comparable commercial exposure, not the launch industry.</li>
 <li><strong>Data quality.</strong> Yahoo adjusted prices and GCAT records are good but not audited sources; price-quality issues are logged in the pipeline.</li>
-<li><strong>Prespecification.</strong> The plan was committed to git before results but not filed with an independent registry; git timestamps are set by the author.</li>
+<li><strong>Prespecification.</strong> The rules were committed to git before results (Appendix G) but not filed with an independent registry; git timestamps are set by the author.</li>
 </ul></section>
 
 <section id="s11"><h2>11. Conclusion</h2>
@@ -615,6 +625,11 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
 <li><code>07_export_site_data.py</code> exports derived statistics; <code>08_build_html.py</code> builds the site and this paper; <code>python audit/verify_published.py</code> re-checks every statistic.</li>
 <li><code>python -m pytest tests</code> runs the test suite.</li>
 </ol></section>
+
+<section><h2>Appendix G. Freeze record</h2>
+<p>The rules (hypothesis, test, windows, sample criteria, checks) were committed to the public repository before the first results. Commits:</p>
+{_ttable(num, "Commit record", ["Item", "Commit", "Time (+06:00)"], freeze_rows) if freeze_rows else "<p>See the repository history.</p>"}
+<p>Exploratory analyses added later (E1 to E3, R9b and the audit diagnostics) are labelled wherever they appear.</p></section>
 
 <section class="screen-only"><h2>Plain-language FAQ</h2>
 <dl class="faq">

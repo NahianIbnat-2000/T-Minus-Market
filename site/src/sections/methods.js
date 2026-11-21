@@ -9,8 +9,8 @@ export function methodsSection({ manifest: m, results: r }) {
   return `<section class="stage methods" id="methods" aria-labelledby="h-methods"><div class="wrap">
   <div class="stage-label"><span class="t">Appendix</span><span>Data and methods</span></div>
   <h2 id="h-methods">How this study was done</h2>
-  <h3>The plan came first</h3>
-  <p>Every choice below was written into an analysis plan (v${escapeHtml(m.plan_version)}) before any stock reaction was measured, and committed to version control with a timestamp. Checks added after seeing results are labelled exploratory everywhere in this report.</p>
+  <h3>The rules came first</h3>
+  <p>Every choice below was fixed and committed to version control before any stock reaction was measured (commit record: working paper, Appendix G). It was not filed with an independent registry. Checks added after seeing results are labelled exploratory everywhere in this report.</p>
   <h3>Data</h3>
   <table><tbody>
     <tr><th scope="row">Launches</th><td>${escapeHtml(m.sources?.launches)}</td></tr>

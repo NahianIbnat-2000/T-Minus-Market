@@ -107,7 +107,7 @@ function render(out, state, base, ctx) {
       <div><dt>Sample</dt><dd>${plural(res.n, "reaction")}, ${plural(res.failures, "failure")}, ${plural(res.firms, "company", "companies")}, ${plural(res.clusters, "independent event")}</dd></div>
     </dl>
     <p class="lab-read">${res.p !== null ? `In plain words: this average ${escapeHtml(verdict(res.p))}.` : ""}${
-      few ? ` <strong>Caution:</strong> fewer than ${ctx.minClusters} independent events, which is below the minimum set in the plan, so the test is not reliable here.` : ""}</p>
+      few ? ` <strong>Caution:</strong> fewer than ${ctx.minClusters} independent events, which is below the minimum set in advance, so the test is not reliable here.` : ""}</p>
     <figure class="lab-strip">${stripSvg(rows, state.window, res)}
       <figcaption>Each dot is one company's reaction to one failure (red below zero, blue above). Hover a dot for details. The shaded band is the 95% interval of the average.</figcaption></figure>`;
 }

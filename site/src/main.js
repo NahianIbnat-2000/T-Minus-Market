@@ -15,7 +15,7 @@ async function start() {
     main.innerHTML = renderReport(data);
     const m = data.manifest;
     document.getElementById("run-info").innerHTML =
-      `Analysis plan v${escapeHtml(m.plan_version)} · results computed ${date(m.results_run_utc)} · data exported ${date(m.exported_utc)}`;
+      `Results computed ${date(m.results_run_utc)} · data exported ${date(m.exported_utc)}`;
     watchStages(document);
     mountLab(document, data);
     mountPlacebo(document, data);

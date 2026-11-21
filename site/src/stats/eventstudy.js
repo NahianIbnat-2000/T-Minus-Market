@@ -1,7 +1,7 @@
 // T-Minus Markets: browser event-study statistics.
 //
 // Works only from exported derived statistics (site/data/*.json): per firm-event CARs and
-// their variances, and same-cluster CAR correlations. It re-runs the plan's primary test
+// their variances, and same-cluster CAR correlations. It re-runs the prespecified primary test
 // (BMP with the Kolari-Pynnonen cluster adjustment) on any subset a reader chooses.
 // It must match pipeline/siteexport.py::bmp_kp_from_records within the tolerances in
 // site/data/manifest.json (checked by tests/test_phase3_parity.py).

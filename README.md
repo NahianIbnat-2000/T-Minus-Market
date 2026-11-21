@@ -17,7 +17,6 @@ Static pages, all built by one command, ready for GitHub Pages (branch master, f
 | --- | --- |
 | `index.html` | The article: one-page summary with the key numbers, method, and links (the front door) |
 | `site/index.html` | The interactive report: five stages and four tools (Failure Timeline, Expected vs Actual, Event Study Lab, Placebo Simulator) |
-| `plan.html` | The analysis plan and change log, rendered from `docs/ANALYSIS_PLAN.md` |
 | `case-study.html` | The case study: full write-up with research questions, figures, earlier work, limits, FAQ and references |
 | `case-study.pdf` | The case study typeset with LaTeX (Times New Roman 12 pt), from the same text as the web page. Needs a LaTeX install (MiKTeX on Windows); without one, step 08 still writes `casestudy/` for Overleaf |
 | `casestudy/` | `case-study.tex` and its four figures (vector PDFs) |
@@ -25,7 +24,7 @@ Static pages, all built by one command, ready for GitHub Pages (branch master, f
 
 ```
 python pipeline/07_export_site_data.py   # results -> site/data/*.json
-python pipeline/08_build_html.py         # -> index.html, site/index.html, plan.html, .nojekyll
+python pipeline/08_build_html.py         # -> index.html, site/index.html, case-study.html/.pdf, og.png, .nojekyll
 ```
 
 Every number on every page comes from `site/data/` (derived statistics only). Edit text and code in
@@ -190,3 +189,6 @@ any abnormal return is computed.
 Prices are never published (Yahoo licensing). Anyone can verify every test statistic, interval and p-value from
 the published derived data with `audit/verify_published.py`; re-estimating the CARs themselves needs the prices.
 `data/processed/firm_event_cars.csv` holds alphas and betas and is never committed.
+
+`docs/ANALYSIS_PLAN.md` is the internal record of the rules fixed before results and of every later change. It is not published
+on the website; the working paper reproduces its commit record (Appendix G).

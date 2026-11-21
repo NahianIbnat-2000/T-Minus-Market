@@ -75,17 +75,17 @@ def test_inline_script_parses(built, tmp_path):
 def test_article_and_plan_pages(built, tmp_path):
     root, _ = built
     s8 = _load("s8b", "08_build_html.py")
-    a, p = s8.build_pages(site_data=root / "site_data", root_out=tmp_path)[:2]
-    art, plan = a.read_text(encoding="utf-8"), p.read_text(encoding="utf-8")
+    a = s8.build_pages(site_data=root / "site_data", root_out=tmp_path)[0]
+    art = a.read_text(encoding="utf-8")
     assert (tmp_path / ".nojekyll").exists()
-    assert 'href="site/index.html"' in art and 'href="plan.html"' in art and "<script" not in art
+    assert 'href="site/index.html"' in art and "plan.html" not in art and "<script" not in art
     assert 'property="og:title"' in art and "Nahian Ibnat" in art
     res = json.loads((root / "site_data" / "results.json").read_text())
     import landing
     assert landing.pct(res["primary"]["mean_car"], 2) in art           # number comes from results.json
     text = re.sub(r"<[^>]+>", " ", re.sub(r"<style>.*?</style>", "", art, flags=re.S))
     assert not re.search(r"\bNone\b(?! of)|\bnan\b", text)         # "None of the 12 checks" is prose
-    assert "<table>" in plan and "Change log" in plan
+    assert not (tmp_path / "plan.html").exists()
 
 
 def test_preview_image(built, tmp_path):

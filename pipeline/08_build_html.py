@@ -85,16 +85,16 @@ def bundle(entry: Path) -> str:
 
 
 def build_pages(site_data: Path = SITE / "data", root_out: Path = ROOT) -> list[Path]:
-    """Root article (index.html) and plan page (plan.html) for GitHub Pages."""
+    """Root article (index.html), working paper (case-study.html/.pdf) and preview image for GitHub Pages."""
     import landing
     data = {k: json.loads((site_data / f).read_text(encoding="utf-8")) for k, f in DATA_FILES.items()}
     meta = json.loads((SITE / "site_meta.json").read_text(encoding="utf-8"))
     css = "\n".join((SRC / "styles" / f).read_text(encoding="utf-8") for f in STYLES + ["landing.css"])
-    a, p = root_out / "index.html", root_out / "plan.html"
+    a = root_out / "index.html"
     a.write_text(landing.article(data, meta, ROOT, css), encoding="utf-8")
-    p.write_text(landing.plan_page(ROOT, meta, css), encoding="utf-8")
+    (root_out / "plan.html").unlink(missing_ok=True)            # the plan page is no longer published
     (root_out / ".nojekyll").touch()
-    out = [a, p]
+    out = [a]
     cs_css = "\n".join((SRC / "styles" / f).read_text(encoding="utf-8") for f in STYLES + ["landing.css", "casestudy.css"])
     import casestudy
     import casestudy_tex
@@ -144,7 +144,7 @@ def build(site_data: Path = SITE / "data", out: Path = SITE / "index.html") -> P
     data_json = json.dumps(data, separators=(",", ":")).replace("</", "<\\/")
     style = "\n".join((SRC / "styles" / f).read_text(encoding="utf-8") for f in STYLES)
     script = bundle(SRC / "main.js").replace("</script", "<\\/script")
-    info = f"built {datetime.now(timezone.utc).isoformat(timespec='seconds')}, plan v{data['manifest'].get('plan_version')}"
+    info = f"built {datetime.now(timezone.utc).isoformat(timespec='seconds')}"
     noscript = static_summary(data)
     html = (SITE / "template.html").read_text(encoding="utf-8")
     for key, val in (("{{STYLE}}", style), ("{{DATA}}", data_json), ("{{SCRIPT}}", script), ("{{BUILD_INFO}}", info),
