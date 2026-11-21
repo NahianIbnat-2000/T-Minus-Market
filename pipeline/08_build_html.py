@@ -12,7 +12,9 @@ Usage:  python pipeline/08_build_html.py
 """
 from __future__ import annotations
 
+import importlib.util
 import json
+import shutil
 import re
 from datetime import datetime, timezone
 from pathlib import Path
@@ -130,7 +132,8 @@ def static_summary(data: dict) -> str:
     return (f"<h2>Key results (static summary)</h2><p>This interactive report needs JavaScript for its charts and tools. "
             f"The full text is in the <a href=\"../case-study.html\">working paper</a> and the <a href=\"../index.html\">article</a>.</p>"
             f"<p>Listed competitors: average two-day abnormal return {e(L.pct(p['mean_car'], 2))} (95% interval {e(L.pct(p['ci_low'], 2))} to "
-            f"{e(L.pct(p['ci_high'], 2))}; p = {e(L.pval(p['p']))}), from {p['n_failures']} failures, {p['n_firms']} firms and "
+            f"{e(L.pct(p['ci_high'], 2))}" + (f", p = {e(L.pval(f['pA']))}" if f.get("pA") is not None else "")
+            + f"; prespecified standardized test p = {e(L.pval(p['p']))}), from {p['n_failures']} failures, {p['n_firms']} firms and "
             f"{p['n_clusters']} independent events.</p>"
             f"<table><caption>The rocket's maker: two-day abnormal return</caption><thead><tr><th>Failure</th><th>Listed maker</th>"
             f"<th>CAR T0 to T+1</th></tr></thead><tbody>{rows}</tbody></table>")
@@ -146,9 +149,16 @@ def build(site_data: Path = SITE / "data", out: Path = SITE / "index.html") -> P
     script = bundle(SRC / "main.js").replace("</script", "<\\/script")
     info = f"built {datetime.now(timezone.utc).isoformat(timespec='seconds')}"
     noscript = static_summary(data)
+    meta = json.loads((SITE / "site_meta.json").read_text(encoding="utf-8"))
+    links = [("Article", "../index.html"), ("Working paper", "../case-study.html")]
+    if (ROOT / "case-study.pdf").exists() or shutil.which("xelatex") or shutil.which("pdflatex"):
+        links.append(("PDF", "../case-study.pdf"))
+    if meta.get("repo_url"):
+        links.append(("Code", meta["repo_url"]))
+    nav = " · ".join(f'<a href="{h}">{l}</a>' for l, h in links)
     html = (SITE / "template.html").read_text(encoding="utf-8")
     for key, val in (("{{STYLE}}", style), ("{{DATA}}", data_json), ("{{SCRIPT}}", script), ("{{BUILD_INFO}}", info),
-                     ("{{NOSCRIPT}}", noscript)):
+                     ("{{NOSCRIPT}}", noscript), ("{{NAV}}", nav)):
         if key not in html:
             raise ValueError(f"template is missing {key}")
         html = html.replace(key, val)
@@ -163,4 +173,11 @@ if __name__ == "__main__":
     print(f"Wrote {p.relative_to(ROOT)} ({p.stat().st_size / 1024:.0f} kB): the interactive report.")
     for q in build_pages():
         print(f"Wrote {q.relative_to(ROOT)} ({q.stat().st_size / 1024:.0f} kB).")
+    try:                                             # article, paper and report must agree with results.json
+        spec = importlib.util.spec_from_file_location("consistency", ROOT / "audit" / "check_consistency.py")
+        chk = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(chk)
+        chk.main(ROOT)
+    except FileNotFoundError:
+        pass
     print("Open index.html (the article) in any browser.")

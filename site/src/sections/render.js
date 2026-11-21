@@ -37,6 +37,7 @@ export function renderReport(data) {
     ${T.stageLabel("T−2", "The Failures")}
     <h2 id="h-t-2">Every rocket that failed</h2>
     ${T.failuresText(c)}
+    ${T.sampleDiagram(data.manifest && data.manifest.sample, c)}
     ${yearBarsPlate({ title: "Orbital launch failures per year", failures,
       caption: `Outline: all orbital launch failures (GCAT success score below 0.75), ${c.firstYear} to ${c.lastYear}. Solid: failures that enter the study. Source: GCAT (J. McDowell), CC-BY.` })}
     ${timelineHtml(data)}</div></section>`;

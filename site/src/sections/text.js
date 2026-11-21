@@ -2,7 +2,7 @@
 // Rule: no number is typed here. Every figure comes from results.json, firm_events.json
 // or failures.json, so the text cannot drift from the analysis.
 import { ci, date, escapeHtml, num, pct, pval, signClass, verdict } from "../format.js";
-import { tPpf } from "../stats/eventstudy.js";
+import { tPpf, tSf } from "../stats/eventstudy.js";
 
 const listJoin = (a) => (a.length <= 1 ? a.join("") : `${a.slice(0, -1).join(", ")} and ${a[a.length - 1]}`);
 
@@ -65,11 +65,18 @@ export function mde(p) {
   return (tPpf(0.975, df) + tPpf(0.8, df)) * se;
 }
 
+/** p-value for the equal-weighted mean, from the published cluster-robust interval (t, G-1 df). */
+export function pMean(p) {
+  if (p.ci_low === null || p.ci_low === undefined || !p.n_clusters) return null;
+  const df = p.n_clusters - 1, se = (p.ci_high - p.ci_low) / (2 * tPpf(0.975, df));
+  return se > 0 ? 2 * tSf(Math.abs(p.mean_car / se), df) : null;
+}
+
 export function rivalText(primary, e1, conc) {
   const p = primary;
   let s = `
   <h3>The competitors</h3>
-  <p>When a rival's rocket failed, listed small-launch companies moved by <strong class="${signClass(p.mean_car)}">${pct(p.mean_car, 2)}</strong> on average over two days (95% interval ${ci(p.ci_low, p.ci_high, 2)}; p = ${pval(p.p)}). This reaction ${verdict(p.p)}. It is based on ${p.n_failures} failures, ${p.n_firms} companies and ${p.n_clusters} independent events.</p>`;
+  <p>When a rival's rocket failed, listed small-launch companies moved by <strong class="${signClass(p.mean_car)}">${pct(p.mean_car, 2)}</strong> on average over two days (95% interval ${ci(p.ci_low, p.ci_high, 2)}${pMean(p) !== null ? `, p = ${pval(pMean(p))}` : ""}; prespecified standardized test p = ${pval(p.p)}). This reaction ${verdict(p.p)}. It is based on ${p.n_failures} failures, ${p.n_firms} companies and ${p.n_clusters} independent events.</p>`;
   if (p.p >= 0.05) {
     const m = mde(p);
     s += `<p>"Not detectable" is not the same as "no effect". Average reactions much larger than the interval's ends, in either direction, are unlikely${
@@ -86,6 +93,17 @@ export function rivalText(primary, e1, conc) {
 }
 
 // ------------------------------------------------------------------ T+1
+/** Sample construction as labelled boxes. Units change (launches, reactions, clusters, firms). */
+export function sampleDiagram(sample, c) {
+  if (!sample) return "";
+  const box = (n, label, unit, key) => (n === null || n === undefined) ? "" :
+    `<div class="sd-box${key ? " key" : ""}"><span class="sd-n">${escapeHtml(String(n))}</span><span class="sd-l">${escapeHtml(label)}</span><span class="sd-u">unit: ${escapeHtml(unit)}</span></div>`;
+  return `<figure class="sample-diagram" aria-label="Sample construction">
+    <div class="sd-row">${box(sample.launch_attempts, "Launch attempts", "launches")}<span class="sd-arrow" aria-hidden="true">→</span>${box(sample.failures, "Failures (GCAT score below 0.75)", "launches")}<span class="sd-arrow" aria-hidden="true">→</span>${box(sample.failures_in_study, "In the study (listed maker or listed rival)", "failures")}</div>
+    <div class="sd-row">${box(sample.provider_cases, "Listed maker: case studies", "failures", true)}${box(sample.rival_failures, "Listed rivals", "failures")}<span class="sd-arrow" aria-hidden="true">→</span>${box(sample.rival_firm_events, "Rival reactions (one per rival per failure)", "stock reactions")}<span class="sd-arrow" aria-hidden="true">→</span>${box(sample.rival_clusters, "Independent events", "clusters", true)}${box(sample.rival_firms, "Distinct rival firms", "firms")}</div>
+    <figcaption>The unit changes along the way, so later boxes are not subsets of earlier ones: one failure can produce several rival reactions, and reactions to failures a few days apart are grouped into one independent event.</figcaption></figure>`;
+}
+
 export function placeboText(pl, plShared) {
   if (!pl) return "";
   let s = `

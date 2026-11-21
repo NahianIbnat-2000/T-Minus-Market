@@ -6,6 +6,7 @@ import { axisBottom, bins, line, linear, niceDomain, niceTicks, rect, svgOpen, t
 
 const BIN_COUNT = 40;
 const STEPS = [1, 10];          // draw-button sizes
+const PLACEBO_GAP = 10;         // sessions excluded around each failure day (pipeline/analysis.py, R9)
 
 /** Share counts with the same two-sided rule as pipeline/analysis.py: 2 * min(P(<= actual), P(>= actual)). */
 export function placeboShares(draws, actual) {
@@ -29,6 +30,11 @@ export function placeboToolHtml({ results }) {
     </div>
     <div class="sim-chart"></div>
     <div class="sim-out" aria-live="polite"></div>
+    <ul class="sim-facts">
+      <li><strong>Pseudo-event dates:</strong> random ordinary trading days of each stock's own exchange, at least ${PLACEBO_GAP} sessions away from any of that stock's failure days, with a full year of earlier prices for the market model.</li>
+      <li><strong>One date per reaction:</strong> each company gets its own random day, so the same-day co-movement of rivals hit by one failure is not preserved; this makes the spread of placebo averages somewhat too narrow.</li>
+      <li><strong>What the percentile means:</strong> the share of random-day averages at or below the real one. It is not the probability that the effect is real, and this is not an exact randomization test, because random days are not exchangeable with launch days.</li>
+    </ul>
     <p class="sim-note">How this works: the draws were computed from real price data on the author's computer (fixed seed ${escapeHtml(String(pl.seed))}), and this page replays them in the same order. Only the resulting averages are published, never the prices.</p>
   </div>`;
 }

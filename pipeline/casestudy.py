@@ -20,7 +20,7 @@ INK, MUTED, RULE, SIGNAL, GAIN, DEEP = "#1C1C1C", "#5E574C", "#C9C1B3", "#D9452B
 # ----------------------------------------------------------------------------- small SVG helpers
 def _svg(w, h, label, inner):
     return (f'<svg viewBox="0 0 {w} {h}" width="100%" role="img" aria-label="{e(label)}" '
-            f'font-family="DM Mono, ui-monospace, monospace" font-size="11" fill="{INK}">{inner}</svg>')
+            f'font-family="DM Mono, ui-monospace, monospace" font-size="11" fill="{INK}"><title>{e(label)}</title>{inner}</svg>')
 
 
 def _lin(d0, d1, r0, r1):
@@ -249,6 +249,104 @@ def fig_exposure(firms, rows):
     return _svg(W, H, "Which rival firm is present in each independent event, in date order.", s)
 
 
+def sample_graph(sample, f, p):
+    """Nodes and edges of the sample diagram. Units change along the way (launches -> failures -> stock
+    reactions -> clusters), so edges carry labels and the layout branches instead of a shrinking funnel."""
+    nodes = [
+        ("att", "Launch attempts", sample.get("launch_attempts"), "launches", 0, 0),
+        ("fail", "Failures", sample.get("failures") or f["n_failures"], "launches", 1, 0),
+        ("study", "In the study", sample.get("failures_in_study"), "failures", 2, 0),
+        ("maker", "Listed maker", f["n_cases"], "failures; case studies", 3, 0),
+        ("rivf", "Listed rivals", f["n_rival_failures"], "failures", 2, 1),
+        ("obs", "Rival reactions", p["n_firm_events"], "firm x failure", 3, 1),
+        ("clu", "Independent events", f["n_clusters"], "clusters", 4, 1),
+        ("firm", "Rival firms", f["n_rival_firms"], "firms", 4, 2),
+    ]
+    nodes = [n for n in nodes if n[2] is not None]
+    have = {n[0] for n in nodes}
+    src = "study" if "study" in have else "fail"
+    edges = [(a, b, lab) for a, b, lab in [("att", "fail", "score < 0.75"), ("fail", "study", "listed maker or rival"),
+             ("study", "maker", "maker listed"), ("study", "rivf", "rival listed"), ("fail", "maker", "maker listed"),
+             ("fail", "rivf", "rival listed"), ("rivf", "obs", "one row per rival"), ("obs", "clu", "grouped by date"),
+             ("obs", "firm", "unique firms")] if a in have and b in have and not (a == "fail" and b in ("maker", "rivf") and src == "study")]
+    return nodes, edges
+
+
+def fig_sample(nodes, edges):
+    if not nodes:
+        return ""
+    W, H, bw, bh = 720, 250, 128, 58
+    xs = lambda c: 8 + c * 146
+    ys = lambda r: 12 + r * 80
+    pos = {n[0]: (xs(n[4]), ys(n[5])) for n in nodes}
+    s = f'<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="{INK}"/></marker></defs>'
+    for a, b, lab in edges:
+        (x1, y1), (x2, y2) = pos[a], pos[b]
+        if y1 == y2:
+            ax, ay, bx, by = x1 + bw, y1 + bh / 2, x2, y2 + bh / 2
+        elif x1 == x2:
+            ax, ay, bx, by = x1 + bw / 2, y1 + bh, x2 + bw / 2, y2
+        else:
+            ax, ay, bx, by = x1 + bw / 2, y1 + bh, x2, y2 + bh / 2
+        s += f'<path d="M{ax:.1f},{ay:.1f} L{bx:.1f},{by:.1f}" stroke="{INK}" fill="none" marker-end="url(#arr)"/>'
+    for nid, lab, val, unit, c, r in nodes:
+        x, y = pos[nid]
+        s += f'<rect x="{x}" y="{y}" width="{bw}" height="{bh}" fill="{"#EBE4D6" if nid in ("maker", "clu") else "#F3EEE4"}" stroke="{INK}"/>'
+        s += f'<text x="{x + 8}" y="{y + 22}" font-size="16" font-weight="700">{val:,}</text>'
+        s += f'<text x="{x + 8}" y="{y + 37}" font-size="9.5">{e(lab)}</text><text x="{x + 8}" y="{y + 50}" font-size="8.5" fill="{MUTED}">unit: {e(unit)}</text>'
+    return _svg(W, H, "Sample construction: launches, failures, rival reactions and independent events, with the unit of each box.", s)
+
+
+def fig_weights(rows):
+    """rows: (label, value, kind) dot chart."""
+    rows = [r for r in rows if r[1] is not None]
+    if not rows:
+        return ""
+    W, rh, m = 720, 26, dict(l=260, r=30, t=8, b=28)
+    H = m["t"] + m["b"] + rh * len(rows)
+    vals = [r[1] for r in rows] + [0]
+    tk = _ticks(min(vals), max(vals), 6)
+    x = _lin(tk[0], tk[-1], m["l"], W - m["r"])
+    s = "".join(f'<line x1="{x(t):.1f}" x2="{x(t):.1f}" y1="{m["t"]}" y2="{H - m["b"]}" stroke="{RULE}"/>'
+                f'<text x="{x(t):.1f}" y="{H - 10}" text-anchor="middle" fill="{MUTED}">{pct(t, 1)}</text>' for t in tk)
+    s += f'<line x1="{x(0):.1f}" x2="{x(0):.1f}" y1="{m["t"]}" y2="{H - m["b"]}" stroke="{INK}"/>'
+    for i, (lab, v, kind) in enumerate(rows):
+        cy = m["t"] + rh * i + rh / 2
+        if kind == "primary":
+            s += f'<rect x="0" y="{cy - rh / 2:.1f}" width="{W}" height="{rh}" fill="{DEEP}"/>'
+        s += f'<text x="{m["l"] - 10}" y="{cy + 4:.1f}" text-anchor="end" font-size="10.5">{e(lab)}</text>'
+        s += f'<line x1="{x(0):.1f}" x2="{x(v):.1f}" y1="{cy:.1f}" y2="{cy:.1f}" stroke="{MUTED}"/>'
+        s += f'<circle cx="{x(v):.1f}" cy="{cy:.1f}" r="4.5" fill="{INK}"/><text x="{x(v) + (8 if v >= 0 else -8):.1f}" y="{cy - 6:.1f}" font-size="10" text-anchor="{"start" if v >= 0 else "end"}">{pct(v, 2)}</text>'
+    return _svg(W, H, "The rival average under different weightings.", s)
+
+
+def fig_timing(tm):
+    order = [("high", "Sourced statement, high confidence"), ("low", "Sourced statement, low confidence"),
+             ("provisional", "GCAT launch time (unverified)")]
+    groups = [("Rival reactions", tm["rival_reactions"]), ("Maker cases", tm["maker_cases"])]
+    W, rh, m = 720, 34, dict(l=130, r=20, t=10, b=46)
+    H = m["t"] + m["b"] + rh * len(groups)
+    shade = {"high": INK, "low": MUTED, "provisional": "#F3EEE4"}
+    s = ""
+    for i, (lab, g) in enumerate(groups):
+        y = m["t"] + i * rh; x0 = m["l"]
+        s += f'<text x="{m["l"] - 10}" y="{y + rh / 2 + 4}" text-anchor="end" font-size="11">{e(lab)} (n = {g["n"]})</text>'
+        for k, _ in order:
+            n = g["counts"].get(k, 0)
+            if not n:
+                continue
+            w = (W - m["l"] - m["r"]) * n / g["n"]
+            s += f'<rect x="{x0:.1f}" y="{y + 6}" width="{w:.1f}" height="{rh - 12}" fill="{shade[k]}" stroke="{INK}"/>'
+            if w > 26:
+                s += f'<text x="{x0 + w / 2:.1f}" y="{y + rh / 2 + 4}" text-anchor="middle" font-size="10" fill="{"#F3EEE4" if k != "provisional" else INK}">{n}</text>'
+            x0 += w
+    lx = m["l"]
+    for k, lab in order:
+        s += f'<rect x="{lx}" y="{H - 30}" width="10" height="10" fill="{shade[k]}" stroke="{INK}"/><text x="{lx + 14}" y="{H - 21}" font-size="9.5">{e(lab)}</text>'
+        lx += 14 + len(lab) * 5.6 + 18
+    return _svg(W, H, "How the disclosure time of each event is sourced.", s)
+
+
 # ----------------------------------------------------------------------------- page helpers
 class _Num:
     def __init__(self):
@@ -271,7 +369,8 @@ def _ttable(num, title, head, rows, note="", cls=""):
 
 def _eq(num, html_body, tex):
     num.eq += 1
-    return f'<div class="eq" data-tex="{e(tex)}"><span class="eq-body">{html_body}</span><span class="eq-no">({num.eq})</span></div>'
+    return (f'<div class="eq" data-tex="{e(tex)}" tabindex="0" role="group" aria-label="Equation {num.eq}">'
+            f'<span class="eq-body">{html_body}</span><span class="eq-no">({num.eq})</span></div>')
 
 
 WHY = {"no_firm_map_match": "maker not a listed company",
@@ -323,6 +422,10 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
                "negative" if all(x["windows"]["primary"]["car"] < 0 for x in e1_drop) else "")
     n_sector = sum(1 for x in riv if (x.get("flag") or {}).get("verdict") == "sector_move")
     n_low = len({x["launch_tag"] for x in riv if x.get("disclosure_confidence") == "low"})
+    et = D.estimand_tests(fes, p) if riv else None
+    tm = D.timing(fes)
+    prov_share = tm["rival_reactions"]["shares"].get("provisional", 0.0)
+    nodes, edges = sample_graph(sample, f, p)
     words = ["no", "one", "two", "three", "four", "five", "six"]
     nw = lambda n: words[n] if n < len(words) else str(n)
     top_all = f["top_firm_clusters"] == f["n_clusters"]
@@ -341,13 +444,14 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
         f"This paper asks how equity markets react when an orbital launch fails, both for the company that built the rocket and for "
         f"its publicly listed competitors. Using {f['n_failures']} orbital launch failures from {span} (GCAT) and a market-model event "
         f"study with a prespecified test, it finds that in the {f['n_cases']} failures with a listed maker ({n_case_firms} firms) "
-        + (f"the maker lost between {pct(abs(f['case_hi']), 1, False)} and {pct(abs(f['case_lo']), 1, False)} of market value over two "
-           f"trading days, each case with a 95% interval excluding zero. " if all_fell and all(c['car_primary_ci'][1] < 0 for c in cases)
+        + (f"the maker's two-day cumulative abnormal return was between {pct(f['case_hi'])} and {pct(f['case_lo'])}, "
+           f"each case with a 95% interval excluding zero. " if all_fell and all(c['car_primary_ci'][1] < 0 for c in cases)
            else f"two-day abnormal returns ranged from {pct(f['case_lo'])} to {pct(f['case_hi'])}. ")
         + f"Across {f['n_rival_failures']} failures with listed competitors ({p['n_firm_events']} stock reactions, {f['n_rival_firms']} firms, "
-        f"{f['n_clusters']} independent events), the average two-day cumulative abnormal return is {pct(p['mean_car'], 2)} (95% "
-        f"cluster-robust interval {pct(p['ci_low'], 2)} to {pct(p['ci_high'], 2)}; Boehmer-Musumeci-Poulsen test with Kolari-Pynnönen "
-        f"adjustment, p = {pval(p['p'])}). "
+        f"{f['n_clusters']} independent events), the equal-weighted average two-day cumulative abnormal return is {pct(p['mean_car'], 2)} "
+        f"(95% cluster-robust interval {pct(p['ci_low'], 2)} to {pct(p['ci_high'], 2)}"
+        + (f"; cluster-robust p = {pval(et['A']['p'])}" if et else "")
+        + f"); the prespecified standardized test (Boehmer-Musumeci-Poulsen with a Kolari-Pynnönen adjustment) gives p = {pval(p['p'])}. "
         + ("The evidence therefore establishes neither systematic contagion nor systematic competitive gains among these firms, "
            f"and it does not show the effect is negligible: average effects of about {pct(pw['mde80'], 1, False)} in either direction "
            f"would usually go undetected. " if not detect and pw else "")
@@ -358,7 +462,8 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
     inshort = [
         f"<strong>The rocket's maker:</strong> " + (f"large losses in each of {f['n_cases']} cases ({pct(f['case_hi'])} to {pct(f['case_lo'])} over two days)."
                                                      if all_fell else f"mixed reactions across {f['n_cases']} cases."),
-        f"<strong>Listed competitors:</strong> {pct(p['mean_car'], 2)} on average (95% interval {pct(p['ci_low'], 2)} to {pct(p['ci_high'], 2)}; p = {pval(p['p'])}): "
+        f"<strong>Listed competitors:</strong> {pct(p['mean_car'], 2)} on average (95% interval {pct(p['ci_low'], 2)} to {pct(p['ci_high'], 2)}"
+        + (f", p = {pval(et['A']['p'])}" if et else "") + f"; prespecified standardized test p = {pval(p['p'])}): "
         + ("no detectable reaction." if not detect else "a detectable reaction."),
         (f"<strong>Uncertainty:</strong> effects of about {pct(pw['mde80'], 1, False)} either way could go undetected; " if pw else "<strong>Uncertainty:</strong> ")
         + ("the sign depends on weighting." if sign_flips else "see section 7."),
@@ -367,7 +472,7 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
 
     # ---------------- tables
     funnel_rows = [("Orbital launch attempts", sample.get("launch_attempts")), ("Launch failures", sample.get("failures") or f["n_failures"]),
-                   ("Failures with a listed firm involved", sample.get("failures_with_any_listed_firm")),
+                   ("Failures in the study", sample.get("failures_in_study")),
                    ("Failures with listed competitors", f["n_rival_failures"]), ("Competitor stock reactions", p["n_firm_events"]),
                    ("Independent competitor events", f["n_clusters"]), ("Listed competitor firms", f["n_rival_firms"])]
     desc_rows = [[e(x["firm"]), e(x["ticker"]), str(x["n"]), str(x["clusters"]), f'<span class="num">{pct(x["mean"], 2)}</span>',
@@ -384,7 +489,9 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
                 ["Mean standardized CAR (BMP)", f'<span class="num">{w.get("mean_standardized", float("nan")):.3f}</span>' if w else "n/a"],
                 ["BMP t, unadjusted", f'<span class="num">{t_unadj:.3f}</span>' if t_unadj is not None else "n/a"],
                 ["Kolari-Pynnönen adjustment factor", f'<span class="num">{adj:.3f}</span>' if adj is not None else "n/a"],
-                ["Adjusted t / p (two-sided)", f'<span class="num">{p["stat"]:.3f} / {pval(p["p"])}</span>'],
+                ["BMP-KP adjusted t / p (prespecified test; mean standardized CAR = 0)", f'<span class="num">{p["stat"]:.3f} / {pval(p["p"])}</span>'],
+                ["Cluster-robust t / p for the mean CAR (matches the interval)", f'<span class="num">{et["A"]["t"]:.3f} / {pval(et["A"]["p"])}</span>' if et else "n/a"],
+                [f"Wild cluster bootstrap p for the mean CAR (Webb weights, {et['A']['draws']:,} draws)" if et else "Wild cluster bootstrap p", f'<span class="num">{pval(et["A"]["p_wild"])}</span>' if et else "n/a"],
                 ["Mean within-cluster correlation", f'<span class="num">{p.get("mean_within_cluster_corr", 0):.3f}</span>'],
                 ["Reactions / failures / firms / clusters", f'{p["n_firm_events"]} / {p["n_failures"]} / {p["n_firms"]} / {p["n_clusters"]}']]
     if pw:
@@ -461,7 +568,7 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
                      + ([("Code", meta["repo_url"])] if meta.get("repo_url") else []))
     nav += (f' <span class="screen-only">· <a href="{e(pdf_name)}">PDF</a></span>' if pdf_name else "")
     contents = ["Introduction", "Institutional background", "Related literature", "Data and sample construction", "Empirical methodology",
-                "Main results", "Robustness and sensitivity", "Confounding news", "Discussion", "Limitations", "Conclusion"]
+                "Main results", "Robustness and sensitivity", "Confounding corporate announcements", "Discussion", "Limitations", "Conclusion"]
 
     eqs = [
         _eq(num, "<i>R</i><sub><i>it</i></sub> = <i>α</i><sub><i>i</i></sub> + <i>β</i><sub><i>i</i></sub> <i>R</i><sub><i>mt</i></sub> + <i>ε</i><sub><i>it</i></sub>",
@@ -514,7 +621,13 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
 <p><strong>Firms.</strong> Each failure is linked by hand, point in time, to its maker if listed and to listed rivals. A Tier 1 rival is listed, has launch as a pure-play or major business, sells a rocket of the same size class to the same customer market, and has flown that rocket in the previous 730 days. Firm-map rows used in tests are verified against filings or exchange notices.</p>
 <p><strong>Prices.</strong> Daily adjusted closes from Yahoo Finance, used locally only; benchmarks are each firm's home market index. Prices from before a firm's real listing (a pre-merger shell) are dropped. Only derived statistics are published.</p>
 <p><strong>Event dates and clusters.</strong> Day 0 (T0) is the first trading session at or after the failure became public, on the stock's own exchange calendar. Failures less than {st.get("cluster_gap", 5)} trading days apart that share a firm form one cluster.</p>
-{_figure(num, "funnel", "Sample construction", fig_funnel(funnel_rows), "Bar length on a square-root scale. Counts come from the pipeline's interim files and exported data.")}
+{_figure(num, "sample", "Sample construction", fig_sample(nodes, edges), f"Each box gives a count and its unit, and the unit changes along the way. Failures: GCAT success score below 0.75. In the study: the failure has a listed maker or a listed Tier 1-2 rival (one failure has both). Rival reactions: one per listed rival per failure. Independent events: failures that share a firm within {st.get('cluster_gap', 5)} trading days are grouped. Source: GCAT (J. McDowell) and the project pipeline.")}
+<h3>Event timing verification</h3>
+<p>Day 0 depends on when a failure became public relative to the exchange close. For each event the disclosure time is either a sourced company statement (with high or low confidence) or GCAT's recorded launch time. GCAT times are used only where day 0 would not change if the true disclosure came 10 minutes earlier or up to 180 minutes later; events failing that check need a sourced time. {pct(prov_share, 0, False)} of rival reactions ({tm['rival_reactions']['counts'].get('provisional', 0)} of {tm['rival_reactions']['n']}) and {tm['maker_cases']['counts'].get('provisional', 0)} of {tm['maker_cases']['n']} maker cases rely on GCAT launch times that were not separately verified against a company statement; {tm['rival_reactions']['counts'].get('low', 0)} rival reaction{"s" if tm['rival_reactions']['counts'].get('low', 0) != 1 else ""} rely on a low-confidence sourced time (covered by checks R5a and R5b).</p>
+{_ttable(num, "Disclosure-time sources", ["Source of the disclosure time", "Rival reactions", "Rival failures", "Maker cases"],
+         [[lab, str(tm["rival_reactions"]["counts"].get(k, 0)), str(tm["rival_failures"]["counts"].get(k, 0)), str(tm["maker_cases"]["counts"].get(k, 0))]
+          for k, lab in (("high", "Company statement, high confidence"), ("low", "Company statement, low confidence"), ("provisional", "GCAT launch time (not separately verified)"))])}
+{_figure(num, "timing", "Event timing verification", fig_timing(tm), f"Share of events by disclosure-time source. Rival reactions: n = {tm['rival_reactions']['n']}; maker cases: n = {tm['maker_cases']['n']}. Source: data/manual/disclosure_times.csv and GCAT.")}
 {_figure(num, "years", "Orbital launch failures per year", fig_years(fails), f"Outline: all orbital launch failures, {e(span)}. Filled: failures that enter the study.")}
 {_ttable(num, "Rival reactions by firm, CAR " + t("primary"), ["Firm", "Ticker", "Reactions", "Clusters", "Mean", "Median", "Range"], desc_rows, f"Clusters: independent events in which the firm appears; {f['n_clusters']} in total.")}
 {_figure(num, "exposure", "Which rival is present in each independent event", fig_exposure(firm_names, exp_rows), "Columns: independent events in date order. Filled: the firm is a rival in that event; a number means it appears more than once (two close failures).")}
@@ -531,8 +644,12 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
 {eqs[3]}
 <p>Because one failure can hit several rivals, the statistic is adjusted as in Kolari and Pynnönen (2010). Correlation is non-zero only within a cluster <i>c</i>; for a pair it is the correlation of estimation-window residuals, scaled by the share of event-window days ℓ<sub><i>ij</i></sub> the two windows have in common. p-values use a t distribution with <i>G</i> − 1 degrees of freedom, where <i>G</i> is the number of independent clusters:</p>
 {eqs[4]}
-<p>The reported 95% interval is a separate, cluster-robust interval around the equal-weighted mean CAR. The test and the interval therefore concern slightly different quantities: the test weights each reaction by its precision, the interval does not.</p>
 {eqs[5]}
+<h3>5.1 Estimands</h3>
+<p>Let <i>i</i> = 1, …, <i>N</i> index rival reactions (one per listed rival per failure), <i>g</i> = 1, …, <i>G</i> independent events, and <i>k</i> = 1, …, <i>K</i> firms, with <i>N</i><sub><i>g</i></sub> and <i>N</i><sub><i>k</i></sub> reactions in event <i>g</i> and firm <i>k</i>, and <i>s</i><sub><i>i</i></sub> = √Var(<i>CAR</i><sub><i>i</i></sub>). Four averages answer different questions:</p>
+{_eq(num, "<i>θ</i><sub>obs</sub> = (1/<i>N</i>) Σ<sub><i>i</i></sub> <i>CAR</i><sub><i>i</i></sub>, &nbsp; <i>θ</i><sub>event</sub> = (1/<i>G</i>) Σ<sub><i>g</i></sub> (1/<i>N</i><sub><i>g</i></sub>) Σ<sub><i>i</i>∈<i>g</i></sub> <i>CAR</i><sub><i>i</i></sub>, &nbsp; <i>θ</i><sub>prec</sub> = Σ<sub><i>i</i></sub> <i>CAR</i><sub><i>i</i></sub>/<i>s</i><sub><i>i</i></sub> / Σ<sub><i>i</i></sub> 1/<i>s</i><sub><i>i</i></sub>, &nbsp; <i>θ</i><sub>firm</sub> = (1/<i>K</i>) Σ<sub><i>k</i></sub> (1/<i>N</i><sub><i>k</i></sub>) Σ<sub><i>i</i>∈<i>k</i></sub> <i>CAR</i><sub><i>i</i></sub>",
+     r"\theta_{obs} = \frac{1}{N}\sum_i CAR_i,\quad \theta_{event} = \frac{1}{G}\sum_g \frac{1}{N_g}\sum_{i\in g} CAR_i,\quad \theta_{prec} = \frac{\sum_i CAR_i/s_i}{\sum_i 1/s_i},\quad \theta_{firm} = \frac{1}{K}\sum_k \frac{1}{N_k}\sum_{i\in k} CAR_i")}
+<p><i>θ</i><sub>obs</sub> is the average reaction of a listed rival to a failure; <i>θ</i><sub>event</sub> treats every failure cluster equally; <i>θ</i><sub>prec</sub> gives more weight to calm stocks; <i>θ</i><sub>firm</sub> treats every firm equally. The confirmatory hypothesis H2 is stated for <i>θ</i><sub>obs</sub> (the published estimate and its cluster-robust interval, equation (6)). The prespecified test statistic is the standardized BMP-KP test, whose null is a zero mean standardized CAR; it coincides with <i>θ</i><sub>obs</sub> = 0 only when volatilities are similar, and is closest in spirit to <i>θ</i><sub>prec</sub>. Both tests are reported, each next to the estimand it matches. None of the weightings is preferred on statistical grounds; <i>θ</i><sub>obs</sub> stays primary because it was fixed in advance.</p>
 {_ttable(num, "Event windows", ["Window", "Days", "Role"], [["Main", t("primary"), "Confirmatory test (H2)"], ["Wider", t("robust"), "Robustness check"], ["One month", t("descriptive"), "Description only"]])}
 <p><strong>Prespecified checks.</strong> R1 one average per cluster (t-test and sign test); R2 plain t-test; R3 rank test with simulated p-value; R4 the wider window; R5 timing (drop or shift uncertain disclosure times); R6 drop market-adjusted fallbacks; R7 drop clusters with several failures; R8 leave one firm out; R9 a placebo on random non-event days. <strong>Exploratory analyses</strong>, designed after results were seen, are labelled wherever they appear and never replace H2.</p></section>
 
@@ -540,28 +657,37 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
 <h3>6.1 The rocket's maker</h3>
 <p>{"In every listed case the maker's shares fell over the two days after the failure became public, after allowing for the market, and each 95% interval excludes zero." if all_fell and all(c["car_primary_ci"][1] < 0 for c in cases) else "The listed cases are reported individually below."} With {f['n_cases']} cases from {n_case_firms} firm{"s" if n_case_firms != 1 else ""}, these are case studies, not an estimate of an average effect.</p>
 {_ttable(num, "The rocket's maker: two-day abnormal returns", ["Rocket", "Failure", "Listed maker", f"CAR {t('primary')}", "95% interval", f"CAR {t('robust')}"], case_rows, "Intervals: CAR ± 1.96 × prediction-error standard deviation.")}
-{_figure(num, "paths", "The rocket's maker: cumulative abnormal return", fig_paths(cases), "Each line is one case, set to zero at the close before the failure (T−1), so the value at T+1 is the two-day result in the table.")}
+{_figure(num, "paths", "The rocket's maker: cumulative abnormal return", fig_paths(cases), f"Cumulative abnormal return from T−5 to T+20, set to zero at the close before the failure (T−1), so the value at T+1 is the two-day result in the table. {f['n_cases']} cases, market model, simple returns, home-market index. Source: project pipeline (prices from Yahoo Finance, not published).")}
 <h3>6.2 Listed competitors</h3>
-<p>Table {num.tab + 1} reports the confirmatory test. The average two-day abnormal return of listed rivals is <strong>{pct(p['mean_car'], 2)}</strong> (95% interval {_ci(p['ci_low'], p['ci_high'])}); the adjusted BMP statistic is {p['stat']:.2f} (p = {pval(p['p'])}). {"H2 is not rejected at the 5% level." if not detect else "H2 is rejected at the 5% level."}</p>
+<p>Table {num.tab + 1} reports the confirmatory test. The equal-weighted average two-day abnormal return of listed rivals is <strong>{pct(p['mean_car'], 2)}</strong> (95% interval {_ci(p['ci_low'], p['ci_high'])}{f"; cluster-robust p = {pval(et['A']['p'])}, wild cluster bootstrap p = {pval(et['A']['p_wild'])}" if et else ""}). The prespecified standardized test gives t = {p['stat']:.2f} (p = {pval(p['p'])}). {"H2 is not rejected at the 5% level under any of these tests." if not detect and (not et or et['A']['p'] >= 0.05) else "See the table for each test."}</p>
 {_ttable(num, "Confirmatory test of H2: listed competitors, CAR " + t("primary"), ["Quantity", "Value"], inf_rows, "Minimum detectable effect: two-sided 5% test, from the cluster-robust standard error implied by the interval.")}
 <p><strong>Precision.</strong> {f"With a cluster-robust standard error of {pct(pw['se'], 2, False)}, an average effect would need to be about {pct(pw['mde80'], 1, False)} to be detected with 80% probability; the probability of detecting a true 1% effect is {pw['power'][0.01]:.2f}. The 90% interval ({_ci(*pw['ci90'])}) would support an equivalence claim only for a margin of about ±{pct(max(abs(pw['ci90'][0]), abs(pw['ci90'][1])), 1, False)}, which is not economically negligible for a two-day return. The data therefore do not show that rivals are unaffected." if pw else ""}</p>
-{_ttable(num, "How the rival average depends on weighting", ["Weighting", "Estimate", "Note"], wt_rows, "Descriptive, added after the audit; not new tests.") if wt_rows else ""}
-<p>{f"The sign of the average depends on weighting: equal weight per reaction gives {pct(w['observation_weighted'], 2)}, equal weight per firm gives {pct(w['firm_balanced'], 2)}, because {e(firms[-1]['firm'])}'s {firms[-1]['n']} reactions average {pct(firms[-1]['mean'], 2)}." if sign_flips and firms else ""} With {f['n_rival_firms']} firms, asymptotic inference clustered by firm is not reliable, so firm-level dependence is examined by leaving each firm out (R8) rather than by clustering on firms.</p></section>
+<h3>6.3 Sample concentration, repeated firm exposure, and external validity</h3>
+<p>The rival sample is concentrated. {f"{e(f['top_firm'])} appears in every one of the {f['n_clusters']} independent events. " if top_all else ""}The same securities appear in many events, so the {f['n_clusters']} clusters are not {f['n_clusters']} independent draws from the launch industry: clustering by event handles rivals that react on the same day, but a firm-specific shock that persists across months (for example a change in how investors value one firm) links that firm's reactions across events. Clustering by firm would address this, but with {f['n_rival_firms']} firms such inference is not reliable.</p>
+{_ttable(num, "Contribution of each firm to the rival average", ["Firm", "Reactions", "Share of reactions", "Contribution to the mean", "Firm mean"],
+         [[e(c["firm"]), str(c["n"]), f'{c["share"] * 100:.0f}%', f'<span class="num">{pct(c["contribution"], 2)}</span>',
+           f'<span class="num">{pct(next(x["mean"] for x in firms if x["firm"] == c["firm"]), 2)}</span>'] for c in et["contrib"]] if et else [],
+         f"Contribution: the firm's summed CARs divided by all {p['n_firm_events']} reactions; contributions add up to the equal-weighted mean ({pct(p['mean_car'], 2)}).") if et else ""}
+<p>{f"The estimate is close to zero partly because offsetting firms cancel: {e(et['contrib'][-1]['firm'])}'s {et['contrib'][-1]['n']} reactions contribute {pct(et['contrib'][-1]['contribution'], 2)} to the mean, against {pct(et['contrib'][0]['contribution'], 2)} from {e(et['contrib'][0]['firm'])}'s {et['contrib'][0]['n']}. " if et and len(et['contrib']) > 1 else ""}Weighting each firm equally gives a different answer, and none of the weightings is statistically preferred (Table {num.tab + 1}, Figure {num.fig + 1}).</p>
+{_ttable(num, "The rival average under alternative weightings", ["Weighting (estimand)", "Estimate", "Note"], wt_rows, "Sensitivity analysis added after the audit; the prespecified estimate is the first row.") if wt_rows else ""}
+{_figure(num, "weights", "The rival average under alternative weightings", fig_weights([("Every reaction equal (prespecified)", w.get("observation_weighted"), "primary"), ("Every independent event equal", w.get("event_weighted"), ""), ("Inverse prediction-error SD", w.get("precision_weighted"), ""), ("Every firm equal", w.get("firm_balanced"), ""), ("Median reaction", w.get("median"), "")]) if w else "", f"CAR {t('primary')}, market model, simple returns; {p['n_firm_events']} reactions, {f['n_clusters']} events, {f['n_rival_firms']} firms. Shaded: the prespecified estimand.")}
+<p>{f"A firm-level view makes the limit concrete: the mean of the {et['firm']['k']} firm means is {pct(et['firm']['mean'], 2)}, with a 95% t interval of {_ci(*et['firm']['ci'], 1)} on {et['firm']['k'] - 1} degrees of freedom. " if et and et['firm']['ci'][0] is not None else ""}Leaving one firm out (R8, section 7) is the more informative check of firm dependence here. The results describe these listed firms, not private, state-owned or diversified aerospace companies, and they cannot be generalized to the launch industry as a whole.</p></section>
 
 <section id="s7"><h2>7. Robustness and sensitivity</h2>
 <p>{"None of the" if f["n_robust_sig"] == 0 else str(f["n_robust_sig"]) + " of the"} {len(robust)} prespecified checks {"detects" if f["n_robust_sig"] == 0 else "detect"} a significant average at the 5% level. Non-rejection is stable; the estimate is not: across checks the average ranges from {pct(rob_lo, 2)} ({e(_plain_name(f['rob_min_name']))}) to {pct(rob_hi, 2)} ({e(_plain_name(f['rob_max_name']))}).{" Leaving one firm out changes the sign." if r8_flip else ""}</p>
-{_figure(num, "forest", "Listed competitors: main test and prespecified checks", fig_forest(forest), "Dots: average two-day abnormal return; lines: 95% intervals. Shaded: the confirmatory test.")}
+{_figure(num, "forest", "Listed competitors: main test and prespecified checks", fig_forest(forest), f"Dots: average CAR {t('primary')} (except the wider-window check); lines: 95% cluster-robust intervals; tests without an interval are omitted. Full sample: {p['n_firm_events']} reactions, {f['n_clusters']} events. Shaded: the confirmatory estimate.")}
 {_ttable(num, "Prespecified robustness checks", ["Check", "Average", "95% interval", "p", "Reactions", "Clusters"], rob_rows)}
 <p><strong>Placebo.</strong> R9 repeats the calculation on {pl.get("draws")} sets of random ordinary trading days. The real result sits at the {ordinal(pl["actual_percentile"])} percentile (two-sided share {pl["two_sided_share"]:.3f}). Because R9 draws a separate date for each reaction, it ignores that rivals hit by one failure move on the same day, so its spread is too narrow; it is a benchmark, not an exact permutation test, and the percentile is not a probability that the effect is real.{f" An exploratory version with one shared date per cluster (R9b, {r9b['draws']} draws) places the real result at the {ordinal(r9b['actual_percentile'])} percentile (two-sided share {r9b['two_sided_share']:.3f})." if r9b else " A corrected version with one shared date per cluster (R9b) is specified as exploratory and is run by step 09."}</p>
-{_figure(num, "placebo", "Real result against random ordinary days (R9)", fig_placebo(pl), f"Histogram of {pl.get('draws')} placebo averages (fixed seed). Red: averages at least as far out as the real result. Black line: the real failures.")}
+{_figure(num, "placebo", "Real result against random ordinary days (R9)", fig_placebo(pl), f"Average CAR {t('primary')} over {p['n_firm_events']} reactions on random non-event days, {pl.get('draws')} draws (fixed seed), one random day per reaction. Red: averages at least as far out as the real result. Black line: the real failures. A benchmark, not an exact permutation test.")}
 </section>
 
-<section id="s8"><h2>8. Confounding news</h2>
+<section id="s8"><h2>8. Confounding corporate announcements and sensitivity of the rival estimate</h2>
 <p>An event study attributes every unusual return in the window to the event. If a firm announces something else on the same days, its reaction mixes the two. The news around the largest rival reactions was therefore checked against public sources. Flagged reactions stay in the confirmatory test, because the rules fixed in advance do not allow removing events after results are seen.</p>
 {_ttable(num, "Rival reactions with other news in the window", ["Firm", "Failure", "CAR", "Verdict", "News"], flag_rows) if flag_rows else ""}
+<p>Each flagged announcement was checked for timing against the event window {t('primary')}: the news column gives what was announced and when, with its source. Announcements unrelated to the failure but inside the window mix two pieces of news in one reaction; this is a standard identification problem in event studies, and it cannot be fixed by the event-study model.</p>
 <p>The exploratory specifications below drop the flagged reactions. Dropping the {len(e1.get('dropped') or []) if e1 else 0} contract-news days changes the average from {pct(p['mean_car'], 2)} to {pct(e1['mean_car'], 2) if e1 else 'n/a'}{f", but the median moves only from {pct(w['median'], 2)} to {pct(w_e1['median'], 2)}: the change comes from removing {nw(n_e1)} large {e1_sign + " " if e1_sign else ""}move{"s" if n_e1 != 1 else ""}, not from a shift in the typical reaction" if w and w_e1 else ""}. The standardized test barely moves (p = {pval(e1['p']) if e1 else 'n/a'}), because it gives less weight to the volatile stocks behind those moves. The exploratory estimates are not more correct than the prespecified one: the choice of what to drop was made after seeing the data.</p>
 {_ttable(num, "Confounding-news sensitivity (exploratory)", ["Specification", "Average", "95% interval", "p", "Median", "Reactions", "Clusters"], conf_rows)}
-{_figure(num, "conf", "Confounding-news sensitivity", fig_forest(conf_forest), "Shaded: the confirmatory test. Hollow: exploratory specifications that drop flagged reactions.")}
+{_figure(num, "conf", "Confounding-news sensitivity", fig_forest(conf_forest), f"Average CAR {t('primary')} with 95% cluster-robust intervals. Shaded: the prespecified estimate ({p['n_firm_events']} reactions). Hollow: exploratory specifications, chosen after results, that drop reactions with other news. Sources for each flag: Table on announcements above.")}
 </section>
 
 <section id="s9"><h2>9. Discussion</h2>
@@ -570,11 +696,12 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
 
 <section id="s10"><h2>10. Limitations</h2>
 <ul>
-<li><strong>Few listed firms.</strong> {f['n_rival_firms']} rival firms and {f['n_clusters']} independent events{f"; {e(f['top_firm'])} appears in all of them" if top_all else ""}. Repeated exposure of the same stock means clustering by event captures only part of the dependence.</li>
+<li><strong>Few listed firms.</strong> {f['n_rival_firms']} rival firms and {f['n_clusters']} independent events{f"; {e(f['top_firm'])} appears in all of them" if top_all else ""}. Repeated exposure of the same stock means clustering by event captures only part of the dependence, and with {f['n_rival_firms']} firms clustering by firm is not reliable.</li>
+<li><strong>Small maker sample.</strong> {f['n_cases']} cases from {n_case_firms} firm{"s" if n_case_firms != 1 else ""}: case studies, not an average effect.</li>
 <li><strong>Power.</strong> Average effects of about {pct(pw.get('mde80', 0), 1, False)} could go undetected; no equivalence claim is possible.</li>
 <li><strong>Weighting and outliers.</strong> {"The sign of the estimate depends on weighting" if sign_flips else "The estimate is sensitive to weighting"}{f" and on {nw(n_e1)} large reaction{'s' if n_e1 != 1 else ''} with contract news" if n_e1 else ""}.</li>
 <li><strong>Two estimands.</strong> The interval (equal-weighted mean) and the test (standardized mean) concern different quantities and can disagree.</li>
-<li><strong>Timing.</strong> A few failures are dated by later company statements{f"; {nw(n_low)} of these {'is' if n_low == 1 else 'are'} uncertain" if n_low else ""}. R5 checks cover them.</li>
+<li><strong>Timing.</strong> {pct(prov_share, 0, False)} of rival reactions and {tm['maker_cases']['counts'].get('provisional', 0)} of {tm['maker_cases']['n']} maker cases use GCAT launch times not separately verified against a company statement (only where day 0 is insensitive to a −10 to +180 minute error); {nw(n_low)} failure{"s are" if n_low != 1 else " is"} dated by a low-confidence statement (R5 checks). Time-zone or clock errors beyond that band would shift day 0.</li>
 <li><strong>Model dependence.</strong> A one-factor market model with a home index; sector-wide moves on event days are not absorbed{f" ({nw(n_sector)} flagged case{'s' if n_sector != 1 else ''})" if n_sector else ""}.</li>
 <li><strong>Survivorship.</strong> Listed launch firms that later delisted (Orbital Sciences/Orbital ATK, Astra, Virgin Orbit) are missing because the free price source does not carry them.</li>
 <li><strong>External validity.</strong> The population is historically eligible, publicly traded launch-service competitors with comparable commercial exposure, not the launch industry.</li>
@@ -629,7 +756,7 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
 <section><h2>Appendix G. Freeze record</h2>
 <p>The rules (hypothesis, test, windows, sample criteria, checks) were committed to the public repository before the first results. Commits:</p>
 {_ttable(num, "Commit record", ["Item", "Commit", "Time (+06:00)"], freeze_rows) if freeze_rows else "<p>See the repository history.</p>"}
-<p>Exploratory analyses added later (E1 to E3, R9b and the audit diagnostics) are labelled wherever they appear.</p></section>
+<p>{f"The published statistics were exported from commit <code>{e(str(man['git']['commit'])[:7])}</code>" + (" (with uncommitted changes in the working tree)" if man['git'].get('uncommitted_changes') else "") + "." if (man.get('git') or {}).get('commit') else ""} Exploratory analyses added later (E1 to E3, R9b and the audit diagnostics) are labelled wherever they appear.</p></section>
 
 <section class="screen-only"><h2>Plain-language FAQ</h2>
 <dl class="faq">

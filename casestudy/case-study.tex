@@ -28,7 +28,7 @@
 {\raggedright{\LARGE\bfseries Rocket Launch Failures and Equity-Market Spillovers: Evidence from Publicly Listed Launch Providers\par}\vspace{6pt}{\large A T-Minus Markets case study of stock market reactions to orbital launch failures, 2000 to 2026.\par}\vspace{8pt}{\normalsize Nahian Ibnat \textperiodcentered{} Nov 2026\par}{\small Interactive version: \url{https://nahianibnat-2000.github.io/T-Minus-Market/}\par}}
 \vspace{6pt}
 \begin{abstract}
-\noindent This paper asks how equity markets react when an orbital launch fails, both for the company that built the rocket and for its publicly listed competitors. Using 138 orbital launch failures from 2000 to 2026 (GCAT) and a market-model event study with a prespecified test, it finds that in the 4 failures with a listed maker (2 firms) the maker lost between 8.8\% and 16.3\% of market value over two trading days, each case with a 95\% interval excluding zero. Across 24 failures with listed competitors (42 stock reactions, 3 firms, 22 independent events), the average two-day cumulative abnormal return is +0.28\% (95\% cluster-robust interval \textminus{}1.62\% to +2.18\%; Boehmer-Musumeci-Poulsen test with Kolari-Pynnönen adjustment, p = 0.40). The evidence therefore establishes neither systematic contagion nor systematic competitive gains among these firms, and it does not show the effect is negligible: average effects of about 2.7\% in either direction would usually go undetected. The sign of the estimate changes with how events and firms are weighted, and every independent event involves Avio SpA. The study is a small-sample case study of listed firms, not an estimate for the launch industry as a whole.
+\noindent This paper asks how equity markets react when an orbital launch fails, both for the company that built the rocket and for its publicly listed competitors. Using 138 orbital launch failures from 2000 to 2026 (GCAT) and a market-model event study with a prespecified test, it finds that in the 4 failures with a listed maker (2 firms) the maker's two-day cumulative abnormal return was between \textminus{}8.8\% and \textminus{}16.3\%, each case with a 95\% interval excluding zero. Across 24 failures with listed competitors (42 stock reactions, 3 firms, 22 independent events), the equal-weighted average two-day cumulative abnormal return is +0.28\% (95\% cluster-robust interval \textminus{}1.62\% to +2.18\%; cluster-robust p = 0.76); the prespecified standardized test (Boehmer-Musumeci-Poulsen with a Kolari-Pynnönen adjustment) gives p = 0.40. The evidence therefore establishes neither systematic contagion nor systematic competitive gains among these firms, and it does not show the effect is negligible: average effects of about 2.7\% in either direction would usually go undetected. The sign of the estimate changes with how events and firms are weighted, and every independent event involves Avio SpA. The study is a small-sample case study of listed firms, not an estimate for the launch industry as a whole.
 
 \textbf{Keywords:} event study; industry spillovers; contagion; competitive effects; launch failures. \textbf{JEL:} G14, L13.
 \end{abstract}
@@ -71,18 +71,43 @@ Section 2 describes the industry; section 3 relates the study to earlier work; s
 
 \begin{figure}[htbp]\centering
 \caption*{\textbf{Figure 1.} Sample construction}
-\includegraphics[width=\textwidth]{fig-funnel.pdf}
-\par\vspace{2pt}{\footnotesize Bar length on a square-root scale. Counts come from the pipeline's interim files and exported data.}
+\includegraphics[width=\textwidth]{fig-sample.pdf}
+\par\vspace{2pt}{\footnotesize Each box gives a count and its unit, and the unit changes along the way. Failures: GCAT success score below 0.75. In the study: the failure has a listed maker or a listed Tier 1-2 rival (one failure has both). Rival reactions: one per listed rival per failure. Independent events: failures that share a firm within 5 trading days are grouped. Source: GCAT (J. McDowell) and the project pipeline.}
+\end{figure}
+
+\subsection*{Event timing verification}
+Day 0 depends on when a failure became public relative to the exchange close. For each event the disclosure time is either a sourced company statement (with high or low confidence) or GCAT's recorded launch time. GCAT times are used only where day 0 would not change if the true disclosure came 10 minutes earlier or up to 180 minutes later; events failing that check need a sourced time. 88\% of rival reactions (37 of 42) and 4 of 4 maker cases rely on GCAT launch times that were not separately verified against a company statement; 2 rival reactions rely on a low-confidence sourced time (covered by checks R5a and R5b).
+
+\par\noindent\begin{minipage}{\textwidth}
+\textbf{Table 1.} Disclosure-time sources
+
+{\small\setlength{\tabcolsep}{4pt}\begin{tabularx}{\textwidth}{Xlll}
+\toprule
+\textbf{Source of the disclosure time} & \textbf{Rival reactions} & \textbf{Rival failures} & \textbf{Maker cases} \\
+\midrule
+Company statement, high confidence & 3 & 2 & 0 \\
+Company statement, low confidence & 2 & 1 & 0 \\
+GCAT launch time (not separately verified) & 37 & 21 & 4 \\
+\bottomrule
+\end{tabularx}}
+\vspace{6pt}
+
+\end{minipage}\par\vspace{4pt}
+
+\begin{figure}[htbp]\centering
+\caption*{\textbf{Figure 2.} Event timing verification}
+\includegraphics[width=\textwidth]{fig-timing.pdf}
+\par\vspace{2pt}{\footnotesize Share of events by disclosure-time source. Rival reactions: n = 42; maker cases: n = 4. Source: data/manual/disclosure\_times.csv and GCAT.}
 \end{figure}
 
 \begin{figure}[htbp]\centering
-\caption*{\textbf{Figure 2.} Orbital launch failures per year}
+\caption*{\textbf{Figure 3.} Orbital launch failures per year}
 \includegraphics[width=\textwidth]{fig-years.pdf}
 \par\vspace{2pt}{\footnotesize Outline: all orbital launch failures, 2000 to 2026. Filled: failures that enter the study.}
 \end{figure}
 
 \par\noindent\begin{minipage}{\textwidth}
-\textbf{Table 1.} Rival reactions by firm, CAR T0 to T+1
+\textbf{Table 2.} Rival reactions by firm, CAR T0 to T+1
 
 {\small\setlength{\tabcolsep}{4pt}\begin{tabularx}{\textwidth}{Xllllll}
 \toprule
@@ -101,7 +126,7 @@ Clusters: independent events in which the firm appears; 22 in total.
 \end{minipage}\par\vspace{4pt}
 
 \begin{figure}[htbp]\centering
-\caption*{\textbf{Figure 3.} Which rival is present in each independent event}
+\caption*{\textbf{Figure 4.} Which rival is present in each independent event}
 \includegraphics[width=\textwidth]{fig-exposure.pdf}
 \par\vspace{2pt}{\footnotesize Columns: independent events in date order. Filled: the firm is a rival in that event; a number means it appears more than once (two close failures).}
 \end{figure}
@@ -137,14 +162,21 @@ Because one failure can hit several rivals, the statistic is adjusted as in Kola
 t_{KP} = t_{BMP}\sqrt{\frac{1-\bar r}{1+(N-1)\bar r}}, \quad \bar r = \frac{\sum_{i\neq j,\,c(i)=c(j)} \rho_{ij}}{N(N-1)}, \quad \rho_{ij} = \mathrm{corr}(\varepsilon_i,\varepsilon_j)\,\frac{\ell_{ij}}{L}
 \end{equation}
 
-The reported 95\% interval is a separate, cluster-robust interval around the equal-weighted mean CAR. The test and the interval therefore concern slightly different quantities: the test weights each reaction by its precision, the interval does not.
-
 \begin{equation}
 SE_{CR} = \frac{1}{N}\sqrt{\frac{G}{G-1}\sum_g\Big(\sum_{i\in g}(CAR_i-\overline{CAR})\Big)^2}, \qquad \overline{CAR} \pm t_{G-1,\,0.975}\,SE_{CR}
 \end{equation}
 
+\subsection*{5.1 Estimands}
+Let \emph{i} = 1, …, \emph{N} index rival reactions (one per listed rival per failure), \emph{g} = 1, …, \emph{G} independent events, and \emph{k} = 1, …, \emph{K} firms, with \emph{N}\emph{g} and \emph{N}\emph{k} reactions in event \emph{g} and firm \emph{k}, and \emph{s}\emph{i} = √Var(\emph{CAR}\emph{i}). Four averages answer different questions:
+
+\begin{equation}
+\theta_{obs} = \frac{1}{N}\sum_i CAR_i,\quad \theta_{event} = \frac{1}{G}\sum_g \frac{1}{N_g}\sum_{i\in g} CAR_i,\quad \theta_{prec} = \frac{\sum_i CAR_i/s_i}{\sum_i 1/s_i},\quad \theta_{firm} = \frac{1}{K}\sum_k \frac{1}{N_k}\sum_{i\in k} CAR_i
+\end{equation}
+
+\emph{θ}obs is the average reaction of a listed rival to a failure; \emph{θ}event treats every failure cluster equally; \emph{θ}prec gives more weight to calm stocks; \emph{θ}firm treats every firm equally. The confirmatory hypothesis H2 is stated for \emph{θ}obs (the published estimate and its cluster-robust interval, equation (6)). The prespecified test statistic is the standardized BMP-KP test, whose null is a zero mean standardized CAR; it coincides with \emph{θ}obs = 0 only when volatilities are similar, and is closest in spirit to \emph{θ}prec. Both tests are reported, each next to the estimand it matches. None of the weightings is preferred on statistical grounds; \emph{θ}obs stays primary because it was fixed in advance.
+
 \par\noindent\begin{minipage}{\textwidth}
-\textbf{Table 2.} Event windows
+\textbf{Table 3.} Event windows
 
 {\small\setlength{\tabcolsep}{4pt}\begin{tabularx}{\textwidth}{llX}
 \toprule
@@ -166,7 +198,7 @@ One month & T0 to T+20 & Description only \\
 In every listed case the maker's shares fell over the two days after the failure became public, after allowing for the market, and each 95\% interval excludes zero. With 4 cases from 2 firms, these are case studies, not an estimate of an average effect.
 
 \par\noindent\begin{minipage}{\textwidth}
-\textbf{Table 3.} The rocket's maker: two-day abnormal returns
+\textbf{Table 4.} The rocket's maker: two-day abnormal returns
 
 {\small\setlength{\tabcolsep}{4pt}\begin{tabularx}{\textwidth}{llXlll}
 \toprule
@@ -185,16 +217,16 @@ Intervals: CAR ± 1.96 × prediction-error standard deviation.
 \end{minipage}\par\vspace{4pt}
 
 \begin{figure}[htbp]\centering
-\caption*{\textbf{Figure 4.} The rocket's maker: cumulative abnormal return}
+\caption*{\textbf{Figure 5.} The rocket's maker: cumulative abnormal return}
 \includegraphics[width=\textwidth]{fig-paths.pdf}
-\par\vspace{2pt}{\footnotesize Each line is one case, set to zero at the close before the failure (T\textminus{}1), so the value at T+1 is the two-day result in the table.}
+\par\vspace{2pt}{\footnotesize Cumulative abnormal return from T\textminus{}5 to T+20, set to zero at the close before the failure (T\textminus{}1), so the value at T+1 is the two-day result in the table. 4 cases, market model, simple returns, home-market index. Source: project pipeline (prices from Yahoo Finance, not published).}
 \end{figure}
 
 \subsection*{6.2 Listed competitors}
-Table 4 reports the confirmatory test. The average two-day abnormal return of listed rivals is \textbf{+0.28\%} (95\% interval \textminus{}1.62\% to +2.18\%); the adjusted BMP statistic is 0.85 (p = 0.40). H2 is not rejected at the 5\% level.
+Table 5 reports the confirmatory test. The equal-weighted average two-day abnormal return of listed rivals is \textbf{+0.28\%} (95\% interval \textminus{}1.62\% to +2.18\%; cluster-robust p = 0.76, wild cluster bootstrap p = 0.85). The prespecified standardized test gives t = 0.85 (p = 0.40). H2 is not rejected at the 5\% level under any of these tests.
 
 \par\noindent\begin{minipage}{\textwidth}
-\textbf{Table 4.} Confirmatory test of H2: listed competitors, CAR T0 to T+1
+\textbf{Table 5.} Confirmatory test of H2: listed competitors, CAR T0 to T+1
 
 {\small\setlength{\tabcolsep}{4pt}\begin{tabularx}{\textwidth}{Xl}
 \toprule
@@ -205,7 +237,9 @@ Mean CAR, equal weight per reaction & +0.28\% \\
 Mean standardized CAR (BMP) & 0.227 \\
 BMP t, unadjusted & 0.932 \\
 Kolari-Pynnönen adjustment factor & 0.916 \\
-Adjusted t / p (two-sided) & 0.854 / 0.40 \\
+BMP-KP adjusted t / p (prespecified test; mean standardized CAR = 0) & 0.854 / 0.40 \\
+Cluster-robust t / p for the mean CAR (matches the interval) & 0.306 / 0.76 \\
+Wild cluster bootstrap p for the mean CAR (Webb weights, 9,999 draws) & 0.85 \\
 Mean within-cluster correlation & 0.150 \\
 Reactions / failures / firms / clusters & 42 / 24 / 3 / 22 \\
 Minimum detectable effect (80\% / 90\% power) & 2.7\% / 3.1\% \\
@@ -221,12 +255,35 @@ Minimum detectable effect: two-sided 5\% test, from the cluster-robust standard 
 
 \textbf{Precision.} With a cluster-robust standard error of 0.91\%, an average effect would need to be about 2.7\% to be detected with 80\% probability; the probability of detecting a true 1\% effect is 0.18. The 90\% interval (\textminus{}1.29\% to +1.85\%) would support an equivalence claim only for a margin of about ±1.9\%, which is not economically negligible for a two-day return. The data therefore do not show that rivals are unaffected.
 
+\subsection*{6.3 Sample concentration, repeated firm exposure, and external validity}
+The rival sample is concentrated. Avio SpA appears in every one of the 22 independent events. The same securities appear in many events, so the 22 clusters are not 22 independent draws from the launch industry: clustering by event handles rivals that react on the same day, but a firm-specific shock that persists across months (for example a change in how investors value one firm) links that firm's reactions across events. Clustering by firm would address this, but with 3 firms such inference is not reliable.
+
 \par\noindent\begin{minipage}{\textwidth}
-\textbf{Table 5.} How the rival average depends on weighting
+\textbf{Table 6.} Contribution of each firm to the rival average
+
+{\small\setlength{\tabcolsep}{4pt}\begin{tabularx}{\textwidth}{lllXl}
+\toprule
+\textbf{Firm} & \textbf{Reactions} & \textbf{Share of reactions} & \textbf{Contribution to the mean} & \textbf{Firm mean} \\
+\midrule
+Avio SpA & 24 & 57\% & +0.34\% & +0.60\% \\
+Rocket Lab & 15 & 36\% & +0.28\% & +0.79\% \\
+Firefly Aerospace & 3 & 7\% & \textminus{}0.35\% & \textminus{}4.86\% \\
+\bottomrule
+\end{tabularx}}
+\vspace{6pt}
+
+Contribution: the firm's summed CARs divided by all 42 reactions; contributions add up to the equal-weighted mean (+0.28\%).
+
+\end{minipage}\par\vspace{4pt}
+
+The estimate is close to zero partly because offsetting firms cancel: Firefly Aerospace's 3 reactions contribute \textminus{}0.35\% to the mean, against +0.34\% from Avio SpA's 24. Weighting each firm equally gives a different answer, and none of the weightings is statistically preferred (Table 7, Figure 6).
+
+\par\noindent\begin{minipage}{\textwidth}
+\textbf{Table 7.} The rival average under alternative weightings
 
 {\small\setlength{\tabcolsep}{4pt}\begin{tabularx}{\textwidth}{XlX}
 \toprule
-\textbf{Weighting} & \textbf{Estimate} & \textbf{Note} \\
+\textbf{Weighting (estimand)} & \textbf{Estimate} & \textbf{Note} \\
 \midrule
 Every reaction equal (prespecified estimand) & +0.28\% & the main estimate \\
 Every independent event equal & +0.21\% & same as the R1 portfolio average \\
@@ -237,23 +294,29 @@ Median reaction & +0.28\% & not driven by a few large moves \\
 \end{tabularx}}
 \vspace{6pt}
 
-Descriptive, added after the audit; not new tests.
+Sensitivity analysis added after the audit; the prespecified estimate is the first row.
 
 \end{minipage}\par\vspace{4pt}
 
-The sign of the average depends on weighting: equal weight per reaction gives +0.28\%, equal weight per firm gives \textminus{}1.16\%, because Firefly Aerospace's 3 reactions average \textminus{}4.86\%. With 3 firms, asymptotic inference clustered by firm is not reliable, so firm-level dependence is examined by leaving each firm out (R8) rather than by clustering on firms.
+\begin{figure}[htbp]\centering
+\caption*{\textbf{Figure 6.} The rival average under alternative weightings}
+\includegraphics[width=\textwidth]{fig-weights.pdf}
+\par\vspace{2pt}{\footnotesize CAR T0 to T+1, market model, simple returns; 42 reactions, 22 events, 3 firms. Shaded: the prespecified estimand.}
+\end{figure}
+
+A firm-level view makes the limit concrete: the mean of the 3 firm means is \textminus{}1.16\%, with a 95\% t interval of \textminus{}9.1\% to +6.8\% on 2 degrees of freedom. Leaving one firm out (R8, section 7) is the more informative check of firm dependence here. The results describe these listed firms, not private, state-owned or diversified aerospace companies, and they cannot be generalized to the launch industry as a whole.
 
 \section*{7. Robustness and sensitivity}
 None of the 12 prespecified checks detects a significant average at the 5\% level. Non-rejection is stable; the estimate is not: across checks the average ranges from \textminus{}0.15\% (Leave out AVIO.MI) to +1.84\% (Wider window, T\textminus{}1 to T+3). Leaving one firm out changes the sign.
 
 \begin{figure}[htbp]\centering
-\caption*{\textbf{Figure 5.} Listed competitors: main test and prespecified checks}
+\caption*{\textbf{Figure 7.} Listed competitors: main test and prespecified checks}
 \includegraphics[width=\textwidth]{fig-forest.pdf}
-\par\vspace{2pt}{\footnotesize Dots: average two-day abnormal return; lines: 95\% intervals. Shaded: the confirmatory test.}
+\par\vspace{2pt}{\footnotesize Dots: average CAR T0 to T+1 (except the wider-window check); lines: 95\% cluster-robust intervals; tests without an interval are omitted. Full sample: 42 reactions, 22 events. Shaded: the confirmatory estimate.}
 \end{figure}
 
 \par\noindent\begin{minipage}{\textwidth}
-\textbf{Table 6.} Prespecified robustness checks
+\textbf{Table 8.} Prespecified robustness checks
 
 {\small\setlength{\tabcolsep}{4pt}\begin{tabularx}{\textwidth}{Xlllll}
 \toprule
@@ -280,16 +343,16 @@ Leave out RKLB & 0.00\% & \textminus{}1.76\% to +1.75\% & 0.52 & 27 & 22 \\
 \textbf{Placebo.} R9 repeats the calculation on 1000 sets of random ordinary trading days. The real result sits at the 61st percentile (two-sided share 0.776). Because R9 draws a separate date for each reaction, it ignores that rivals hit by one failure move on the same day, so its spread is too narrow; it is a benchmark, not an exact permutation test, and the percentile is not a probability that the effect is real. An exploratory version with one shared date per cluster (R9b, 1000 draws) places the real result at the 66th percentile (two-sided share 0.684).
 
 \begin{figure}[htbp]\centering
-\caption*{\textbf{Figure 6.} Real result against random ordinary days (R9)}
+\caption*{\textbf{Figure 8.} Real result against random ordinary days (R9)}
 \includegraphics[width=\textwidth]{fig-placebo.pdf}
-\par\vspace{2pt}{\footnotesize Histogram of 1000 placebo averages (fixed seed). Red: averages at least as far out as the real result. Black line: the real failures.}
+\par\vspace{2pt}{\footnotesize Average CAR T0 to T+1 over 42 reactions on random non-event days, 1000 draws (fixed seed), one random day per reaction. Red: averages at least as far out as the real result. Black line: the real failures. A benchmark, not an exact permutation test.}
 \end{figure}
 
-\section*{8. Confounding news}
+\section*{8. Confounding corporate announcements and sensitivity of the rival estimate}
 An event study attributes every unusual return in the window to the event. If a firm announces something else on the same days, its reaction mixes the two. The news around the largest rival reactions was therefore checked against public sources. Flagged reactions stay in the confirmatory test, because the rules fixed in advance do not allow removing events after results are seen.
 
 \par\noindent\begin{minipage}{\textwidth}
-\textbf{Table 7.} Rival reactions with other news in the window
+\textbf{Table 9.} Rival reactions with other news in the window
 
 {\small\setlength{\tabcolsep}{4pt}\begin{tabularx}{\textwidth}{lXllX}
 \toprule
@@ -305,10 +368,12 @@ Rocket Lab & Spectrum, 31 Mar 2025 & \textminus{}6.49\% & sector move & Broad te
 
 \end{minipage}\par\vspace{4pt}
 
+Each flagged announcement was checked for timing against the event window T0 to T+1: the news column gives what was announced and when, with its source. Announcements unrelated to the failure but inside the window mix two pieces of news in one reaction; this is a standard identification problem in event studies, and it cannot be fixed by the event-study model.
+
 The exploratory specifications below drop the flagged reactions. Dropping the 2 contract-news days changes the average from +0.28\% to \textminus{}0.70\%, but the median moves only from +0.28\% to +0.09\%: the change comes from removing two large positive moves, not from a shift in the typical reaction. The standardized test barely moves (p = 0.86), because it gives less weight to the volatile stocks behind those moves. The exploratory estimates are not more correct than the prespecified one: the choice of what to drop was made after seeing the data.
 
 \par\noindent\begin{minipage}{\textwidth}
-\textbf{Table 8.} Confounding-news sensitivity (exploratory)
+\textbf{Table 10.} Confounding-news sensitivity (exploratory)
 
 {\small\setlength{\tabcolsep}{4pt}\begin{tabularx}{\textwidth}{Xllllll}
 \toprule
@@ -325,9 +390,9 @@ Drop every flagged day (exploratory) & \textminus{}0.38\% & \textminus{}1.58\% t
 \end{minipage}\par\vspace{4pt}
 
 \begin{figure}[htbp]\centering
-\caption*{\textbf{Figure 7.} Confounding-news sensitivity}
+\caption*{\textbf{Figure 9.} Confounding-news sensitivity}
 \includegraphics[width=\textwidth]{fig-conf.pdf}
-\par\vspace{2pt}{\footnotesize Shaded: the confirmatory test. Hollow: exploratory specifications that drop flagged reactions.}
+\par\vspace{2pt}{\footnotesize Average CAR T0 to T+1 with 95\% cluster-robust intervals. Shaded: the prespecified estimate (42 reactions). Hollow: exploratory specifications, chosen after results, that drop reactions with other news. Sources for each flag: Table on announcements above.}
 \end{figure}
 
 \section*{9. Discussion}
@@ -337,11 +402,12 @@ Several mechanisms are consistent with a small net rival reaction: contagion and
 
 \section*{10. Limitations}
 \begin{itemize}[leftmargin=*,itemsep=2pt,topsep=4pt]
-  \item \textbf{Few listed firms.} 3 rival firms and 22 independent events; Avio SpA appears in all of them. Repeated exposure of the same stock means clustering by event captures only part of the dependence.
+  \item \textbf{Few listed firms.} 3 rival firms and 22 independent events; Avio SpA appears in all of them. Repeated exposure of the same stock means clustering by event captures only part of the dependence, and with 3 firms clustering by firm is not reliable.
+  \item \textbf{Small maker sample.} 4 cases from 2 firms: case studies, not an average effect.
   \item \textbf{Power.} Average effects of about 2.7\% could go undetected; no equivalence claim is possible.
   \item \textbf{Weighting and outliers.} The sign of the estimate depends on weighting and on two large reactions with contract news.
   \item \textbf{Two estimands.} The interval (equal-weighted mean) and the test (standardized mean) concern different quantities and can disagree.
-  \item \textbf{Timing.} A few failures are dated by later company statements; one of these is uncertain. R5 checks cover them.
+  \item \textbf{Timing.} 88\% of rival reactions and 4 of 4 maker cases use GCAT launch times not separately verified against a company statement (only where day 0 is insensitive to a \textminus{}10 to +180 minute error); one failure is dated by a low-confidence statement (R5 checks). Time-zone or clock errors beyond that band would shift day 0.
   \item \textbf{Model dependence.} A one-factor market model with a home index; sector-wide moves on event days are not absorbed (one flagged case).
   \item \textbf{Survivorship.} Listed launch firms that later delisted (Orbital Sciences/Orbital ATK, Astra, Virgin Orbit) are missing because the free price source does not carry them.
   \item \textbf{External validity.} The population is historically eligible, publicly traded launch-service competitors with comparable commercial exposure, not the launch industry.
@@ -371,7 +437,7 @@ When an orbital rocket fails, its listed maker loses a large share of its value 
 \end{enumerate}
 
 \section*{Appendix A. Rival event list}
-\textbf{Table 9.} All rival reactions, CAR T0 to T+1
+\textbf{Table 11.} All rival reactions, CAR T0 to T+1
 
 {\scriptsize\setlength{\tabcolsep}{4pt}\begin{xltabular}{\textwidth}{lllllllXll}
 \toprule
@@ -431,7 +497,7 @@ Rivals are classified point in time from the hand-built firm map (\texttt{data/m
 
 \section*{Appendix C. Additional exploratory results}
 \par\noindent\begin{minipage}{\textwidth}
-\textbf{Table 10.} Exploratory comparisons (Holm-adjusted p-values)
+\textbf{Table 12.} Exploratory comparisons (Holm-adjusted p-values)
 
 {\small\setlength{\tabcolsep}{4pt}\begin{tabularx}{\textwidth}{Xlll}
 \toprule
@@ -451,7 +517,7 @@ An independent script (\texttt{audit/verify\_published.py}) recomputes the publi
 
 \section*{Appendix E. Exclusions}
 \par\noindent\begin{minipage}{\textwidth}
-\textbf{Table 11.} Failures not in the study, by reason
+\textbf{Table 13.} Failures not in the study, by reason
 
 {\small\setlength{\tabcolsep}{4pt}\begin{tabularx}{\textwidth}{Xl}
 \toprule
@@ -482,7 +548,7 @@ A failure can have more than one reason, so the counts can add up to more than t
 The rules (hypothesis, test, windows, sample criteria, checks) were committed to the public repository before the first results. Commits:
 
 \par\noindent\begin{minipage}{\textwidth}
-\textbf{Table 12.} Commit record
+\textbf{Table 14.} Commit record
 
 {\small\setlength{\tabcolsep}{4pt}\begin{tabularx}{\textwidth}{Xll}
 \toprule
@@ -497,7 +563,7 @@ First results (step 05) & \texttt{be71a52} & 21 Nov 2026 20:31:18 \\
 
 \end{minipage}\par\vspace{4pt}
 
-Exploratory analyses added later (E1 to E3, R9b and the audit diagnostics) are labelled wherever they appear.
+The published statistics were exported from commit \texttt{52f85d8} (with uncommitted changes in the working tree). Exploratory analyses added later (E1 to E3, R9b and the audit diagnostics) are labelled wherever they appear.
 
 \section*{Where to find the charts, data and code}
 {\small\setlength{\tabcolsep}{4pt}\begin{tabularx}{\textwidth}{XX}

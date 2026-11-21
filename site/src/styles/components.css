@@ -72,7 +72,7 @@
 .anomaly .no { font-family: var(--font-mono); letter-spacing: 0.08em; white-space: nowrap; }
 .anomaly .stamp {
   font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800; font-size: 0.72rem;
-  letter-spacing: 0.14em; color: var(--signal); border: 2px solid var(--signal); padding: 0.05rem 0.4rem;
+  letter-spacing: 0.14em; color: var(--signal-text); border: 2px solid var(--signal-text); padding: 0.05rem 0.4rem;
   transform: rotate(-3deg); display: inline-block;
 }
 .anomaly h3 { font-size: var(--step-0); margin-bottom: var(--space-1); }
@@ -191,3 +191,24 @@ svg .series.draw { stroke-dasharray: var(--len); animation: draw 1.2s ease-out b
 .ex-exp-bar { fill: none; stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
 .ex-ab-bar { fill: var(--signal); }
 .small-note { font-size: var(--step--1); color: var(--muted); }
+
+/* sample-construction diagram */
+.sample-diagram { margin: var(--space-4) 0; }
+.sd-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2); }
+.sd-box { border: var(--inkline); background: var(--paper); padding: var(--space-2) var(--space-3); min-width: 9rem; display: flex; flex-direction: column; }
+.sd-box.key { background: var(--paper-deep); }
+.sd-n { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800; font-size: var(--step-1); }
+.sd-l { font-size: var(--step--1); }
+.sd-u { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); }
+.sd-arrow { font-family: var(--font-mono); color: var(--muted); }
+.sample-diagram figcaption { font-size: var(--step--1); color: var(--muted); }
+/* lab comparison */
+.lab-compare { width: 100%; border-collapse: collapse; font-size: var(--step--1); margin: var(--space-3) 0; }
+.lab-compare th, .lab-compare td { text-align: left; padding: var(--space-1) var(--space-2); border-bottom: var(--hairline); }
+.lab-compare tr.changed td { background: var(--paper-deep); }
+.lab-compare td.num { font-family: var(--font-mono); }
+.sim-facts { font-size: var(--step--1); padding-left: 1.1rem; }
+/* small screens: wide tables scroll inside their own box instead of widening the page */
+@media (max-width: 640px) {
+  .stage table, .tool table { display: block; max-width: 100%; overflow-x: auto; }
+}

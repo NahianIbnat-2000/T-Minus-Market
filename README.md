@@ -183,7 +183,8 @@ any abnormal return is computed.
 | 9 | `python pipeline/09_audit_exploratory.py` | prices; exploratory (R9b) |
 | 7 | `python pipeline/07_export_site_data.py` | derived statistics only |
 | 8 | `python pipeline/08_build_html.py` | matplotlib; LaTeX for the PDF |
-| check | `python audit/verify_published.py` | published data only; recomputes every statistic independently |
+| check | `python audit/verify_published.py` | published data only; recomputes every statistic independently; writes `audit/VERIFICATION.md` |
+| check | `python audit/check_consistency.py` | article, paper and report agree with results.json (also run by step 08) |
 | tests | `python -m pytest tests` and `cd site && npm test` | |
 
 Prices are never published (Yahoo licensing). Anyone can verify every test statistic, interval and p-value from

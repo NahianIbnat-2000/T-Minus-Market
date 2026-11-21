@@ -129,3 +129,25 @@ exposure; not private, state-owned or diversified aerospace firms.
 Tests: 54 Python and 14 site tests pass. Paper and article were built from the real published data and read
 in full; the PDF was compiled with XeLaTeX (15 pages) and every page inspected.
 **Not tested:** screen readers and physical mobile devices; R9b on real prices (needs the owner's local run).
+
+## 7. Second review (22 Nov 2026): items from the external review prompt
+
+The external prompt was written from the live site at v15; items already fixed in v18-v19 are marked so.
+
+| Item | Status | What was done (v20) |
+| --- | --- | --- |
+| Site and paper out of sync ("in preparation", "on request") | Fixed in v18 | Article links paper (HTML and PDF), report, code, methods and replication guide |
+| Link to the analysis plan | Not done, by the owner's decision (v19) | Commit record kept in the paper, Appendix G |
+| Estimate, interval and p from different estimands (P0 presentation) | **Fixed** | Every page pairs the equal-weighted mean and its interval with its own cluster-robust p (0.76; wild cluster bootstrap 0.85, 9,999 draws) and names the prespecified standardized test separately (p = 0.40). Paper section 5.1 defines four estimands formally |
+| Repeated-firm dependence | **Added** | Paper 6.3: why event clustering is incomplete, firm-level interval on 2 df (-9.1% to +6.8%), firm contributions, leave-one-firm-out |
+| Weighting sensitivity | Added v18, **figure added** | Table and chart; prespecified estimand stays primary |
+| Confounding announcements | **Renamed and expanded** | Paper section 8 with sources, timing note, mean vs median, exploratory label |
+| Timestamp verification | **Added** | 88% of rival reactions (37 of 42) and 4 of 4 maker cases use GCAT launch times not separately verified; 2 low-confidence; table and chart |
+| Funnel mixing units | **Fixed** | Branching diagram with the unit of every box, in paper, article and report; "failures with a listed firm" (138, inflated by descriptive Tier 3) replaced by failures in the study (27) |
+| Publication consistency tests | **Added** | `audit/check_consistency.py` (56 checks), run by step 08 and by the test suite, with a planted-error test |
+| Verification report in four parts | **Added** | `audit/VERIFICATION.md`; export commit recorded by step 07 |
+| Event Study Lab baseline vs selection | **Added** | Side-by-side table with changed settings marked |
+| Placebo explanation | **Added** | Pseudo-dates, exclusions, lost co-movement, meaning of the percentile |
+| Accessibility | **Tested (automated) and fixed** | axe-core 4 (WCAG 2.0-2.2 A/AA rules) in headless Chrome: 0 violations on all three pages after fixes (chart names, stamp contrast 3.75 to 5.8, focusable equation boxes, timeline role). Phone width 390 px: no page overflow after fixes. **Not tested:** screen readers, real devices, states after interaction |
+
+Numbers reproduced again: 81 of 81. Tests: 55 Python, 14 site.

@@ -261,24 +261,76 @@ def make_figures(data: dict, outdir: Path) -> dict:
     def save(fig, key):
         figs[key] = f"fig-{key}.pdf"; fig.savefig(outdir / figs[key]); plt.close(fig)
 
-    # funnel
-    smp = man.get("sample") or {}
-    stages = [(l, v) for l, v in [("Orbital launch attempts", smp.get("launch_attempts")), ("Launch failures", smp.get("failures") or f["n_failures"]),
-              ("Failures with a listed firm involved", smp.get("failures_with_any_listed_firm")), ("Failures with listed competitors", f["n_rival_failures"]),
-              ("Competitor stock reactions", p["n_firm_events"]), ("Independent competitor events", f["n_clusters"]),
-              ("Listed competitor firms", f["n_rival_firms"])] if v is not None]
-    if stages:
-        fig, ax = plt.subplots(figsize=(6.3, 0.34 * len(stages) + 0.4))
-        top = max(v for _, v in stages)
-        for i, (lab, v) in enumerate(stages):
-            yv = len(stages) - 1 - i
-            ax.barh(yv, (v / top) ** 0.5, color=INK if i else "white", edgecolor=INK, height=0.6)
-            ax.text((v / top) ** 0.5 + 0.015, yv, f"{v:,}", va="center", fontsize=9, fontweight="bold")
-        ax.set_yticks(range(len(stages))[::-1], [s_[0] for s_ in stages], fontsize=9)
-        ax.set_xlim(0, 1.15); ax.set_xticks([]); ax.grid(False)
-        for sp in ("left", "bottom"):
-            ax.spines[sp].set_visible(False)
-        fig.tight_layout(); save(fig, "funnel")
+    # sample diagram (boxes and arrows; units change along the way)
+    from casestudy import sample_graph
+    nodes, edges = sample_graph(man.get("sample") or {}, f, p)
+    if nodes:
+        fig, ax = plt.subplots(figsize=(6.3, 2.9))
+        bw, bh, sx, sy = 0.92, 0.66, 1.3, 1.05
+        pos = {n[0]: (n[4] * sx, -n[5] * sy) for n in nodes}
+        for a_, b_, lab in edges:
+            (x1, y1), (x2, y2) = pos[a_], pos[b_]
+            if y1 == y2:
+                p1, p2 = (x1 + bw, y1 + bh / 2), (x2, y2 + bh / 2)
+                tx, ty, ha = (p1[0] + p2[0]) / 2, p1[1] + 0.06, "center"
+            elif x1 == x2:
+                p1, p2 = (x1 + bw / 2, y1), (x2 + bw / 2, y2 + bh)
+                tx, ty, ha = p1[0] + 0.05, (p1[1] + p2[1]) / 2, "left"
+            else:
+                p1, p2 = (x1 + bw / 2, y1), (x2, y2 + bh / 2)
+                tx, ty, ha = (p1[0] + p2[0]) / 2 + 0.05, (p1[1] + p2[1]) / 2, "left"
+            ax.annotate("", xy=p2, xytext=p1, arrowprops=dict(arrowstyle="-|>", color=INK, lw=0.8))
+        for nid, lab, val, unit, c, r in nodes:
+            x, y = pos[nid]
+            ax.add_patch(plt.Rectangle((x, y), bw, bh, facecolor="#EBE4D6" if nid in ("maker", "clu") else "white", edgecolor=INK, linewidth=0.8))
+            ax.text(x + 0.06, y + bh - 0.2, f"{val:,}", fontsize=11, fontweight="bold")
+            ax.text(x + 0.06, y + bh - 0.4, lab, fontsize=7)
+            ax.text(x + 0.06, y + 0.07, unit, fontsize=5.8, color=MUTED)
+        ax.set_xlim(-0.05, max(n[4] for n in nodes) * sx + bw + 0.05); ax.set_ylim(-max(n[5] for n in nodes) * sy - 0.08, bh + 0.25); ax.axis("off")
+        fig.tight_layout(); save(fig, "sample")
+
+    # weighting comparison
+    w = f.get("w")
+    if w:
+        rows_w = [("Every reaction equal (prespecified)", w["observation_weighted"]), ("Every independent event equal", w["event_weighted"]),
+                  ("Inverse prediction-error SD", w["precision_weighted"]), ("Every firm equal", w["firm_balanced"]), ("Median reaction", w["median"])]
+        fig, ax = plt.subplots(figsize=(6.3, 1.9))
+        for i, (lab, v) in enumerate(rows_w):
+            yv = len(rows_w) - 1 - i
+            if i == 0:
+                ax.axhspan(yv - 0.5, yv + 0.5, color="#EBE4D6", zorder=0)
+            ax.plot([0, v], [yv, yv], color=MUTED, linewidth=0.8); ax.plot([v], [yv], "o", color=INK, markersize=5)
+            ax.annotate(pct(v, 2), xy=(v, yv), xytext=(6 if v >= 0 else -6, 4), textcoords="offset points", fontsize=8, ha="left" if v >= 0 else "right")
+        ax.axvline(0, color=INK, linewidth=0.8)
+        ax.set_yticks(range(len(rows_w))[::-1], [r[0] for r in rows_w], fontsize=8.5)
+        ax.set_ylim(-0.6, len(rows_w) - 0.4); ax.grid(axis="x"); ax.grid(axis="y", visible=False)
+        lo_, hi_ = min(r[1] for r in rows_w + [("", 0)]), max(r[1] for r in rows_w + [("", 0)])
+        ax.set_xlim(lo_ - 0.006, hi_ + 0.006)
+        _pct_axis(ax, "x", 1)
+        fig.tight_layout(); save(fig, "weights")
+
+    # event timing verification
+    tm = D.timing(fes)
+    order = [("high", "Sourced statement, high confidence", INK), ("low", "Sourced statement, low confidence", MUTED),
+             ("provisional", "GCAT launch time (unverified)", "white")]
+    groups = [("Rival reactions", tm["rival_reactions"]), ("Maker cases", tm["maker_cases"])]
+    if any(g["n"] for _, g in groups):
+        fig, ax = plt.subplots(figsize=(6.3, 1.5))
+        for i, (lab, g) in enumerate(groups):
+            left = 0.0
+            for k, kl, col in order:
+                n = g["counts"].get(k, 0)
+                if not n or not g["n"]:
+                    continue
+                wdt = n / g["n"]
+                ax.barh(len(groups) - 1 - i, wdt, left=left, color=col, edgecolor=INK, height=0.55, label=kl if i == 0 else None)
+                if wdt > 0.05:
+                    ax.text(left + wdt / 2, len(groups) - 1 - i, str(n), ha="center", va="center", fontsize=8, color="white" if k != "provisional" else INK)
+                left += wdt
+        ax.set_yticks(range(len(groups))[::-1], [f"{l} (n = {g['n']})" for l, g in groups], fontsize=8.5)
+        ax.set_xlim(0, 1); ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f"{v * 100:.0f}%")); ax.grid(False)
+        ax.legend(frameon=False, fontsize=7, loc="upper center", bbox_to_anchor=(0.5, -0.32), ncol=3)
+        fig.tight_layout(); save(fig, "timing")
 
     # failures per year
     yrs = [int(str(x["launch_utc"])[:4]) for x in fails if x.get("launch_utc")]

@@ -67,6 +67,17 @@ def failures_table(cov: pd.DataFrame) -> list[dict]:
     return out
 
 
+def git_state() -> dict:
+    """Commit the export was made from, and whether the working tree had uncommitted changes."""
+    import subprocess
+    try:
+        head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=C.ROOT, capture_output=True, text=True, timeout=20).stdout.strip()
+        dirty = bool(subprocess.run(["git", "status", "--porcelain"], cwd=C.ROOT, capture_output=True, text=True, timeout=20).stdout.strip())
+        return {"commit": head or None, "uncommitted_changes": dirty}
+    except (OSError, subprocess.SubprocessError):
+        return {"commit": None, "uncommitted_changes": None}
+
+
 def sample_funnel(cov, records) -> dict:
     """Counts for the sample-construction funnel, from the pipeline's own interim files (no typed numbers)."""
     from collections import Counter
@@ -83,7 +94,8 @@ def sample_funnel(cov, records) -> dict:
         "launch_attempts": nrows("orbital_launches.csv"),
         "failures": nrows("failures.csv"),
         "pad_explosions": nrows("ground_anomalies.csv"),
-        "failures_with_any_listed_firm": int(fail["launch_tag"].nunique()),
+        "failures_in_study": len({r["launch_tag"] for r in records}),     # listed maker or Tier 1-2 rival
+        "failures_with_any_mapped_firm": int(fail["launch_tag"].nunique()),  # includes descriptive Tier 3 (diversified groups)
         "failure_firm_events_mapped": int(len(fail)),
         "failure_firm_events_dropped": ({str(k): int(v) for k, v in Counter(dropped["coverage_reason"].fillna("other")).items()}
                                         if "coverage_reason" in dropped else {}),
@@ -120,6 +132,7 @@ def main(site_data: Path = SITE_DATA):
                        "residual volatility and CAR correlations. No raw prices, raw returns, alphas or betas.",
         "parity_tolerances": TOLERANCES,
         "sample": sample_funnel(cov, records),
+        "git": git_state(),
     }, indent=2))
     n_r = sum(r["group"] == "rival" for r in records)
     print(f"Exported {n_r} rival and {len(records) - n_r} provider firm-events to {site_data}")

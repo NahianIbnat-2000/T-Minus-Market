@@ -70,7 +70,7 @@ function chart(items, all, selected) {
   const years = all.map((f) => yearFrac(f.launch_utc)).filter(Number.isFinite);
   const y0 = Math.floor(Math.min(...years)), y1 = Math.ceil(Math.max(...years) + 0.001);
   const x = linear([y0, y1], [m.l, W - m.r]);
-  let s = svgOpen(W, H, "Timeline of orbital launch failures by date, in three lanes by whether a listed company was involved.");
+  let s = svgOpen(W, H, "Timeline of orbital launch failures by date, in three lanes by whether a listed company was involved.", "group");
   const ticks = [];
   for (let y = Math.ceil(y0 / 5) * 5; y <= y1; y += 5) ticks.push(y);
   for (const t of ticks) s += line(x(t), m.t, x(t), H - m.b, "grid-line");

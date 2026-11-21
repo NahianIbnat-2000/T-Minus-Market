@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>T-Minus Markets: when a rocket blows up, who loses money?</title>
-<meta name="description" content="Event study of 138 orbital launch failures: the rocket&#x27;s maker loses −8.8% to −16.3% in two days; listed competitors show no detectable reaction (+0.28%, p = 0.40)."><meta name="author" content="Nahian Ibnat">
+<meta name="description" content="Event study of 138 orbital launch failures: the rocket&#x27;s maker loses −8.8% to −16.3% in two days; listed competitors show no detectable reaction (+0.28%, 95% interval −1.62% to +2.18%)."><meta name="author" content="Nahian Ibnat">
 <meta property="og:type" content="article"><meta property="og:title" content="T-Minus Markets: when a rocket blows up, who loses money?">
-<meta property="og:description" content="Event study of 138 orbital launch failures: the rocket&#x27;s maker loses −8.8% to −16.3% in two days; listed competitors show no detectable reaction (+0.28%, p = 0.40)."><meta property="og:url" content="https://nahianibnat-2000.github.io/T-Minus-Market/">
+<meta property="og:description" content="Event study of 138 orbital launch failures: the rocket&#x27;s maker loses −8.8% to −16.3% in two days; listed competitors show no detectable reaction (+0.28%, 95% interval −1.62% to +2.18%)."><meta property="og:url" content="https://nahianibnat-2000.github.io/T-Minus-Market/">
 <meta name="twitter:card" content="summary_large_image"><meta property="og:image" content="https://nahianibnat-2000.github.io/T-Minus-Market/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="T-Minus Markets: when a rocket blows up, who loses money?"><link rel="canonical" href="https://nahianibnat-2000.github.io/T-Minus-Market/">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,600..800&family=DM+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400&display=swap">
 <style>
@@ -174,7 +174,7 @@ td.num, th.num { text-align: right; }
 .anomaly .no { font-family: var(--font-mono); letter-spacing: 0.08em; white-space: nowrap; }
 .anomaly .stamp {
   font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800; font-size: 0.72rem;
-  letter-spacing: 0.14em; color: var(--signal); border: 2px solid var(--signal); padding: 0.05rem 0.4rem;
+  letter-spacing: 0.14em; color: var(--signal-text); border: 2px solid var(--signal-text); padding: 0.05rem 0.4rem;
   transform: rotate(-3deg); display: inline-block;
 }
 .anomaly h3 { font-size: var(--step-0); margin-bottom: var(--space-1); }
@@ -294,6 +294,27 @@ svg .series.draw { stroke-dasharray: var(--len); animation: draw 1.2s ease-out b
 .ex-ab-bar { fill: var(--signal); }
 .small-note { font-size: var(--step--1); color: var(--muted); }
 
+/* sample-construction diagram */
+.sample-diagram { margin: var(--space-4) 0; }
+.sd-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2); }
+.sd-box { border: var(--inkline); background: var(--paper); padding: var(--space-2) var(--space-3); min-width: 9rem; display: flex; flex-direction: column; }
+.sd-box.key { background: var(--paper-deep); }
+.sd-n { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800; font-size: var(--step-1); }
+.sd-l { font-size: var(--step--1); }
+.sd-u { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); }
+.sd-arrow { font-family: var(--font-mono); color: var(--muted); }
+.sample-diagram figcaption { font-size: var(--step--1); color: var(--muted); }
+/* lab comparison */
+.lab-compare { width: 100%; border-collapse: collapse; font-size: var(--step--1); margin: var(--space-3) 0; }
+.lab-compare th, .lab-compare td { text-align: left; padding: var(--space-1) var(--space-2); border-bottom: var(--hairline); }
+.lab-compare tr.changed td { background: var(--paper-deep); }
+.lab-compare td.num { font-family: var(--font-mono); }
+.sim-facts { font-size: var(--step--1); padding-left: 1.1rem; }
+/* small screens: wide tables scroll inside their own box instead of widening the page */
+@media (max-width: 640px) {
+  .stage table, .tool table { display: block; max-width: 100%; overflow-x: auto; }
+}
+
 /* Root article page and plan page (static, no JavaScript) */
 .article { max-width: 46rem; padding-top: var(--space-5); padding-bottom: var(--space-6); }
 .article section { margin: var(--space-6) 0 0; }
@@ -329,6 +350,10 @@ a.read-card:hover, a.read-card:focus-visible { background: var(--paper-deep); ou
 .plan table { font-size: var(--step--1); }
 .table-wrap { overflow-x: auto; }
 .masthead .kicker a { color: inherit; }
+@media (max-width: 640px) {
+  .tile { border-right: 0; border-bottom: var(--hairline); padding: var(--space-3) 0 !important; }
+  .tile:last-child { border-bottom: 0; }
+}
 
 </style>
 </head>
@@ -341,48 +366,59 @@ a.read-card:hover, a.read-card:focus-visible { background: var(--paper-deep); ou
   <p class="byline">Nahian Ibnat · Independent research · Updated Nov 2026</p>
 </div></header>
 <main id="main" class="wrap article">
-  <section class="tiles" aria-label="Key findings"><div class="tile loss"><div class="tile-num">−8.8% to −16.3%</div><p>two-day abnormal return of the rocket&#x27;s maker: a loss in each of the 4 listed cases</p></div><div class="tile neutral"><div class="tile-num">+0.28%</div><p>average two-day reaction of listed competitors; 95% interval −1.62% to +2.18%, p = 0.40</p></div><div class="tile neutral"><div class="tile-num">61st</div><p>percentile of the real competitor result among 1000 random sets of ordinary trading days</p></div></section>
+  <section class="tiles" aria-label="Key findings"><div class="tile loss"><div class="tile-num">−8.8% to −16.3%</div><p>two-day abnormal return of the rocket&#x27;s maker: a loss in each of the 4 listed cases</p></div><div class="tile neutral"><div class="tile-num">+0.28%</div><p>average two-day reaction of listed competitors; 95% interval −1.62% to +2.18%; not statistically detectable</p></div><div class="tile neutral"><div class="tile-num">61st</div><p>percentile of the real competitor result among 1000 random sets of ordinary trading days</p></div></section>
 
-  <section class="abstract"><h2>In short</h2><p>When an orbital rocket fails, does the stock market punish only the company that built it, or its listed competitors too? Using 138 orbital launch failures from 2000 to 2026, this study measures abnormal stock returns over the two trading days after each failure became public, with a market model and a prespecified event-study test. In the 4 cases where the rocket&#x27;s maker was listed, its shares fell by between 8.8% and 16.3% after allowing for the market. Across 24 failures with listed competitors (42 stock reactions, 3 firms, 22 independent events), the average reaction was +0.28% (95% interval −1.62% to +2.18%; p = 0.40). The data therefore do not establish either contagion or competitive gains among these firms. They also do not show that the effect is small: average reactions of about 2.7% in either direction could not have been reliably detected. The evidence comes from 3 listed firms, with Avio SpA in every independent event, and the sign of the average changes with how events and firms are weighted.</p>
-    <p class="cta"><a class="btn" href="site/index.html">Open the interactive report</a> <a class="btn ghost" href="case-study.html">Read the working paper</a></p></section>
+  <section class="abstract"><h2>In short</h2><p>When an orbital rocket fails, does the stock market punish only the company that built it, or its listed competitors too? Using 138 orbital launch failures from 2000 to 2026, this study measures abnormal stock returns over the two trading days after each failure became public, with a market model and a prespecified event-study test. In the 4 cases where the rocket&#x27;s maker was listed, its shares fell by between 8.8% and 16.3% after allowing for the market. Across 24 failures with listed competitors (42 stock reactions, 3 firms, 22 independent events), the average reaction was +0.28% (95% interval −1.62% to +2.18%, p = 0.76; the prespecified standardized test gives p = 0.40). The data therefore do not establish either contagion or competitive gains among these firms. They also do not show that the effect is small: average reactions of about 2.7% in either direction could not have been reliably detected. The evidence comes from 3 listed firms, with Avio SpA in every independent event, and the sign of the average changes with how events and firms are weighted.</p>
+    <p class="cta"><a class="btn" href="site/index.html">Open the interactive report</a> <a class="btn ghost" href="case-study.html">Read the working paper</a> <a class="btn ghost" href="case-study.pdf">PDF</a></p></section>
 
-  <section><h2>Why this question</h2>
-  <p>Orbital launch is a small industry with a handful of listed firms, and every launch is a public, all-or-nothing test. A failure destroys hardware and a customer's satellite, so the rocket's maker should lose value. The open question is the competitors. If investors read a failure as a reminder that spaceflight is risky for everyone, rival launch stocks fall too: contagion. If they expect customers to switch to a rocket that works, rivals rise: competitive gain. The two stories point in opposite directions, so only data can say which one investors act on.</p>
+  <section id="a1"><h2>1. The research question</h2>
+  <p>Orbital launch is a small industry with a handful of listed firms, and every launch is a public, all-or-nothing test. A failure destroys hardware and often a customer's satellite, so the rocket's maker should lose value. The open question is the competitors. If investors read a failure as a reminder that spaceflight is risky for everyone, rival launch stocks fall too: <strong>contagion</strong>. If they expect customers to move to a rocket that works, rivals rise: <strong>competitive gain</strong>. The two stories point in opposite directions, and both could operate at once.</p>
   <p>The same question appears wherever one firm's bad news may spread to similar firms: bank failures, product recalls, sovereign debt crises. Launch failures are useful because they are sudden, public and easy to date.</p></section>
 
-  <section><h2>What the data say</h2>
-  <h3>The rocket's maker</h3>
-  <p>In every listed case the maker's shares fell over the two days after the failure became public, after allowing for the market. With 4 cases from 2 firms, these are case studies, not an industry average.</p>
-  <h3>Its listed competitors</h3>
-  <p>The average two-day reaction was +0.28% (95% interval −1.62% to +2.18%), which is not statistically detectable (p = 0.40). The interval is a cluster-robust interval around the simple average; the p-value comes from the prespecified standardized test, which gives less weight to volatile stocks. The two answer slightly different questions, and both are reported.</p>
-  <p>The sample is small and concentrated: 3 firms, and Avio SpA is in every one of the 22 independent events. The direction of the average depends on how it is weighted: +0.28% with every reaction equal, +0.21% with every event equal, and −1.16% with every firm equal. </p>
-  <h3>How sure can we be?</h3>
-  <p>Not very. With this sample, an average effect smaller than about 2.7% in either direction would usually go undetected (80% power at the 5% level); the chance of detecting a true 1% effect is about 18%. So "not detectable" here does not mean "no effect".</p>
-  <p>None of the 12 prespecified robustness checks detects a significant average at the 5% level, but the estimates range from −0.15% to +1.84%, so the direction and size are not stable. An exploratory check added after the results leaves out the 2 days when competitors announced large contracts: the average moves to −0.70% (95% interval −1.80% to +0.39%), while the median moves only from +0.28% to +0.09%, so the average is sensitive to a few large moves. It is exploratory and does not replace the main result.</p>
-  <h3>What this does and does not show</h3>
+  <section id="a2"><h2>2. What the data include</h2>
+  <p>The numbers below count different things, so they cannot be read as one shrinking funnel:</p>
+  <figure class="cs-fig"><svg viewBox="0 0 720 250" width="100%" role="img" aria-label="Sample construction: launches, failures, rival reactions and independent events, with the unit of each box." font-family="DM Mono, ui-monospace, monospace" font-size="11" fill="#1C1C1C"><title>Sample construction: launches, failures, rival reactions and independent events, with the unit of each box.</title><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1C1C1C"/></marker></defs><path d="M136.0,41.0 L154.0,41.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><path d="M282.0,41.0 L300.0,41.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><path d="M428.0,41.0 L446.0,41.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><path d="M364.0,70.0 L364.0,92.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><path d="M428.0,121.0 L446.0,121.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><path d="M574.0,121.0 L592.0,121.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><path d="M510.0,150.0 L592.0,201.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><rect x="8" y="12" width="128" height="58" fill="#F3EEE4" stroke="#1C1C1C"/><text x="16" y="34" font-size="16" font-weight="700">3,077</text><text x="16" y="49" font-size="9.5">Launch attempts</text><text x="16" y="62" font-size="8.5" fill="#5E574C">unit: launches</text><rect x="154" y="12" width="128" height="58" fill="#F3EEE4" stroke="#1C1C1C"/><text x="162" y="34" font-size="16" font-weight="700">138</text><text x="162" y="49" font-size="9.5">Failures</text><text x="162" y="62" font-size="8.5" fill="#5E574C">unit: launches</text><rect x="300" y="12" width="128" height="58" fill="#F3EEE4" stroke="#1C1C1C"/><text x="308" y="34" font-size="16" font-weight="700">27</text><text x="308" y="49" font-size="9.5">In the study</text><text x="308" y="62" font-size="8.5" fill="#5E574C">unit: failures</text><rect x="446" y="12" width="128" height="58" fill="#EBE4D6" stroke="#1C1C1C"/><text x="454" y="34" font-size="16" font-weight="700">4</text><text x="454" y="49" font-size="9.5">Listed maker</text><text x="454" y="62" font-size="8.5" fill="#5E574C">unit: failures; case studies</text><rect x="300" y="92" width="128" height="58" fill="#F3EEE4" stroke="#1C1C1C"/><text x="308" y="114" font-size="16" font-weight="700">24</text><text x="308" y="129" font-size="9.5">Listed rivals</text><text x="308" y="142" font-size="8.5" fill="#5E574C">unit: failures</text><rect x="446" y="92" width="128" height="58" fill="#F3EEE4" stroke="#1C1C1C"/><text x="454" y="114" font-size="16" font-weight="700">42</text><text x="454" y="129" font-size="9.5">Rival reactions</text><text x="454" y="142" font-size="8.5" fill="#5E574C">unit: firm x failure</text><rect x="592" y="92" width="128" height="58" fill="#EBE4D6" stroke="#1C1C1C"/><text x="600" y="114" font-size="16" font-weight="700">22</text><text x="600" y="129" font-size="9.5">Independent events</text><text x="600" y="142" font-size="8.5" fill="#5E574C">unit: clusters</text><rect x="592" y="172" width="128" height="58" fill="#F3EEE4" stroke="#1C1C1C"/><text x="600" y="194" font-size="16" font-weight="700">3</text><text x="600" y="209" font-size="9.5">Rival firms</text><text x="600" y="222" font-size="8.5" fill="#5E574C">unit: firms</text></svg><figcaption class="cs-cap">Each box gives a count and its unit. Source: GCAT and the project pipeline.</figcaption></figure>
   <ul class="method">
-    <li><strong>Shown:</strong> large two-day losses for the listed maker in each case; no detectable average reaction among the listed competitors studied.</li>
-    <li><strong>Not shown:</strong> that competitors systematically lose (contagion) or gain (competition); that the effect is negligible; that customers switch providers; that the pattern holds for private, state-owned or diversified aerospace firms.</li>
-    <li><strong>One reading the data do not contradict:</strong> investors may treat a failure mainly as news about the firm that flew the rocket. This is a possible explanation, not a finding.</li>
+    <li><strong>Launch failures (138):</strong> every orbital launch from 2000 to 2026 that GCAT scores below 0.75.</li>
+    <li><strong>Listed-maker cases (4):</strong> failures whose rocket was built by a company listed on a stock exchange at the time.</li>
+    <li><strong>Rival-eligible failures (24):</strong> failures with at least one listed direct competitor (similar rocket size, same customers, launch a major business).</li>
+    <li><strong>Rival reactions (42):</strong> one per listed rival per failure; one failure can produce several.</li>
+    <li><strong>Independent events (22):</strong> failures that share a firm within a few trading days are grouped, because their reactions are not independent.</li>
+    <li><strong>Distinct rival firms (3):</strong> Avio SpA, Firefly Aerospace, Rocket Lab.</li>
+  </ul>
+  <p><strong>Method in brief.</strong> For each stock, a market model fitted on about a year of earlier data predicts the return given its home market index; the <em>abnormal return</em> is the actual return minus that prediction, summed over the two trading days after the failure became public. Only derived statistics are published, never stock prices. The rules were committed to the public repository before results (commit record in the working paper, Appendix G); they were not filed with an independent registry.</p></section>
+
+  <section id="a3"><h2>3. What happened to the rocket's maker?</h2>
+  <p>In every listed case the maker's shares fell over the two days after the failure became public, after allowing for the market. Two-day abnormal returns ranged from −8.8% to −16.3%. With 4 cases from 2 firms, these are case studies, not a general launch-provider effect, and abnormal returns are not exact monetary losses caused by the failure.</p></section>
+
+  <section id="a4"><h2>4. What happened to its competitors?</h2>
+  <p>The average two-day reaction was +0.28% (95% interval −1.62% to +2.18%, p = 0.76), which is not statistically detectable. The prespecified standardized test, which gives less weight to volatile stocks and so asks a slightly different question, also finds nothing detectable (p = 0.40). Each p-value is reported next to the quantity it tests.</p></section>
+
+  <section id="a5"><h2>5. How reliable is the result?</h2>
+  <p>The sample is small and concentrated: 3 firms, and Avio SpA is in every one of the 22 independent events, so the events are not independent draws from the whole industry.</p>
+  <p>With this sample, an average effect smaller than about 2.7% in either direction would usually go undetected (80% power at the 5% level); the chance of detecting a true 1% effect is about 18%. So "not detectable" here does not mean "no effect": the interval contains economically meaningful losses and gains.</p>
+  <p>The result is consistent with several explanations: contagion and competitive gain cancelling out, customers being unable to switch rockets quickly, or investors treating a failure mainly as news about the failed firm. The data cannot tell these apart.</p></section>
+
+  <section id="a6"><h2>6. What changes under robustness checks?</h2>
+  <p><strong>Prespecified checks.</strong> None of the 12 checks fixed in advance detects a significant average at the 5% level, but the estimates range from −0.15% to +1.84%: the lack of a detectable effect is stable, its direction and size are not. The real result sits at the 61st percentile of averages on random ordinary days.</p>
+  <p><strong>Weighting (sensitivity, added after the results).</strong> +0.28% with every reaction equal (the prespecified estimate), +0.21% with every event equal, +0.87% weighting calm stocks more, −1.16% with every firm equal. No weighting is statistically preferred.</p>
+  <p><strong>Exploratory.</strong> An exploratory check added after the results leaves out the 2 days when competitors announced large contracts: the average moves to −0.70% (95% interval −1.80% to +0.39%), while the median moves only from +0.28% to +0.09%, so the average is sensitive to a few large moves. It is exploratory and does not replace the main result.</p></section>
+
+  <section id="a7"><h2>7. What does the evidence establish?</h2>
+  <ul class="method">
+    <li><strong>Shown:</strong> large two-day abnormal losses for the listed maker in each observed case; no detectable average reaction among the 3 listed competitors studied.</li>
+    <li><strong>Not shown:</strong> that competitors systematically lose (contagion) or gain (competition); that the effect is negligible; that customers switch providers; that industry-wide reactions are absent; that the pattern holds for private, state-owned or diversified aerospace firms.</li>
   </ul></section>
 
-  <section aria-label="Read the work"><h2>Read the work</h2>
+  <section id="a8" aria-label="Read the research"><h2>8. Read the research</h2>
   <div class="read-grid">
+    <a class="read-card" href="case-study.html"><span class="rc-kicker">Working paper</span><h3>The full study</h3><p><em>Rocket Launch Failures and Equity-Market Spillovers.</em> Methods, results, power, robustness, confounding news, limits and appendices, with a typeset PDF.</p><span class="rc-go">Read the paper</span></a>
     <a class="read-card" href="site/index.html"><span class="rc-kicker">Interactive</span><h3>The report</h3>
       <p>Five countdown stages from the question to the checks, with four tools: Failure Timeline, Expected vs Actual, Event Study Lab and Placebo Simulator.</p><span class="rc-go">Open the report</span></a>
-    <a class="read-card" href="case-study.html"><span class="rc-kicker">Working paper</span><h3>The full study</h3><p><em>Rocket Launch Failures and Equity-Market Spillovers.</em> Methods, results, power, robustness, confounding news, limits and appendices, with a typeset PDF.</p><span class="rc-go">Read the paper</span></a>
     <a class="read-card" href="https://github.com/NahianIbnat-2000/T-Minus-Market"><span class="rc-kicker">GitHub</span><h3>Code and pipeline</h3><p>Python pipeline from raw launch records to the published statistics, with tests.</p><span class="rc-go">View the code</span></a>
   </div>
+  <p class="evidence"><strong>Also:</strong> <a href="case-study.pdf">Working paper (PDF)</a> · <a href="site/index.html#methods">Data and methods</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market#reproduction-and-verification">Replication instructions</a></p>
   <p class="evidence"><strong>Evidence:</strong> <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/reports/04_feasibility_report.md">Feasibility report (before results)</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/reports/05_results.md">Results report</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/docs/CONFOUNDING_NEWS.md">Confounding-news checks</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/reports/06_confounding_sensitivity.md">Exploratory confounding sensitivity</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/audit/AUDIT_REPORT.md">Independent audit and verification</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/README.md">Reproduction guide</a></p></section>
-
-  <section><h2>How it was done</h2>
-  <ul class="method">
-    <li><strong>Sample.</strong> Orbital launch failures since 2000 from GCAT (J. McDowell), linked by hand to listed makers and to listed competitors of a similar size selling to the same customers.</li>
-    <li><strong>Measure.</strong> Abnormal return: the stock's actual return minus what a market model, fitted on about a year of earlier data, predicts from its home market index.</li>
-    <li><strong>Test.</strong> A standardized event-study test (Boehmer, Musumeci and Poulsen) adjusted for failures that hit several competitors at once (Kolari and Pynnönen); the 95% interval is a separate cluster-robust interval around the simple average.</li>
-    <li><strong>Checks.</strong> Other test statistics, a wider window, timing and sample changes, leaving out one firm at a time, and a placebo using random ordinary days.</li>
-    <li><strong>Rules.</strong> The rules were fixed and committed to the public repository before results (commit record in the working paper, Appendix G); they were not filed with an independent registry. Anything added later is labelled exploratory. Only derived statistics are published, never stock prices.</li>
-  </ul></section>
 
   <section class="cite"><h2>Cite</h2>
   <p class="mono">Ibnat, N. (2026). When a rocket blows up, who loses money, and does anyone win? An event study of orbital launch failures. T-Minus Markets. https://nahianibnat-2000.github.io/T-Minus-Market/</p></section>

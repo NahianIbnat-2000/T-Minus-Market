@@ -81,3 +81,64 @@ def power(primary):
             "mde90": float((q + stats.t.ppf(0.90, G - 1)) * se),
             "power": {d: pw(d) for d in (0.01, 0.02, 0.03)},
             "ci90": (float(primary["mean_car"] - q90 * se), float(primary["mean_car"] + q90 * se))}
+
+
+def estimand_tests(firm_events, primary, draws=9999, seed=20261121):
+    """Inference aligned to each estimand (descriptive companions to the prespecified BMP-KP test).
+
+    A  equal-weighted mean CAR: cluster-robust t (G-1 df), the test that matches the published interval,
+       plus a wild cluster bootstrap (Webb six-point weights, null imposed).
+    F  firm level: the mean of the per-firm mean CARs with a t interval on 2 df (three firms): shows how
+       little firm-level inference is possible.
+    """
+    riv = _rows(firm_events)
+    car = np.array([r["windows"]["primary"]["car"] for r in riv])
+    cl = [r["cluster"] for r in riv]
+    ids = {c: i for i, c in enumerate(sorted(set(cl)))}
+    ci = np.array([ids[c] for c in cl])
+    N, G, mu = len(car), len(ids), car.mean()
+
+    def crt(y):
+        m = y.mean()
+        u = np.bincount(ci, weights=y - m, minlength=G)
+        return m / (np.sqrt(G / (G - 1) * np.sum(u ** 2)) / N)
+
+    t_a = crt(car)
+    p_a = float(2 * stats.t.sf(abs(t_a), G - 1))
+    rng = np.random.default_rng(seed)
+    webb = np.array([-np.sqrt(1.5), -1.0, -np.sqrt(0.5), np.sqrt(0.5), 1.0, np.sqrt(1.5)])
+    ts = np.array([crt(car * webb[rng.integers(0, 6, G)][ci]) for _ in range(draws)])
+    p_boot = float(np.mean(np.abs(ts) >= abs(t_a)))
+    by_f = defaultdict(list)
+    for r, c in zip(riv, car):
+        by_f[r["firm"]].append(c)
+    fm = np.array([np.mean(v) for v in by_f.values()])
+    k = len(fm)
+    if k >= 2:
+        se_f = fm.std(ddof=1) / np.sqrt(k)
+        q = stats.t.ppf(0.975, k - 1)
+        firm = {"k": k, "mean": float(fm.mean()), "ci": (float(fm.mean() - q * se_f), float(fm.mean() + q * se_f)),
+                "p": float(2 * stats.t.sf(abs(fm.mean() / se_f), k - 1)) if se_f > 0 else None}
+    else:
+        firm = {"k": k, "mean": float(fm.mean()) if k else None, "ci": (None, None), "p": None}
+    contrib = [{"firm": f, "n": len(v), "share": len(v) / N, "contribution": float(np.sum(v) / N)} for f, v in
+               sorted(by_f.items(), key=lambda kv: -len(kv[1]))]
+    return {"A": {"estimate": float(mu), "t": float(t_a), "p": p_a, "p_wild": p_boot, "draws": draws, "G": G},
+            "B": {"mean_scar": float(np.mean(car / np.sqrt([r["windows"]["primary"]["var"] for r in riv]))),
+                  "t": primary.get("stat"), "p": primary.get("p")},
+            "firm": firm, "contrib": contrib}
+
+
+def timing(firm_events):
+    """How each event's disclosure time is sourced: 'high'/'low' = sourced company statement (confidence),
+    'provisional' = GCAT launch time, used where day 0 does not change within -10 to +180 minutes."""
+    from collections import Counter
+    out = {}
+    for grp, sel in (("rival_reactions", lambda r: r["group"] == "rival"), ("maker_cases", lambda r: r["group"] != "rival")):
+        rows = [r for r in firm_events if sel(r)]
+        c = Counter(r.get("disclosure_confidence") or "unknown" for r in rows)
+        out[grp] = {"n": len(rows), "counts": dict(c), "shares": {k: v / len(rows) for k, v in c.items()} if rows else {}}
+    fails = {r["launch_tag"]: r for r in firm_events if r["group"] == "rival"}
+    c = Counter(r.get("disclosure_confidence") or "unknown" for r in fails.values())
+    out["rival_failures"] = {"n": len(fails), "counts": dict(c)}
+    return out

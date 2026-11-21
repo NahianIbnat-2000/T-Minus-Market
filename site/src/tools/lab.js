@@ -97,9 +97,27 @@ function render(out, state, base, ctx) {
     ? `<p class="lab-status main">This is the prespecified main test.${ctx.matches ? " It matches the result in the report exactly." : ""}</p>`
     : `<p class="lab-status explore">Exploratory: you chose this sample after seeing the data, so treat the p-value as a description, not a test.</p>`;
   if (!rows.length) { out.innerHTML = status + `<p class="lab-empty">No company reactions match this choice.</p>`; return; }
+  const b = ctx.baseRes;
+  const setting = (label, a, c) => `<tr class="${a !== c ? "changed" : ""}"><td>${escapeHtml(label)}</td><td>${escapeHtml(a)}</td><td>${escapeHtml(c)}${a !== c ? " (changed)" : ""}</td></tr>`;
+  const stat = (label, a, c) => `<tr><td>${escapeHtml(label)}</td><td class="num">${a}</td><td class="num">${c}</td></tr>`;
+  const wl = (k) => `${tLabel(ctx.windows[k][0])} to ${tLabel(ctx.windows[k][1])}`;
+  const listOr = (arr, none) => (arr.length ? arr.join(", ") : none);
+  const compare = `<table class="lab-compare"><caption class="visually-hidden">Prespecified baseline compared with your selection</caption>
+    <thead><tr><th></th><th>Prespecified baseline</th><th>Your selection</th></tr></thead><tbody>
+    ${setting("Event window", wl(base.window), wl(state.window))}
+    ${setting("Companies", listOr(base.tickers, "none"), listOr(state.tickers, "none"))}
+    ${setting("Left out", "nothing", listOr([...state.dropFlags.map((f) => f.replace(/_/g, " ")), ...(state.dropLowConfidence ? ["uncertain timing"] : []), ...(state.dropFallback ? ["short price history"] : [])], "nothing"))}
+    ${setting("Expected-return model", "market model (fallback where flagged)", "market model (fallback where flagged)")}
+    ${ctx.est ? setting("Estimation window", ctx.est, ctx.est) : ""}
+    ${stat("Average CAR", pct(b.mean, 2), pct(res.mean, 2))}
+    ${stat("95% interval", b.ci_low !== null ? ci(b.ci_low, b.ci_high, 2) : "n/a", res.ci_low !== null ? ci(res.ci_low, res.ci_high, 2) : "n/a")}
+    ${stat("Standardized test p", b.p !== null ? pval(b.p) : "n/a", res.p !== null ? pval(res.p) : "n/a")}
+    ${stat("Reactions / independent events", `${b.n} / ${b.clusters}`, `${res.n} / ${res.clusters}`)}
+    </tbody></table>`;
   out.innerHTML = `${status}
     <div class="lab-big"><span class="lab-num ${signClass(res.mean)}">${pct(res.mean, 2)}</span>
       <span class="lab-unit">average abnormal return, ${escapeHtml(tLabel(ctx.windows[state.window][0]))} to ${escapeHtml(tLabel(ctx.windows[state.window][1]))}</span></div>
+    ${isMain ? "" : compare}
     <dl class="lab-stats">
       <div><dt>95% interval</dt><dd>${res.ci_low !== null ? ci(res.ci_low, res.ci_high, 2) : "n/a"}</dd></div>
       <div><dt>Adjusted t</dt><dd>${res.stat !== null ? num(res.stat) : "n/a"}</dd></div>
@@ -123,7 +141,8 @@ export function mountLab(root, { firmEvents, rho, manifest, results }) {
   const check = bmpKp(records.filter((r) => r.windows.primary.car !== null), rhoIdx.primary, "primary");
   const matches = results?.primary && Math.abs(check.mean - results.primary.mean_car) <= manifest.parity_tolerances.car_and_ci_abs
     && Math.abs(check.p - results.primary.p) <= manifest.parity_tolerances.p_value_abs;
-  const ctx = { records, rho: rhoIdx, windows: manifest.windows, minClusters: manifest.min_rival_clusters ?? 0, matches };
+  const ctx = { records, rho: rhoIdx, windows: manifest.windows, minClusters: manifest.min_rival_clusters ?? 0, matches, baseRes: check,
+    est: results?.settings?.estimation_window ? `${-results.settings.estimation_window[0]} to ${-results.settings.estimation_window[1]} trading days before T0` : null };
   const update = () => render(out, readForm(form), base, ctx);
   form.addEventListener("change", update);
   el.querySelector(".lab-reset").addEventListener("click", () => { form.reset(); update(); });

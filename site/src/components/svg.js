@@ -50,8 +50,9 @@ export function bins(values, lo, hi, count = 40) {
 
 const f2 = (v) => (Math.round(v * 100) / 100).toString();
 
-export const svgOpen = (W, H, desc) =>
-  `<svg viewBox="0 0 ${W} ${H}" role="img" xmlns="http://www.w3.org/2000/svg"><desc>${escapeHtml(desc)}</desc>`;
+/** role "img" for static charts (named by aria-label and title); "group" when the chart contains focusable marks. */
+export const svgOpen = (W, H, desc, role = "img") =>
+  `<svg viewBox="0 0 ${W} ${H}" role="${role}" aria-label="${escapeHtml(desc)}" xmlns="http://www.w3.org/2000/svg"><title>${escapeHtml(desc)}</title>`;
 export const line = (x1, y1, x2, y2, cls = "", extra = "") =>
   `<line class="${cls}" x1="${f2(x1)}" y1="${f2(y1)}" x2="${f2(x2)}" y2="${f2(y2)}" ${extra}/>`;
 export const rect = (x, y, w, h, extra = "") =>

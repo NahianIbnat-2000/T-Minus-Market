@@ -33,3 +33,7 @@ a.read-card:hover, a.read-card:focus-visible { background: var(--paper-deep); ou
 .plan table { font-size: var(--step--1); }
 .table-wrap { overflow-x: auto; }
 .masthead .kicker a { color: inherit; }
+@media (max-width: 640px) {
+  .tile { border-right: 0; border-bottom: var(--hairline); padding: var(--space-3) 0 !important; }
+  .tile:last-child { border-bottom: 0; }
+}

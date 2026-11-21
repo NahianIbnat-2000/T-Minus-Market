@@ -102,7 +102,7 @@ def test_case_study_page(built, tmp_path):
     cs = (tmp_path / "case-study.html").read_text(encoding="utf-8")
     assert tmp_path / "case-study.html" in outs
     for heading in ["Abstract", "1. Introduction", "2. Institutional background", "3. Related literature", "4. Data and sample construction",
-                    "5. Empirical methodology", "6. Main results", "7. Robustness and sensitivity", "8. Confounding news",
+                    "5. Empirical methodology", "6. Main results", "7. Robustness and sensitivity", "8. Confounding corporate announcements",
                     "9. Discussion", "10. Limitations", "11. Conclusion", "References", "Appendix A", "Appendix F"]:
         assert heading in cs
     import landing
@@ -130,3 +130,18 @@ def test_case_study_latex(built, tmp_path):
     assert all(f"{{{f}}}" in tex for f in figs)                     # every drawn figure is used
     if shutil.which("xelatex") or shutil.which("pdflatex"):
         assert (tmp_path / "case-study.pdf").read_bytes()[:5] == b"%PDF-"
+
+
+def test_publication_consistency(built, tmp_path):
+    root, _ = built
+    site = tmp_path / "site"
+    shutil.copytree(root / "site_data", site / "data")
+    (tmp_path / "README.md").write_text("Reproduction guide.")
+    _load("s8f", "08_build_html.py").build_pages(site_data=site / "data", root_out=tmp_path)
+    spec = importlib.util.spec_from_file_location("chk", ROOT / "audit" / "check_consistency.py")
+    chk = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(chk)
+    assert chk.main(tmp_path) == 0
+    art = tmp_path / "index.html"                                   # a planted banned phrase must be caught
+    art.write_text(art.read_text(encoding="utf-8").replace("</main>", "<p>Preregistered.</p></main>"), encoding="utf-8")
+    assert chk.main(tmp_path) == 1
