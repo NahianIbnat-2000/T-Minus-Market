@@ -9,7 +9,29 @@ Launch data: GCAT (J. McDowell, planet4589.org/space/gcat), CC-BY.
 
 ---
 
-## Phase 1: feasibility (current)
+## Phase 2: event study (current)
+
+Phase 1 is complete and the analysis plan is frozen (`docs/ANALYSIS_PLAN.md`).
+Phase 2 runs the plan exactly. Run it **once**, after steps 01 to 04:
+
+```bash
+python pipeline/05_event_study.py
+```
+
+| Output | What it is |
+| --- | --- |
+| `reports/05_results.md` | Primary result (H2), all robustness checks R1 to R9, provider case series, exploratory H3 |
+| `data/processed/results.json` | Every number, for the website and the paper |
+| `data/processed/firm_event_cars.csv` | One row per firm-event: model, beta, sigma, CARs for all windows |
+
+**After this run, do not change anything in `pipeline/config.py` or `data/manual/`.**
+A data-error fix is allowed only with a dated entry in the plan's change log, and results are then
+reported before and after the fix.
+
+The tests include known-answer checks: a planted +3% rival effect is recovered, and with correlated
+rivals and no true effect the primary test rejects about 5% of the time while a plain t-test rejects about 21%.
+
+## Phase 1: feasibility (complete)
 
 Phase 1 answers one question: **is there enough usable data for a credible test?**
 It never computes an abnormal return inside an event window, so nothing you see
@@ -22,7 +44,7 @@ cd t-minus-markets
 python -m venv .venv
 source .venv/Scripts/activate
 pip install -r requirements.txt
-python -m pytest -q tests          # should print: 29 passed
+python -m pytest -q tests          # should print: 36 passed
 ```
 
 ### Run
