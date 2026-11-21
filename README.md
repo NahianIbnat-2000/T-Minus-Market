@@ -24,6 +24,15 @@ python pipeline/05_event_study.py
 | `data/processed/results.json` | Every number, for the website and the paper |
 | `data/processed/firm_event_cars.csv` | One row per firm-event: model, beta, sigma, CARs for all windows |
 
+Then the exploratory confounding check (designed after results; never replaces H2):
+
+```bash
+python pipeline/06_confounding_sensitivity.py
+```
+
+It re-runs the primary test without rival events flagged in `data/manual/confounded_events.csv`
+(E1 confounded, E2 plus possibly confounded, E3 every flag) and writes `reports/06_confounding_sensitivity.md`.
+
 **After this run, do not change anything in `pipeline/config.py` or `data/manual/`.**
 A data-error fix is allowed only with a dated entry in the plan's change log, and results are then
 reported before and after the fix.
@@ -44,7 +53,7 @@ cd t-minus-markets
 python -m venv .venv
 source .venv/Scripts/activate
 pip install -r requirements.txt
-python -m pytest -q tests          # should print: 36 passed
+python -m pytest -q tests          # should print: 37 passed
 ```
 
 ### Run
