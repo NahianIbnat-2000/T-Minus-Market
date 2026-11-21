@@ -28,3 +28,4 @@ abnormal returns are computed is a plan change and must be logged in the change 
 | 2026-11-21 | 1.0 | Added step 06, an EXPLORATORY confounding sensitivity (E1-E3) designed after results; flags in data/manual/confounded_events.csv. H2 unchanged | Yes |
 | 2026-11-21 | 1.0 | Phase 3: site export (step 07) and browser module; derived statistics only (no raw returns). No analysis change | Yes |
 | 2026-11-21 | 1.0 | Phase 4: website skeleton (five stages, anomaly cards, printed-figure charts); text generated from results. No analysis change | Yes |
+| 2026-11-21 | 1.0 | Website rebuilt as one self-contained file (step 08, site/index.html); D3 and Vite removed; Methods moved into the page. Presentation only, no analysis change | Yes |

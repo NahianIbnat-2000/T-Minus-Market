@@ -5,6 +5,7 @@ export const STAGES = [
   { id: "t-1", t: "T−1", name: "The Method" },
   { id: "t0", t: "T0", name: "The Reaction" },
   { id: "t+1", t: "T+1", name: "Is It Real?" },
+  { id: "methods", t: "\u00a7", name: "Methods" },
 ];
 
 export function stageNavHtml() {

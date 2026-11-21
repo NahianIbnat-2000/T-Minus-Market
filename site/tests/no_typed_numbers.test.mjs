@@ -4,9 +4,10 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
-const FILES = ["src/sections/text.js", "src/sections/render.js", "src/components/anomalyCard.js"];
+const FILES = ["src/sections/text.js", "src/sections/render.js", "src/sections/methods.js", "src/components/anomalyCard.js"];
 const ALLOWED = [/95%/g, /\b5%/g, /0\.75/g, /\bT0\b/g, /T\+1\b/g, /T\+3\b/g, /T\+20\b/g, /\\u2212\d?/g,
-  /\bh[1-6]\b/g, /\bt[+-]?\d\b/g, /h-t[01]p?/g, /\bt0\b/g, /\bt\+1\b/g, /\bt-[123]\b/g, /Phase \d/g, /CC-BY/g, /Story \d/g, /\bE1\b/g, /\bDay 0\b/g];
+  /\bh[1-6]\b/g, /\bt[+-]?\d\b/g, /h-t[01]p?/g, /\bt0\b/g, /\bt\+1\b/g, /\bt-[123]\b/g, /Phase \d/g, /CC-BY/g, /Story \d/g, /\bE1\b/g, /\bDay 0\b/g,
+  /\(\d{4}\)/g, /\d+\(\d+\), \d+-\d+/g, /planet4589/g, /\bv\d/g, /\u00a7/g];  // citations in methods.js
 
 function strings(src) {
   const out = [];

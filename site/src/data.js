@@ -1,5 +1,5 @@
 // Loads site/data/*.json (served from the site root by Vite's publicDir).
-const BASE = import.meta.env?.BASE_URL ?? "/";
+const BASE = "./";
 
 async function getJson(name) {
   const res = await fetch(`${BASE}${name}`);
@@ -8,6 +8,9 @@ async function getJson(name) {
 }
 
 export async function loadAll() {
+  // Single-file build: data is embedded in <script type="application/json" id="site-data">.
+  const inline = typeof document !== "undefined" && document.getElementById("site-data");
+  if (inline) return JSON.parse(inline.textContent);
   const [manifest, results, firmEvents, failures, rho] = await Promise.all([
     getJson("manifest.json"), getJson("results.json"), getJson("firm_events.json"),
     getJson("failures.json"), getJson("rho.json"),

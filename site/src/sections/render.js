@@ -5,6 +5,7 @@ import { counts } from "../data.js";
 import { carPath } from "../stats/eventstudy.js";
 import { escapeHtml, pct } from "../format.js";
 import * as T from "./text.js";
+import { methodsSection } from "./methods.js";
 
 const placeholder = (what, phase) =>
   `<div class="placeholder-tool" role="note">${escapeHtml(what)} arrives in ${escapeHtml(phase)}.</div>`;
@@ -70,5 +71,5 @@ export function renderReport(data) {
     ${T.limitsText(c)}
     ${placeholder("The Placebo Simulator", "Phase 5")}</div></section>`;
 
-  return t3 + t2 + t1 + t0 + t1p;
+  return t3 + t2 + t1 + t0 + t1p + methodsSection(data);
 }

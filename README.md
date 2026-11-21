@@ -11,19 +11,20 @@ Launch data: GCAT (J. McDowell, planet4589.org/space/gcat), CC-BY.
 
 ## Phase 4: website (current)
 
-The site lives in `site/` (Vite, vanilla JavaScript, D3). It reads `site/data/`, written by step 07.
+The whole website is ONE file: `site/index.html`. It holds the styles, the code and the data
+(derived statistics only), so it opens by double-click, works offline and can be hosted anywhere.
+No npm and no build server are needed.
 
-```bash
-cd site
-npm install          # once
-npm test             # site unit tests (formatting, no hand-typed numbers in the text)
-npm run dev          # preview at the address it prints (Ctrl+C to stop)
-npm run build        # production build into site/dist/
+```
+python pipeline/07_export_site_data.py   # results -> site/data/*.json
+python pipeline/08_build_html.py         # site/src + site/data -> site/index.html
 ```
 
-Every number on the page is read from `site/data/` when the page loads. A test fails if a
-result number is typed into the narrative code. Commit `site/data/` (derived statistics only)
-so the site can be built for GitHub Pages.
+Edit the source in `site/src/` (code, text, styles) and `site/template.html` (page frame), then
+re-run step 08. Never edit `site/index.html` by hand; it is overwritten on every build.
+
+Every number on the page comes from the embedded data. A test fails if a result number is typed
+into the narrative code. Optional checks with Node.js: `cd site && npm test`.
 
 ## Phase 3: website data (complete)
 

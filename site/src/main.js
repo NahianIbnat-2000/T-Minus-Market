@@ -1,6 +1,3 @@
-import "./styles/tokens.css";
-import "./styles/base.css";
-import "./styles/components.css";
 import { loadAll } from "./data.js";
 import { stageNavHtml, watchStages } from "./components/stageNav.js";
 import { renderReport } from "./sections/render.js";
