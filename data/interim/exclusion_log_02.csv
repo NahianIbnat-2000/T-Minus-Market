@@ -1,0 +1,118 @@
+launch_tag,lv_type,reason,detail
+2000-U01,M-V,no_firm_map_match,vehicle not linked to any listed firm
+2000-F02,Zenit-3SL,no_firm_map_match,vehicle not linked to any listed firm
+2000-074,Kosmos 11K65M,no_firm_map_match,vehicle not linked to any listed firm
+2000-F03,Tsiklon-3,no_firm_map_match,vehicle not linked to any listed firm
+2002-F01,KT-1,no_firm_map_match,vehicle not linked to any listed firm
+2002-F02,Soyuz-U-PVB,no_firm_map_match,vehicle not linked to any listed firm
+2002-053,Proton-K/DM-2M,no_firm_map_match,vehicle not linked to any listed firm
+2003-U01,KT-1,no_firm_map_match,vehicle not linked to any listed firm
+2004-F01,Shavit 1,no_firm_map_match,vehicle not linked to any listed firm
+2004-052,Tsiklon-3,no_firm_map_match,vehicle not linked to any listed firm
+2005-F04,KT-1,no_firm_map_match,vehicle not linked to any listed firm
+2005-F01,Molniya 8K78M,no_firm_map_match,vehicle not linked to any listed firm
+2005-F02,Volna,no_firm_map_match,vehicle not linked to any listed firm
+2005-F03,Rokot,no_firm_map_match,vehicle not linked to any listed firm
+2006-006,Proton-M/Briz-M,no_firm_map_match,vehicle not linked to any listed firm
+2006-F01,Falcon 1,no_firm_map_match,vehicle not linked to any listed firm
+2006-F02,GSLV Mk I,no_firm_map_match,vehicle not linked to any listed firm
+2006-F03,Dnepr,no_firm_map_match,vehicle not linked to any listed firm
+2007-F01,Zenit-3SL,no_firm_map_match,vehicle not linked to any listed firm
+2007-F02,Falcon 1,no_firm_map_match,vehicle not linked to any listed firm
+2007-F03,Proton-M/Briz-M,no_firm_map_match,vehicle not linked to any listed firm
+2008-011,Proton-M/Briz-M,no_firm_map_match,vehicle not linked to any listed firm
+2008-F01,Falcon 1,no_firm_map_match,vehicle not linked to any listed firm
+2008-F02,Safir,no_firm_map_match,vehicle not linked to any listed firm
+2009-F02,Unha-2,no_firm_map_match,vehicle not linked to any listed firm
+2009-F03,Naro-1,no_firm_map_match,vehicle not linked to any listed firm
+2009-046,Chang Zheng 3B,no_firm_map_match,vehicle not linked to any listed firm
+2010-F01,GSLV Mk II,no_firm_map_match,vehicle not linked to any listed firm
+2010-F02,Naro-1,no_firm_map_match,vehicle not linked to any listed firm
+2010-F03,Proton-M/DM-3,no_firm_map_match,vehicle not linked to any listed firm
+2010-F04,GSLV Mk I,no_firm_map_match,vehicle not linked to any listed firm
+2011-005,Rokot,no_firm_map_match,vehicle not linked to any listed firm
+2011-045,Proton-M/Briz-M,no_firm_map_match,vehicle not linked to any listed firm
+2011-F02,Chang Zheng 2C,no_firm_map_match,vehicle not linked to any listed firm
+2011-F03,Soyuz-U-PVB,no_firm_map_match,vehicle not linked to any listed firm
+2011-F04,Soyuz-2-1B,no_firm_map_match,vehicle not linked to any listed firm
+2012-F01,Unha-3,no_firm_map_match,vehicle not linked to any listed firm
+2012-F02,Safir,no_firm_map_match,vehicle not linked to any listed firm
+2012-044,Proton-M/Briz-M,no_firm_map_match,vehicle not linked to any listed firm
+2012-F03,Safir,no_firm_map_match,vehicle not linked to any listed firm
+2012-070,Proton-M/Briz-M,no_firm_map_match,vehicle not linked to any listed firm
+2013-F01,Zenit-3SL,no_firm_map_match,vehicle not linked to any listed firm
+2013-F02,Proton-M/DM-3,no_firm_map_match,vehicle not linked to any listed firm
+2013-F03,Chang Zheng 4B,no_firm_map_match,vehicle not linked to any listed firm
+2014-F01,Proton-M/Briz-M,no_firm_map_match,vehicle not linked to any listed firm
+2014-050,Soyuz-ST-B,no_firm_map_match,vehicle not linked to any listed firm
+2015-024,Soyuz-2-1A,no_firm_map_match,vehicle not linked to any listed firm
+2015-F01,Proton-M/Briz-M,no_firm_map_match,vehicle not linked to any listed firm
+2015-F02,Falcon 9,no_firm_map_match,vehicle not linked to any listed firm
+2015-F03,Super Strypi,no_firm_map_match,vehicle not linked to any listed firm
+2015-071,Soyuz-2-1V,no_firm_map_match,vehicle not linked to any listed firm
+2016-F01,Chang Zheng 4C,no_firm_map_match,vehicle not linked to any listed firm
+2016-F02,Soyuz-U-PVB,no_firm_map_match,vehicle not linked to any listed firm
+2017-F01,SS-520,no_firm_map_match,vehicle not linked to any listed firm
+2017-F02,Electron,provider_not_listed_or_not_owner_on_date,Rocket Lab
+2017-035,Chang Zheng 3B,no_firm_map_match,vehicle not linked to any listed firm
+2017-F03,Chang Zheng 5,no_firm_map_match,vehicle not linked to any listed firm
+2017-051,PSLV-XL,no_firm_map_match,vehicle not linked to any listed firm
+2017-F05,Soyuz-2-1B,no_firm_map_match,vehicle not linked to any listed firm
+2018-F01,Soyuz-FG,no_firm_map_match,vehicle not linked to any listed firm
+2018-F02,Zhuque-1,no_firm_map_match,vehicle not linked to any listed firm
+2019-F01,Simorgh,no_firm_map_match,vehicle not linked to any listed firm
+2019-F02,Safir,no_firm_map_match,vehicle not linked to any listed firm
+2019-F03,OS-M1,no_firm_map_match,vehicle not linked to any listed firm
+2019-F04,Chang Zheng 4C,no_firm_map_match,vehicle not linked to any listed firm
+2020-F01,Simorgh,no_firm_map_match,vehicle not linked to any listed firm
+2020-F02,Chang Zheng 7A,no_firm_map_match,vehicle not linked to any listed firm
+2020-F03,Chang Zheng 3B,no_firm_map_match,vehicle not linked to any listed firm
+2020-F04,LauncherOne,provider_not_listed_or_not_owner_on_date,Virgin Orbit
+2020-F05,Electron,provider_not_listed_or_not_owner_on_date,Rocket Lab
+2020-F06,Kuaizhou-11,no_firm_map_match,vehicle not linked to any listed firm
+2020-F07,Astra Rocket 3.1,provider_not_listed_or_not_owner_on_date,Astra Space
+2020-F08,Kuaizhou-1A,no_firm_map_match,vehicle not linked to any listed firm
+2020-F09,Astra Rocket 3.2,provider_not_listed_or_not_owner_on_date,Astra Space
+2021-F01,Shuang Quxian 1,no_firm_map_match,vehicle not linked to any listed firm
+2021-F02,Electron,provider_not_listed_or_not_owner_on_date,Rocket Lab
+2021-F03,Simorgh,no_firm_map_match,vehicle not linked to any listed firm
+2021-F05,Shuang Quxian 1,no_firm_map_match,vehicle not linked to any listed firm
+2021-F06,GSLV Mk II,no_firm_map_match,vehicle not linked to any listed firm
+2021-F08,Firefly Alpha,provider_not_listed_or_not_owner_on_date,Firefly Aerospace
+2021-F09,Nuri,no_firm_map_match,vehicle not linked to any listed firm
+2021-F10,Kuaizhou-1A,no_firm_map_match,vehicle not linked to any listed firm
+2021-133,Angara A5/Persei,no_firm_map_match,vehicle not linked to any listed firm
+2021-F11,Simorgh,no_firm_map_match,vehicle not linked to any listed firm
+2022-F02,Shuang Quxian 1,no_firm_map_match,vehicle not linked to any listed firm
+2022-U02,SSLV,no_firm_map_match,vehicle not linked to any listed firm
+2022-F05,Zhuque-2,no_firm_map_match,vehicle not linked to any listed firm
+2023-F02,RS1,no_firm_map_match,vehicle not linked to any listed firm
+2023-F10,Qaem-100,no_firm_map_match,vehicle not linked to any listed firm
+2023-F04,Terran 1,no_firm_map_match,vehicle not linked to any listed firm
+2023-F06,Cheonlima-1,no_firm_map_match,vehicle not linked to any listed firm
+2023-F07,Cheonlima-1,no_firm_map_match,vehicle not linked to any listed firm
+2023-F09,Gushenxing 1,no_firm_map_match,vehicle not linked to any listed firm
+2023-202,Firefly Alpha,provider_not_listed_or_not_owner_on_date,Firefly Aerospace
+2024-F01,Kairos,no_firm_map_match,vehicle not linked to any listed firm
+2024-F02,NK Kerolox LV,no_firm_map_match,vehicle not linked to any listed firm
+2024-F03,Shuang Quxian 1,no_firm_map_match,vehicle not linked to any listed firm
+2024-129,Falcon 9,no_firm_map_match,vehicle not linked to any listed firm
+2024-F04,Kairos,no_firm_map_match,vehicle not linked to any listed firm
+2024-F05,Lijian-1,no_firm_map_match,vehicle not linked to any listed firm
+2025-F01,Starship V2,no_firm_map_match,vehicle not linked to any listed firm
+2025-F03,Starship V2,no_firm_map_match,vehicle not linked to any listed firm
+2025-F04,Spectrum,no_firm_map_match,vehicle not linked to any listed firm
+2025-U01,Firefly Alpha,provider_not_listed_or_not_owner_on_date,Firefly Aerospace
+2025-F05,PSLV-XL,no_firm_map_match,vehicle not linked to any listed firm
+2025-F06,Eris Block 1,no_firm_map_match,vehicle not linked to any listed firm
+2025-F07,Zhuque-2E,no_firm_map_match,vehicle not linked to any listed firm
+2025-F08,Zoljanah,no_firm_map_match,vehicle not linked to any listed firm
+2025-U05,Gushenxing 1,no_firm_map_match,vehicle not linked to any listed firm
+2025-F09,HANBIT-NANO,no_firm_map_match,vehicle not linked to any listed firm
+2026-F01,PSLV-DL,no_firm_map_match,vehicle not linked to any listed firm
+2026-F02,Chang Zheng 3B,no_firm_map_match,vehicle not linked to any listed firm
+2026-F03,Gushenxing-2,no_firm_map_match,vehicle not linked to any listed firm
+2026-F04,Kairos,no_firm_map_match,vehicle not linked to any listed firm
+2026-F05,Tianlong-3,no_firm_map_match,vehicle not linked to any listed firm
+2026-085,New Glenn 7x2,no_firm_map_match,vehicle not linked to any listed firm
+2026-F06,Chang Zheng 7A,no_firm_map_match,vehicle not linked to any listed firm

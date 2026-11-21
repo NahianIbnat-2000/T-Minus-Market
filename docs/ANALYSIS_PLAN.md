@@ -1,0 +1,26 @@
+# Frozen Analysis Plan v1.0 (21 Nov 2026)
+
+Full plan: https://claude.ai/artifact/6xn5JNEeNn75fEXcL5bs5a
+
+The numbers below are enforced by `pipeline/config.py`. Changing any of them after
+abnormal returns are computed is a plan change and must be logged in the change log.
+
+| Item | Locked value |
+| --- | --- |
+| Confirmatory test | H2: mean rival CAR[0,+1] = 0, two-sided, 5% |
+| Primary test | BMP standardized test with Kolari-Pynnonen within-cluster correlation adjustment |
+| Providers | Case series (4 failures) unless CRSP data gives >= 10 independent failures |
+| Failure | GCAT score < 0.75, categories O and D, from 2000-01-01 |
+| Tier 1 rival | listed, pure_play/major, same size class and customer market, flew in prior 730 days |
+| Day 0 | first session at/after disclosure; sourced time if timing-sensitive |
+| Model | market model, simple returns, local index benchmark |
+| Estimation window | [-250, -30]; >=100 obs market model; 30-99 market-adjusted (flagged) |
+| Windows | primary [0,+1]; robustness [-1,+3]; descriptive [0,+20] |
+| Clusters | failures sharing a firm within 5 trading days |
+| Robustness | R1 portfolio, R2 plain t, R3 rank (simulated p), R4 window, R5 timing, R6 fallback, R7 overlaps, R8 leave-one-firm-out, R9 placebo (seed 20261121) |
+
+## Change log
+
+| Date | Version | Change | Results seen? |
+| --- | --- | --- | --- |
+| 2026-11-21 | 1.0 | Plan frozen at end of Phase 1 | No |

@@ -1,0 +1,10 @@
+ticker,date,issue,value
+7011.T,2017-09-27,split_reported_check_adjustment,0.1
+7011.T,2024-03-28,split_reported_check_adjustment,10.0
+7013.T,2017-09-27,split_reported_check_adjustment,0.1
+7013.T,2025-09-29,split_reported_check_adjustment,7.0
+LMT,1999-01-04,split_reported_check_adjustment,2.0
+NOC,2004-06-22,split_reported_check_adjustment,2.0
+NOC,2011-03-31,split_reported_check_adjustment,1.1068068622025458
+SAF.PA,2000-07-10,split_reported_check_adjustment,3.0
+SAF.PA,2004-12-22,split_reported_check_adjustment,5.0

@@ -1,0 +1,44 @@
+lv_pattern,segment,market,valid_from,valid_to,notes
+^Electron,small,global_commercial,,,"v1 researcher classification. Segment: small < 2 t to LEO (or sells mainly small-sat rides), medium 2-10 t, heavy > 10 t. Market: who the vehicle actually sells to. Verify each."
+^Astra Rocket ?3,small,global_commercial,,,v1
+^LauncherOne,small,global_commercial,,,v1
+^Firefly Alpha,small,global_commercial,,,v1
+^Terran 1,small,global_commercial,,,"v1: Relativity, private"
+^RS1,small,global_commercial,,,"v1: ABL, private"
+^Eris,small,global_commercial,,,"v1: Gilmour Space, private"
+^Spectrum,small,global_commercial,,,"v1: Isar Aerospace, private"
+^Kairos,small,global_commercial,,,"v1: Space One (Japan), private; check commercial customers"
+^HANBIT,small,global_commercial,,,"v1: Innospace (Korea); check commercial customers and listing status"
+^Falcon ?1,small,global_commercial,,,v1
+^Pegasus,small,global_commercial,,,v1
+^Taurus,small,global_commercial,,,v1
+^Vega$,small,global_commercial,,,v1
+^Dnepr,small,global_commercial,,,"v1: sold commercially by Kosmotras; verify segment"
+^Rokot,small,global_commercial,,,"v1: sold commercially by Eurockot; verify"
+^PSLV,small,global_commercial,,,"DECISION: PSLV is medium by mass but its commercial business is small-sat rideshare; classed small here. Change to medium/national_government if you disagree."
+^Minotaur,small,us_government,,,v1: US government payloads only
+^Super Strypi,small,us_government,,,v1
+^(Epsilon|M-V|SS-520),small,national_government,,,"v1: Japanese government payloads"
+^SSLV,small,national_government,,,"v1: Indian state vehicle; revisit if it sells commercially"
+^(Naro|Nuri),small,national_government,,,v1: Korean state vehicles
+^(Kuaizhou|Zhuque|Ceres|Gushenxing|Hyperbola|Shuang Quxian|Jielong|Lijian|Gravity|Tianlong|Kinetica|KT-1|OS-M1),small,china,,,v1: Chinese vehicles do not compete for Western commercial customers
+^(Safir|Simorgh|Unha|Cheonlima|Qased|Qaem|Zoljanah|Shavit|NK Kerolox),small,state_other,,,v1
+^(Kosmos|Tsiklon|Molniya|Volna),small,russia_government,,,v1
+^Vega[ -]?C,medium,global_commercial,,,v1
+^Antares,medium,global_commercial,,,"v1: NASA cargo plus some commercial"
+^(H-IIA|H-2A|GSLV),medium,national_government,,,"v1: mostly own-government payloads"
+^Soyuz-ST,medium,global_commercial,,,"v1: Kourou Soyuz, sold by Arianespace"
+^Soyuz,medium,russia_government,,,"v1: Baikonur/Plesetsk Soyuz, mostly Russian government and ISS"
+^(CZ-|Chang Zheng|Long March),medium,china,,,v1
+^Delta,heavy,global_commercial,,,v1
+^Atlas,heavy,global_commercial,,,v1
+^(H-IIB|H-?3|H3),heavy,national_government,,,"v1: mostly Japanese government; H3 seeks commercial customers"
+^Ariane,heavy,global_commercial,,,v1
+^Falcon ?9,heavy,global_commercial,,,v1
+^Falcon Heavy,heavy,global_commercial,,,v1
+^Vulcan,heavy,global_commercial,,,v1
+^New Glenn,heavy,global_commercial,,,v1
+^Starship,heavy,global_commercial,,,v1: test flights; private provider
+^(Proton|Zenit),heavy,global_commercial,,2022-02-28,v1: Proton sold via ILS; Zenit via Sea Launch
+^(Proton|Zenit|Angara),heavy,russia_government,2022-03-01,,v1
+^Angara,heavy,russia_government,,,v1

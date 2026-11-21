@@ -1,0 +1,135 @@
+{
+  "source": "Yahoo Finance via yfinance",
+  "auto_adjust": false,
+  "returns_from": "Adj Close, simple returns",
+  "retrieved_utc": "2026-11-21T13:21:46+00:00",
+  "tickers": [
+    {
+      "ticker": "7011.T",
+      "status": "ok",
+      "rows": 6706,
+      "first_date": "2000-01-04",
+      "last_date": "2026-11-20"
+    },
+    {
+      "ticker": "7013.T",
+      "status": "ok",
+      "rows": 6706,
+      "first_date": "2000-01-04",
+      "last_date": "2026-11-20"
+    },
+    {
+      "ticker": "AIR.PA",
+      "status": "ok",
+      "rows": 6474,
+      "first_date": "2001-09-03",
+      "last_date": "2026-11-20"
+    },
+    {
+      "ticker": "ASTR",
+      "status": "empty",
+      "rows": 0,
+      "first_date": "",
+      "last_date": ""
+    },
+    {
+      "ticker": "AVIO.MI",
+      "status": "ok",
+      "rows": 2876,
+      "first_date": "2015-07-31",
+      "last_date": "2026-11-20"
+    },
+    {
+      "ticker": "BA",
+      "status": "ok",
+      "rows": 7165,
+      "first_date": "1998-06-01",
+      "last_date": "2026-11-20"
+    },
+    {
+      "ticker": "FLY",
+      "status": "ok",
+      "rows": 326,
+      "first_date": "2025-08-07",
+      "last_date": "2026-11-20"
+    },
+    {
+      "ticker": "LMT",
+      "status": "ok",
+      "rows": 7165,
+      "first_date": "1998-06-01",
+      "last_date": "2026-11-20"
+    },
+    {
+      "ticker": "NOC",
+      "status": "ok",
+      "rows": 7165,
+      "first_date": "1998-06-01",
+      "last_date": "2026-11-20"
+    },
+    {
+      "ticker": "OA",
+      "status": "empty",
+      "rows": 0,
+      "first_date": "",
+      "last_date": ""
+    },
+    {
+      "ticker": "ORB",
+      "status": "empty",
+      "rows": 0,
+      "first_date": "",
+      "last_date": ""
+    },
+    {
+      "ticker": "RKLB",
+      "status": "ok",
+      "rows": 1505,
+      "first_date": "2020-11-24",
+      "last_date": "2026-11-20"
+    },
+    {
+      "ticker": "SAF.PA",
+      "status": "ok",
+      "rows": 6909,
+      "first_date": "2000-01-03",
+      "last_date": "2026-11-20"
+    },
+    {
+      "ticker": "VORB",
+      "status": "empty",
+      "rows": 0,
+      "first_date": "",
+      "last_date": ""
+    },
+    {
+      "ticker": "FTSEMIB.MI",
+      "status": "ok",
+      "rows": 7273,
+      "first_date": "1998-06-01",
+      "last_date": "2026-11-20"
+    },
+    {
+      "ticker": "^FCHI",
+      "status": "ok",
+      "rows": 7274,
+      "first_date": "1998-06-02",
+      "last_date": "2026-11-20"
+    },
+    {
+      "ticker": "^GSPC",
+      "status": "ok",
+      "rows": 7165,
+      "first_date": "1998-06-01",
+      "last_date": "2026-11-20"
+    },
+    {
+      "ticker": "^N225",
+      "status": "ok",
+      "rows": 6976,
+      "first_date": "1998-06-01",
+      "last_date": "2026-11-20"
+    }
+  ],
+  "licence_note": "Check Yahoo terms before publishing raw prices or returns (audit risk 8)."
+}

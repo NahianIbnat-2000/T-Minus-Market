@@ -1,0 +1,139 @@
+Launch_Tag,launch_utc,launch_time_source,Launch_Date,LV_Type,Launch_Site,LaunchCode,score,outcome,FailCode,Flight_ID,Mission,LTCite
+2000-U01,2000-02-10 01:30:00+00:00,Launch_Date,2000 Feb 10 0130,M-V,KASC,OF,0.0,failure,S1P*,M-V-4,ASTRO E,Wire
+2000-F02,2000-03-12 14:49:15+00:00,Launch_Date,2000 Mar 12 1449:15,Zenit-3SL,KLA,OF,0.0,failure,S2P,2L/DM-SL-2L,ICO F1,Wire
+2000-074,2000-11-20 23:00:00+00:00,Launch_Date,2000 Nov 20 2300:00,Kosmos 11K65M,GIK-1,OF40,0.4,failure,S2R,47165-631,QuickBird 1,NK0101-21
+2000-F03,2000-12-27 09:56:31+00:00,Launch_Date,2000 Dec 27 0956:31,Tsiklon-3,GIK-1,OF,0.0,failure,S3P,450-34-  503,Gonets-D1 No. 19/20/21,NK0102-35
+2001-029,2001-07-12 21:58:00+00:00,Launch_Date,2001 Jul 12 2158,Ariane 5G,CSG,OF50,0.5,failure,S2U,V142 (510),Artemis,Wire
+2001-U01,2001-09-21 18:49:30+00:00,Launch_Date,2001 Sep 21 1849:30,Taurus 2110,V,OF,0.0,failure,S2G*,T6,Warfighter-1,Wire
+2002-F01,2002-09-15 10:30:00+00:00,Launch_Date,2002 Sep 15 1030,KT-1,TYSC,OF,0.0,failure,S2,001201Y,HTSTL-1,pc
+2002-F02,2002-10-15 18:20:00+00:00,Launch_Date,2002 Oct 15 1820:00,Soyuz-U-PVB,GIK-1,OF,0.0,failure,S1P,A 15000-066,Foton-M No. 1,NK0212-34
+2002-053,2002-11-25 23:04:23+00:00,Launch_Date,2002 Nov 25 2304:23,Proton-K/DM-2M,GIK-5,OF40,0.4,failure,S4R,408-02,Astra 1K,NK0301-50
+2002-F03,2002-12-11 22:22:00+00:00,Launch_Date,2002 Dec 11 2222,Ariane 5ECA,CSG,OF,0.0,failure,S1P,V157 (517),Hot Bird 7,Wire
+2003-U01,2003-09-16 10:33:36+00:00,Launch_JD,2003 Sep 16 1030?,KT-1,TYSC,OF,0.0,failure,S4,-,KT-1 Test Payload,ChenLan
+2003-F02,2003-11-29 04:33:00+00:00,Launch_Date,2003 Nov 29 0433,H-IIA 2024,TNSC,OF,0.0,failure,S0S,H-IIA-6F,IGS Optical-2,Wire
+2004-F01,2004-09-06 10:53:00+00:00,Launch_Date,2004 Sep  6 1053,Shavit 1,PALB,OF,0.0,failure,S3I,6,'Ofeq-6,jpost.com
+2004-050,2004-12-21 21:50:00+00:00,Launch_Date,2004 Dec 21 2150:00,Delta 4H,CC,OF45,0.45,failure,S1P,D4-4/D310,HLV-OLDSP,Wire
+2004-052,2004-12-24 11:20:00+00:00,Launch_Date,2004 Dec 24 1120:00,Tsiklon-3,GIK-1,OF40,0.4,failure,S3U,450-43-  701 40L,Okean-O1 No. 9,NK0502-21
+2005-F04,2005-06-09 00:00:00+00:00,Launch_JD,2005 Jun  9,KT-1,TYSC,OF,0.0,failure,UX,UNCONFIRMED,MS-1?,nasaspaceflight.com
+2005-F01,2005-06-21 00:48:37+00:00,Launch_Date,2005 Jun 21 0048:37,Molniya 8K78M,GIK-1,OF,0.0,failure,S2P,77046  -694 051,Molniya-3K No. 12L,NK0508-01
+2005-F02,2005-06-21 19:46:09+00:00,Launch_Date,2005 Jun 21 1946:09,Volna,BLA,OF,0.0,failure,S1P,M-1491-035,TPS Solar Sail,Wire
+2005-F03,2005-10-08 15:02:00+00:00,Launch_Date,2005 Oct  8 1502:00,Rokot,GIK-1,OF,0.0,failure,S2P,492-5882-030/72508,Cryosat,NK0512-34
+2006-006,2006-02-28 20:10:00+00:00,Launch_Date,2006 Feb 28 2010:00,Proton-M/Briz-M,GIK-5,OF40,0.4,failure,S4P2,535-11/88515,Arabsat 4A,NK0604-10
+2006-F01,2006-03-24 22:30:00+00:00,Launch_Date,2006 Mar 24 2230,Falcon 1,KMR,OF,0.0,failure,S1P,F001,Falconsat 2,Wire
+2006-F02,2006-07-10 12:08:00+00:00,Launch_Date,2006 Jul 10 1208,GSLV Mk I,SHAR,OF,0.0,failure,S0P,GSLV-F02,Insat 4C,Wire
+2006-F03,2006-07-26 19:43:05+00:00,Launch_Date,2006 Jul 26 1943:05,Dnepr,GIK-5,OF,0.0,failure,S2I,450-2973-804,Dnepr Rideshare 4,NK0609-44
+2007-F01,2007-01-30 23:22:00+00:00,Launch_Date,2007 Jan 30 2322,Zenit-3SL,KLA,OF,0.0,failure,PE,SL24/DM-SL-25L,NSS 8,Wire
+2007-F02,2007-03-21 01:10:00+00:00,Launch_Date,2007 Mar 21 0110,Falcon 1,KMR,OF,0.0,failure,S2P,F002,AFSS/LCT2,Wire
+2007-F03,2007-09-05 22:43:10+00:00,Launch_Date,2007 Sep  5 2243:10,Proton-M/Briz-M,GIK-5,OF,0.0,failure,S1S,535-22/88522,JCSAT 11,NK0711-16
+2008-011,2008-03-14 23:18:55+00:00,Launch_Date,2008 Mar 14 2318:55,Proton-M/Briz-M,GIK-5,OF40,0.4,failure,S4P2,535-25/88525,Americom 14,NK0805-37
+2008-F01,2008-08-03 03:34:00+00:00,Launch_Date,2008 Aug  3 0334,Falcon 1,KMR,OF,0.0,failure,S1S,F003,ORS Trailblazer,Wire
+2008-F02,2008-08-16 19:32:00+00:00,Launch_Date,2008 Aug 16 1932,Safir,SEM,OF,0.0,failure,S2,OES.0001,-,Wire
+2009-F01,2009-02-24 09:55:30+00:00,Launch_Date,2009 Feb 24 0955:30,Taurus 3110,V,OF,0.0,failure,FF,T8 (XL),Orbiting Carbon Observat,Wire
+2009-F02,2009-04-05 02:30:00+00:00,Launch_Date,2009 Apr  5 0230,Unha-2,TONGH,OF,0.0,failure,S3,2,-,Wire
+2009-F03,2009-08-25 08:00:33+00:00,Launch_Date,2009 Aug 25 0800:33,Naro-1,NARO,OF,0.0,failure,FF,74501,STSat-2,Wire
+2009-046,2009-08-31 09:28:00+00:00,Launch_Date,2009 Aug 31 0928,Chang Zheng 3B,XSC,OF60,0.6,failure,S3P2,Y8,Palapa D,xinhuanet.com
+2010-F01,2010-04-15 10:57:00+00:00,Launch_Date,2010 Apr 15 1057,GSLV Mk II,SHAR,OF,0.0,failure,S3P,GSLV-D3,GSAT-4,Wire
+2010-F02,2010-06-10 08:01:00+00:00,Launch_Date,2010 Jun 10 0801,Naro-1,NARO,OF,0.0,failure,AD,74502,STSat-2B,Wire
+2010-F03,2010-12-05 10:25:19+00:00,Launch_Date,2010 Dec  5 1025:19,Proton-M/DM-3,GIK-5,OF,0.0,failure,S3U,535-37/01L,Uragan-M No. 739,nasaspaceflight.com
+2010-F04,2010-12-25 10:34:00+00:00,Launch_Date,2010 Dec 25 1034,GSLV Mk I,SHAR,OF,0.0,failure,S0P,GSLV-F06,GSAT-5 Prime,Wire
+2011-005,2011-02-01 14:00:14+00:00,Launch_Date,2011 Feb  1 1400:14,Rokot,GIK-1,OF40,0.4,failure,S3R,630-9793-568/72517,Musson-2 No. 11,NK1104-26
+2011-F01,2011-03-04 10:09:43+00:00,Launch_Date,2011 Mar  4 1009:43,Taurus 3110,V,OF,0.0,failure,FF,T9 (XL),Glory,Wire
+2011-045,2011-08-17 21:25:01+00:00,Launch_Date,2011 Aug 17 2125:01,Proton-M/Briz-M,GIK-5,OF40,0.4,failure,S4G,935-21/99522,Ekspress AM-4,coopi.krunichev.ru
+2011-F02,2011-08-18 09:28:03+00:00,Launch_Date,2011 Aug 18 0928:03,Chang Zheng 2C,JQ,OF,0.0,failure,S2I,Y26,shijian shi yihao 04 xin,nasaspaceflight.com
+2011-F03,2011-08-24 13:00:08+00:00,Launch_Date,2011 Aug 24 1300:08,Soyuz-U-PVB,GIK-5,OF,0.0,failure,S3P,L 15000-132,Progress 7K-TGM No.412,NK1110-09
+2011-F04,2011-12-23 12:08:10+00:00,Launch_Date,2011 Dec 23 1208:10,Soyuz-2-1B,GIK-1,OF,0.0,failure,S3P,780-75 -164 006/1042,Meridian No. 15L?,nasaspaceflight.com
+2012-F01,2012-04-12 22:38:55+00:00,Launch_Date,2012 Apr 12 2238:55,Unha-3,SOHAE,OF,0.0,failure,S1,3,-,Wire
+2012-F02,2012-05-23 00:00:00+00:00,Launch_JD,2012 May 23?,Safir,SEM,OF,0.0,failure,UX,-,Fajr,JaneIntellRev
+2012-044,2012-08-06 19:31:00+00:00,Launch_Date,2012 Aug  6 1931:00,Proton-M/Briz-M,GIK-5,OF40,0.4,failure,S4P3,935-31/99532,Telkom-3,coopi.krunichev.ru
+2012-F03,2012-09-22 00:00:00+00:00,Launch_JD,2012 Sep 22?,Safir,SEM,OF,0.0,failure,UX,-,Fajr,JaneIntellRev
+2012-070,2012-12-08 13:13:43+00:00,Launch_Date,2012 Dec  8 1313:43,Proton-M/Briz-M,GIK-5,OF50,0.5,failure,S4P4,935-34/99535,Yamal 402,coopi.krunichev.ru
+2013-F01,2013-02-01 06:56:00+00:00,Launch_Date,2013 Feb  1 0656:00,Zenit-3SL,KLA,OF,0.0,failure,S1G,SL36/DM-SL-35L,Intelsat IS-27,sea-launch.com
+2013-F02,2013-07-02 02:38:22+00:00,Launch_Date,2013 Jul  2 0238:22,Proton-M/DM-3,GIK-5,OF,0.0,failure,S1G,535-43/2L,"Glonass-M 48,49,50",nasaspaceflight.com
+2013-F03,2013-12-09 03:26:00+00:00,Launch_Date,2013 Dec  9 0326,Chang Zheng 4B,TYSC,OF,0.0,failure,S3P,Y10,CBERS 3,zenite.nu
+2014-F01,2014-05-15 21:42:00+00:00,Launch_Date,2014 May 15 2142:00,Proton-M/Briz-M,GIK-5,OF,0.0,failure,S3P,935-45/99547,Ekspress AM-4R,nasaspaceflight.com
+2014-050,2014-08-22 12:27:11+00:00,Launch_Date,2014 Aug 22 1227:11,Soyuz-ST-B,CSG,OF40,0.4,failure,S4G2,E 15000-006/1039,GalileoSat 5-6,nasaspaceflight.com
+2014-F02,2014-10-28 22:22:30+00:00,Launch_Date,2014 Oct 28 2222:30,Antares 130,MARS,OF,0.0,failure,S1P,2TRS2S1.5  (5),Cygnus Orb-3,Wire
+2015-024,2015-04-28 07:09:50+00:00,Launch_Date,2015 Apr 28 0709:50,Soyuz-2-1A,GIK-5,OF30,0.3,failure,S3S,G 15000-022,Progress 7K-TGM No. 426,spaceflightnow.com
+2015-F01,2015-05-16 05:47:39+00:00,Launch_Date,2015 May 16 0547:39,Proton-M/Briz-M,GIK-5,OF,0.0,failure,S3P,935-54/99555,Mexsat-1,nasaspaceflight.com
+2015-F02,2015-06-28 14:21:11+00:00,Launch_Date,2015 Jun 28 1421:11,Falcon 9,CC,OF,0.0,failure,S2P,020/B1018?   F019,Dragon C109,Wire
+2015-F03,2015-11-04 03:45:00+00:00,Launch_Date,2015 Nov  4 0345,Super Strypi,KAU,OF,0.0,failure,S1G,1,Hiakasat,Wire
+2015-071,2015-12-05 14:08:33+00:00,Launch_Date,2015 Dec  5 1408:33,Soyuz-2-1V,GIK-1,OF44,0.44,failure,S3S,780-31- 001 001/002,Kanopus-ST/KYuA-1,nasaspaceflight.com
+2016-F01,2016-08-31 18:55:25+00:00,Launch_Date,2016 Aug 31 1855:25,Chang Zheng 4C,TYSC,OF,0.0,failure,S3R,Y22,Gaofen 10,nasaspaceflight.com
+2016-F02,2016-12-01 14:51:52+00:00,Launch_Date,2016 Dec  1 1451:52,Soyuz-U-PVB,GIK-5,OF,0.0,failure,S3P,P 15000-148,Progress 7K-TGM No. 434,spaceflightnow.com
+2017-F01,2017-01-14 23:33:00+00:00,Launch_Date,2017 Jan 14 2333,SS-520,USC,OF,0.0,failure,U,SS-520-4,TRICOM-1,Wire
+2017-F02,2017-05-25 04:20:00+00:00,Launch_Date,2017 May 25 0420:00,Electron,MAHIA,OF,0.0,failure,AD,1,-,twitter.com
+2017-035,2017-06-18 16:11:00+00:00,Launch_Date,2017 Jun 18 1611,Chang Zheng 3B,XSC,OF40,0.4,failure,S3G2,Y28,Zhongxing-9A,nasaspaceflight.com
+2017-F03,2017-07-02 11:23:23+00:00,Launch_Date,2017 Jul  2 1123:23,Chang Zheng 5,WEN,OF,0.0,failure,S1P,Y2,SJ-18,nasaspaceflight.com
+2017-051,2017-08-31 13:30:00+00:00,Launch_Date,2017 Aug 31 1330,PSLV-XL,SHAR,OF20,0.2,failure,FF,PSLV-C39,IRNSS-1H,Wire
+2017-F05,2017-11-28 05:41:46+00:00,Launch_Date,2017 Nov 28 0541:46,Soyuz-2-1B,VOST,OF,0.0,failure,S4G,N 15000-001/122-01,Soyuz Rideshare 5,spaceflightnow.com
+2018-012,2018-01-25 22:20:00+00:00,Launch_Date,2018 Jan 25 2220,Ariane 5ECA,CSG,OS65,0.65,failure,S1G,VA241 (5101),SES-14/Al Yah 3,Wire
+2018-F01,2018-10-11 08:40:15+00:00,Launch_Date,2018 Oct 11 0840:15,Soyuz-FG,GIK-5,OF,0.0,failure,S1S,U 15000-062,Soyuz 11F732A48 No. 740,spaceflightnow.com
+2018-F02,2018-10-27 08:00:00+00:00,Launch_Date,2018 Oct 27 0800,Zhuque-1,JQ,OF,0.0,failure,S3G,-,Weilai,Wire
+2019-F01,2019-01-15 00:30:00+00:00,Launch_Date,2019 Jan 15 0030,Simorgh,SEM,OF,0.0,failure,S2?,3,-,nasaspaceflight.com
+2019-F02,2019-02-05 00:00:00+00:00,Launch_JD,2019 Feb  5,Safir,SEM,OF,0.0,failure,S2P?,-,Dousti,Wire
+2019-F03,2019-03-27 09:39:00+00:00,Launch_Date,2019 Mar 27 0939,OS-M1,JQ,OF,0.0,failure,S2G,OS-M1,-,nasaspaceflight.com
+2019-F04,2019-05-22 22:49:00+00:00,Launch_Date,2019 May 22 2249,Chang Zheng 4C,TYSC,OF,0.0,failure,S3R,Y23,-,nasaspaceflight.com
+2019-F05,2019-07-11 01:53:03+00:00,Launch_Date,2019 Jul 11 0153:03,Vega,CSG,OF,0.0,failure,S2P,VV15,FalconEye 1,spaceflightnow.com
+2020-F01,2020-02-09 15:48:14+00:00,Launch_Date,2020 Feb  9 1548:14,Simorgh,SEM,OF,0.0,failure,S2U?,4 MRS.C001,-,nasaspaceflight.com
+2020-F02,2020-03-16 13:34:00+00:00,Launch_Date,2020 Mar 16 1334,Chang Zheng 7A,WEN,OF,0.0,failure,S2P,Y1,XYZ-6,nasaspaceflight.com
+2020-F03,2020-04-09 11:46:00+00:00,Launch_Date,2020 Apr  9 1146,Chang Zheng 3B,XSC,OF,0.0,failure,S3P,Y71,Nusantara Dua,nasaspaceflight.com
+2020-F04,2020-05-25 19:50:00+00:00,Launch_Date,2020 May 25 1950,LauncherOne,MHV,OF,0.0,failure,S1P,R02,-,Wire
+2020-F05,2020-07-04 21:19:36+00:00,Launch_Date,2020 Jul  4 2119:36,Electron,MAHIA,OF,0.0,failure,S2E,13,Electron 13 Rideshare,Wire
+2020-F06,2020-07-10 04:17:00+00:00,Launch_Date,2020 Jul 10 0417,Kuaizhou-11,JQ,OF,0.0,failure,S3P,Y1,Jilin-1 GF02,nasaspaceflight.com
+2020-F07,2020-09-12 03:19:00+00:00,Launch_Date,2020 Sep 12 0319,Astra Rocket 3.1,PSCA,OF,0.0,failure,S1G,LV0004,-,SN181206
+2020-F08,2020-09-12 05:02:00+00:00,Launch_Date,2020 Sep 12 0502,Kuaizhou-1A,JQ,OF,0.0,failure,S4?,Y3,-,nasaspaceflight.com
+2020-U01,2020-11-17 01:52:20+00:00,Launch_Date,2020 Nov 17 0152:20,Vega,CSG,OF,0.0,failure,S4G,VV17,SEOSAT-Ingenio,spaceflightnow.com
+2020-F09,2020-12-15 20:55:00+00:00,Launch_Date,2020 Dec 15 2055,Astra Rocket 3.2,PSCA,OF,0.0,failure,S2P,LV0005,-,twitter.com
+2021-F01,2021-02-01 08:15:00+00:00,Launch_Date,2021 Feb  1 0815,Shuang Quxian 1,JQ,OF,0.0,failure,S1G,Y2,-,nasaspaceflight.com
+2021-F02,2021-05-15 11:11:39+00:00,Launch_Date,2021 May 15 1111:39,Electron,MAHIA,OF,0.0,failure,S2I,20,Global-8/Global-9,Wire
+2021-F03,2021-06-12 00:00:00+00:00,Launch_JD,2021 Jun 12,Simorgh,SEM,OF,0.0,failure,U,5,-,private-comm
+2021-F05,2021-08-03 07:39:00+00:00,Launch_Date,2021 Aug  3 0739,Shuang Quxian 1,JQ,OF,0.0,failure,FF,Y5,Jilin-1 MF01,nasaspaceflight.com
+2021-F06,2021-08-12 00:13:00+00:00,Launch_Date,2021 Aug 12 0013,GSLV Mk II,SHAR,OF,0.0,failure,S3I,GLSV-F10,GISAT-1,Wire
+2021-F07,2021-08-28 22:35:00+00:00,Launch_Date,2021 Aug 28 2235:00,Astra Rocket 3.3,PSCA,OF,0.0,failure,S1P,LV0006,STP-27AD1,twitter.com
+2021-F08,2021-09-03 01:59:00+00:00,Launch_Date,2021 Sep  3 0159:00,Firefly Alpha,VSFB,OF,0.0,failure,S1P,FLTA001,-,Wire
+2021-F09,2021-10-21 08:00:00+00:00,Launch_Date,2021 Oct 21 0800:00,Nuri,NARO,OF,0.0,failure,S3U,1,-,Wire
+2021-F10,2021-12-15 02:00:00+00:00,Launch_Date,2021 Dec 15 0200,Kuaizhou-1A,JQ,OF,0.0,failure,S3P,Y17,-,nasaspaceflight.com
+2021-133,2021-12-27 19:00:00+00:00,Launch_Date,2021 Dec 27 1900:00,Angara A5/Persei,GIK-1,OF40,0.4,failure,S3R,71753 (3L)/1L,-,Wire
+2021-F11,2021-12-30 03:30:00+00:00,Launch_Date,2021 Dec 30 0330,Simorgh,SEM,OF,0.0,failure,S2U?,6 UKS.C001,-,mehrnews.com
+2022-F01,2022-02-10 20:00:00+00:00,Launch_Date,2022 Feb 10 2000,Astra Rocket 3.3,SPFLA,OF,0.0,failure,FF,LV0008,VCLS Demo 2,youtube.com
+2022-F02,2022-05-13 07:09:00+00:00,Launch_Date,2022 May 13 0709,Shuang Quxian 1,JQ,OF,0.0,failure,S3G,Y4,Jilin-1 MF01,nasaspaceflight.com
+2022-F03,2022-06-12 17:43:00+00:00,Launch_Date,2022 Jun 12 1743:00,Astra Rocket 3.3,SPFLA,OF,0.0,failure,S2P,LV0010,TROPICS 1,youtube.com
+2022-U02,2022-08-07 03:48:00+00:00,Launch_Date,2022 Aug  7 0348:00,SSLV,SHAR,OF,0.0,failure,S3G,SSLV-D1,EOS-02,ISROWebcast
+2022-F04,2022-10-12 00:50:43+00:00,Launch_Date,2022 Oct 12 0050:43,Epsilon,USC,OF,0.0,failure,S2G,E-6,-,Wire
+2022-F05,2022-12-14 08:30:25+00:00,Launch_Date,2022 Dec 14 0830:25,Zhuque-2,JQ,OF,0.0,failure,S2P,Y1,-,nasaspaceflight.com
+2022-F06,2022-12-21 01:47:31+00:00,Launch_Date,2022 Dec 21 0147:31,Vega C,CSG,OF,0.0,failure,S2P,VV22,Pleiades NEO 5/6,spaceflightnow.com
+2023-F01,2023-01-09 23:02:24+00:00,Launch_JD,2023 Jan  9 2308:59?,LauncherOne,NEWQ,OF,0.0,failure,S2P,R07,Start Me Up,Wire
+2023-F02,2023-01-10 23:27:31+00:00,Launch_Date,2023 Jan 10 2327:31,RS1,PSCA,OF,0.0,failure,S1P,1,-,Wire
+2023-F10,2023-03-04 00:00:00+00:00,Launch_JD,2023 Mar  4,Qaem-100,SHAHR,OF,0.0,failure,U,-,-,Wire
+2023-F03,2023-03-07 01:37:55+00:00,Launch_Date,2023 Mar  7 0137:55,H3-22S,TNSC,OF,0.0,failure,S2I,H3-TF1,ALOS 3,Wire
+2023-F04,2023-03-23 03:25:00+00:00,Launch_Date,2023 Mar 23 0325:00,Terran 1,CC,OF,0.0,failure,S2I,1,-,youtube.com
+2023-F06,2023-05-30 21:27:00+00:00,Launch_Date,2023 May 30 2127,Cheonlima-1,SOHAE,OF,0.0,failure,S2I,6,-,nknews.org
+2023-F07,2023-08-23 18:43:12+00:00,Launch_JD,2023 Aug 23 1850?,Cheonlima-1,SOHAE,OF,0.0,failure,AD,-,-,nknews.org
+2023-F08,2023-09-19 06:55:00+00:00,Launch_Date,2023 Sep 19 0655,Electron,MAHIA,OF,0.0,failure,S2E,41,Capella 12 Acadia-2,Wire
+2023-F09,2023-09-21 04:59:10+00:00,Launch_Date,2023 Sep 21 0459:10,Gushenxing 1,JQ,OF,0.0,failure,S1P,Y11,Jilin-1 GF04B,nasaspaceflight.com
+2023-202,2023-12-22 17:32:30+00:00,Launch_Date,2023 Dec 22 1732:30,Firefly Alpha,VSFB,OF40,0.4,failure,S2R,FLTA004,Tantrum,nasaspaceflight
+2024-F01,2024-03-13 02:01:12+00:00,Launch_Date,2024 Mar 13 0201:12,Kairos,KII,OF,0.0,failure,AD,1,Tanki Uchaigegata Kogata,youtube.co
+2024-F02,2024-05-27 13:40:48+00:00,Launch_JD,2024 May 27 1344?,NK Kerolox LV,SOHAE,OF,0.0,failure,S1P,-,-,Wire
+2024-F03,2024-07-10 23:40:00+00:00,Launch_Date,2024 Jul 10 2340,Shuang Quxian 1,JQ,OF,0.0,failure,S4I?,Y8,Yunyao-1,Wire
+2024-129,2024-07-12 02:35:00+00:00,Launch_Date,2024 Jul 12 0235:00,Falcon 9,VSFBS,OF40,0.4,failure,S2R,355/B1063.19 F355,Starlink Group 9-3,Wire
+2024-F04,2024-12-18 02:00:00+00:00,Launch_Date,2024 Dec 18 0200,Kairos,KII,OF,0.0,failure,S1S,2,Tatara-1,youtube.co
+2024-F05,2024-12-27 01:03:31+00:00,Launch_Date,2024 Dec 27 0103:31,Lijian-1,JQ,OF,0.0,failure,S3G,Y6,-,nasaspaceflight.com
+2025-F01,2025-01-16 22:37:00+00:00,Launch_Date,2025 Jan 16 2237,Starship V2,STB,OF,0.0,failure,S2P,B14/S33,Ship 33,nasaspaceflight.com
+2025-F03,2025-03-06 23:31:12+00:00,Launch_JD,2025 Mar  6 2330:31?,Starship V2,STB,OF,0.0,failure,S2P,B15/S34,Ship 34,nasaspaceflight.com
+2025-F04,2025-03-30 10:30:00+00:00,Launch_Date,2025 Mar 30 1030,Spectrum,AND,OF,0.0,failure,S1G,1,-,youtube.com
+2025-U01,2025-04-29 13:40:48+00:00,Launch_JD,2025 Apr 29 1337:47?,Firefly Alpha,VSFB,OF,0.0,failure,S1S,FLTA006,LM-400 Tech Demo,nasaspaceflight
+2025-F05,2025-05-18 00:29:00+00:00,Launch_Date,2025 May 18 0029,PSLV-XL,SHAR,OF,0.0,failure,S3P,PSLV-C61,RISAT-1B,Wire
+2025-F06,2025-07-29 22:33:36+00:00,Launch_JD,2025 Jul 29 2235?,Eris Block 1,BOWEN,OF,0.0,failure,S1U,1,-,youtube.com
+2025-F07,2025-08-15 01:17:00+00:00,Launch_Date,2025 Aug 15 0117,Zhuque-2E,JQ,OF,0.0,failure,S2G,Y3,WHJSW 07?,nasaspaceflight.com
+2025-F08,2025-09-18 14:52:48+00:00,Launch_JD,2025 Sep 18 1500?,Zoljanah,SEM,OF,0.0,failure,S1,-,-,Wire
+2025-U05,2025-11-10 04:02:43+00:00,Launch_Date,2025 Nov 10 0402:43,Gushenxing 1,JQ,OF,0.0,failure,S4P,Y19,Jixing Gaofen 04C,nasaspaceflight.com
+2025-U06,2025-12-22 01:51:30+00:00,Launch_Date,2025 Dec 22 0151:30,H3-22S,TNSC,OF20,0.2,failure,FF,H3-F8,QZS 5,Wire
+2025-F09,2025-12-23 01:13:00+00:00,Launch_Date,2025 Dec 23 0113,HANBIT-NANO,ALCA,OF,0.0,failure,S1P,1,-,Wire
+2026-F01,2026-01-12 04:48:30+00:00,Launch_Date,2026 Jan 12 0448:30,PSLV-DL,SHAR,OF,0.0,failure,S3G,PSLV-C62,PSLV Rideshare 20,Wire
+2026-F02,2026-01-16 16:55:00+00:00,Launch_Date,2026 Jan 16 1655,Chang Zheng 3B,XSC,OF,0.0,failure,S3,Y115,SJ-32,nasaspaceflight.com
+2026-F03,2026-01-17 04:08:00+00:00,Launch_Date,2026 Jan 17 0408,Gushenxing-2,JQ,OF,0.0,failure,S1,Y1,Unk Sat 1-6,nasaspaceflight.com
+2026-F04,2026-03-05 02:10:00+00:00,Launch_Date,2026 Mar  5 0210:00,Kairos,KII,OF,0.0,failure,S1,3,Tatara-1R,youtube.co
+2026-F05,2026-04-03 04:17:19+00:00,Launch_Date,2026 Apr  3 0417:19,Tianlong-3,JQ,OF,0.0,failure,S1P,Y1,-,Wire
+2026-085,2026-04-19 11:25:00+00:00,Launch_Date,2026 Apr 19 1125:00,New Glenn 7x2,CC,OF40,0.4,failure,S2P2,NG3 7E02.2,-,Blue
+2026-F06,2026-08-10 12:00:00+00:00,Launch_JD,2026 Aug 10 1202?,Chang Zheng 7A,WEN,OF,0.0,failure,-,Y16,Zhongxing-4B,nasaspaceflight.com
+2026-F07,2026-11-15 17:40:00+00:00,Launch_Date,2026 Nov 15 1740,Vulcan Centaur VC6L,CC,OF,0.0,failure,-,V-012,Vulcan LEO 1,Wire

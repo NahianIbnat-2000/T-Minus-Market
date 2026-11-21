@@ -1,0 +1,9 @@
+{
+  "source_url": "https://planet4589.org/space/gcat/tsv/launch/launch.tsv",
+  "local_file": "data\\raw\\launch.tsv",
+  "retrieved_utc": "2026-11-21T13:49:11+00:00",
+  "bytes": 13817950,
+  "sha256": "72053523eab6c7e6f1d61604c953b9c37a05b3756e61ac1310a81574e1d9fe4e",
+  "citation": "data from GCAT (J. McDowell, planet4589.org/space/gcat), CC-BY",
+  "note": "offline: retrieved_utc is when the checksum was taken, not the download time"
+}
