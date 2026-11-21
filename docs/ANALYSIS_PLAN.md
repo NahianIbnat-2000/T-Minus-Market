@@ -34,3 +34,4 @@ abnormal returns are computed is a plan change and must be logged in the change 
 | 2026-11-21 | 1.0 | Phase 5 tool 2: Placebo Simulator (replays the R9 draws stored in results.json; same two-sided rule as analysis.py). No analysis change | Yes |
 | 2026-11-21 | 1.0 | Phase 5 tool 3: Failure Timeline (all failures in three lanes, filter and search, detail card). Exclusion codes shown in plain language. Site test scanner rewritten as a tokenizer (it missed nested template strings). No analysis change | Yes |
 | 2026-11-21 | 1.0 | Phase 5 tool 4: Expected vs Actual explorer (simulated example, labelled). Step 08 also builds the root article (index.html) and plan.html for GitHub Pages; links in site/site_meta.json. No analysis change | Yes |
+| 2026-11-21 | 1.0 | Link-preview image (og.png) built from results; non-detectable result shown in neutral colour on the article and image. No analysis change | Yes |

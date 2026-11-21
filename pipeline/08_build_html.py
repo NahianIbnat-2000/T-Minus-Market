@@ -94,7 +94,13 @@ def build_pages(site_data: Path = SITE / "data", root_out: Path = ROOT) -> list[
     a.write_text(landing.article(data, meta, ROOT, css), encoding="utf-8")
     p.write_text(landing.plan_page(ROOT, meta, css), encoding="utf-8")
     (root_out / ".nojekyll").touch()
-    return [a, p]
+    out = [a, p]
+    try:                                            # link-preview image; optional
+        import og_image
+        out.append(og_image.make(landing.facts(data), root_out / "og.png", landing.pct, landing.pval))
+    except ImportError:
+        print("Skipped og.png (link-preview image): run  pip install matplotlib  to make it.")
+    return out
 
 
 def build(site_data: Path = SITE / "data", out: Path = SITE / "index.html") -> Path:

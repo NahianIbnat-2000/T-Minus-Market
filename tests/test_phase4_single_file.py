@@ -75,7 +75,7 @@ def test_inline_script_parses(built, tmp_path):
 def test_article_and_plan_pages(built, tmp_path):
     root, _ = built
     s8 = _load("s8b", "08_build_html.py")
-    a, p = s8.build_pages(site_data=root / "site_data", root_out=tmp_path)
+    a, p = s8.build_pages(site_data=root / "site_data", root_out=tmp_path)[:2]
     art, plan = a.read_text(encoding="utf-8"), p.read_text(encoding="utf-8")
     assert (tmp_path / ".nojekyll").exists()
     assert 'href="site/"' in art and 'href="plan.html"' in art and "<script" not in art
@@ -86,3 +86,11 @@ def test_article_and_plan_pages(built, tmp_path):
     text = re.sub(r"<[^>]+>", " ", re.sub(r"<style>.*?</style>", "", art, flags=re.S))
     assert not re.search(r"\b(None|nan)\b", text)
     assert "<table>" in plan and "Change log" in plan
+
+
+def test_preview_image(built, tmp_path):
+    pytest.importorskip("matplotlib")
+    root, _ = built
+    out = _load("s8c", "08_build_html.py").build_pages(site_data=root / "site_data", root_out=tmp_path)
+    png = tmp_path / "og.png"
+    assert png in out and png.read_bytes()[:8] == b"\x89PNG\r\n\x1a\n"

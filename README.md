@@ -18,6 +18,7 @@ Three static pages, all built by one command, ready for GitHub Pages (branch mas
 | `index.html` | The article: one-page summary with the key numbers, method, and links (the front door) |
 | `site/index.html` | The interactive report: five stages and four tools (Failure Timeline, Expected vs Actual, Event Study Lab, Placebo Simulator) |
 | `plan.html` | The analysis plan and change log, rendered from `docs/ANALYSIS_PLAN.md` |
+| `og.png` | Link-preview image for LinkedIn (needs matplotlib; skipped if missing) |
 
 ```
 python pipeline/07_export_site_data.py   # results -> site/data/*.json

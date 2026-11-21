@@ -75,7 +75,7 @@ def facts(data: dict) -> dict:
     }
 
 
-def _shell(title, desc, url, body, css, canonical=None):
+def _shell(title, desc, url, body, css, canonical=None, image=None):
     og_url = e(url) if url else ""
     return f"""<!doctype html>
 <html lang="en">
@@ -85,7 +85,7 @@ def _shell(title, desc, url, body, css, canonical=None):
 <meta name="description" content="{e(desc)}"><meta name="author" content="Nahian Ibnat">
 <meta property="og:type" content="article"><meta property="og:title" content="{e(title)}">
 <meta property="og:description" content="{e(desc)}">{f'<meta property="og:url" content="{og_url}">' if og_url else ""}
-<meta name="twitter:card" content="summary">{f'<link rel="canonical" href="{e(canonical)}">' if canonical else ""}
+<meta name="twitter:card" content="{"summary_large_image" if image else "summary"}">{f'<meta property="og:image" content="{e(image)}"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="{e(title)}">' if image else ""}{f'<link rel="canonical" href="{e(canonical)}">' if canonical else ""}
 {FONTS}
 <style>
 {css}
@@ -135,7 +135,7 @@ def article(data: dict, meta: dict, root: Path, css: str) -> str:
         ((f"{pct(f['case_hi'])} to {pct(f['case_lo'])}", f"two-day abnormal return of the rocket's maker: a loss in each of the {f['n_cases']} listed cases", "loss")
          if all_fell else
          (f"{pct(f['case_lo'])} to {pct(f['case_hi'])}", f"range of two-day abnormal returns of the rocket's maker across the {f['n_cases']} listed cases", "neutral")),
-        (pct(p["mean_car"], 2), f"average two-day reaction of listed competitors; 95% interval {pct(p['ci_low'], 2)} to {pct(p['ci_high'], 2)}, p = {pval(p['p'])}", "gain" if p["mean_car"] > 0 else "loss"),
+        (pct(p["mean_car"], 2), f"average two-day reaction of listed competitors; 95% interval {pct(p['ci_low'], 2)} to {pct(p['ci_high'], 2)}, p = {pval(p['p'])}", "neutral" if p["p"] >= 0.05 else ("gain" if p["mean_car"] > 0 else "loss")),
     ]
     if pl.get("actual_percentile") is not None:
         tiles.append((ordinal(pl["actual_percentile"]), f"percentile of the real competitor result among {pl['draws']} random sets of ordinary trading days", "neutral"))
@@ -195,7 +195,8 @@ def article(data: dict, meta: dict, root: Path, css: str) -> str:
 </div></footer>"""
     desc = (f"Event study of {f['n_failures']} orbital launch failures: the rocket's maker loses {pct(f['case_hi'])} to {pct(f['case_lo'])} in two days; "
             f"listed competitors show no detectable reaction ({pct(p['mean_car'], 2)}, p = {pval(p['p'])}).")
-    return _shell("T-Minus Markets: when a rocket blows up, who loses money?", desc, meta.get("live_url"), body, css, meta.get("live_url"))
+    image = (meta["live_url"].rstrip("/") + "/og.png") if meta.get("live_url") else None
+    return _shell("T-Minus Markets: when a rocket blows up, who loses money?", desc, meta.get("live_url"), body, css, meta.get("live_url"), image)
 
 
 def md_to_html(md: str) -> str:
