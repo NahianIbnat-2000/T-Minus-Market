@@ -1,0 +1,37 @@
+{
+  "project": "T-Minus Markets",
+  "author": "Nahian Ibnat",
+  "plan_version": "1.0",
+  "results_run_utc": "2026-11-21T14:30:57+00:00",
+  "exported_utc": "2026-11-21T15:24:19+00:00",
+  "windows": {
+    "primary": [
+      0,
+      1
+    ],
+    "robust": [
+      -1,
+      3
+    ],
+    "descriptive": [
+      0,
+      20
+    ]
+  },
+  "path_range": [
+    -5,
+    20
+  ],
+  "returns": "simple",
+  "sources": {
+    "launches": "data from GCAT (J. McDowell, planet4589.org/space/gcat), CC-BY",
+    "prices": "Yahoo Finance via yfinance (used locally only)"
+  },
+  "data_policy": "Only derived statistics are published: CARs, CAR variances, abnormal returns, residual volatility and CAR correlations. No raw prices, raw returns, alphas or betas.",
+  "parity_tolerances": {
+    "car_and_ci_abs": 1e-09,
+    "t_stat_abs": 1e-08,
+    "p_value_abs": 1e-08,
+    "units": "CARs are fractions (0.01 = 1%); tolerance applies to the raw numbers"
+  }
+}

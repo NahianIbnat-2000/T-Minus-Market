@@ -9,7 +9,20 @@ Launch data: GCAT (J. McDowell, planet4589.org/space/gcat), CC-BY.
 
 ---
 
-## Phase 2: event study (current)
+## Phase 3: website data (current)
+
+After steps 05 and 06:
+
+```bash
+python pipeline/07_export_site_data.py
+```
+
+This writes `site/data/` (see `docs/SITE_DATA.md`). Only derived statistics are exported: no raw
+prices or returns. The browser module `site/src/stats/eventstudy.js` re-runs the primary test on any
+subset of events and is checked against Python by `tests/test_phase3_parity.py` (needs Node.js;
+the test is skipped without it).
+
+## Phase 2: event study (complete)
 
 Phase 1 is complete and the analysis plan is frozen (`docs/ANALYSIS_PLAN.md`).
 Phase 2 runs the plan exactly. Run it **once**, after steps 01 to 04:
@@ -53,7 +66,7 @@ cd t-minus-markets
 python -m venv .venv
 source .venv/Scripts/activate
 pip install -r requirements.txt
-python -m pytest -q tests          # should print: 37 passed
+python -m pytest -q tests          # should print: 41 passed
 ```
 
 ### Run
