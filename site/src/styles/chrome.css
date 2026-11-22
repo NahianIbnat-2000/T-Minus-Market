@@ -15,13 +15,15 @@
 .ss-nav a:hover { background: var(--navy-2); }
 .ss-nav a[aria-current="page"] { background: var(--navy-2); color: #fff; box-shadow: inset 0 -2px 0 var(--bench-on-navy); }
 .ss-nav a.ss-dl { color: var(--bench-on-navy); }
-.ss-menu { display: none; }
-.ss-menu summary { list-style: none; cursor: pointer; color: #fff; font-family: var(--font-head); font-weight: 600; font-size: 0.9rem; padding: 0.45rem 0.8rem; border: 1px solid #2B4462; border-radius: 6px; }
-.ss-menu summary::-webkit-details-marker { display: none; }
-.ss-menu[open] ul { position: absolute; right: var(--space-3); top: 3.4rem; background: var(--navy); border: 1px solid #2B4462; border-radius: 8px; padding: 0.4rem; list-style: none; margin: 0; min-width: 13rem; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-.ss-menu[open] a { display: block; color: var(--on-navy); padding: 0.55rem 0.8rem; text-decoration: none; font-family: var(--font-head); border-radius: 6px; }
-.ss-menu[open] a[aria-current="page"] { background: var(--navy-2); }
-@media (max-width: 820px) { .ss-nav { display: none; } .ss-menu { display: block; } .ss-logo .ss-sub { display: none; } }
+/* one navigation for every width: on small screens it becomes a scrollable row under the logo */
+@media (max-width: 860px) {
+  .ss-header { position: static; }
+  .ss-header .ss-row { flex-wrap: wrap; row-gap: 0.35rem; padding-bottom: 0.4rem; }
+  .ss-logo .ss-sub { display: none; }
+  .ss-nav { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .ss-nav ul { flex-wrap: nowrap; }
+  .ss-nav a { white-space: nowrap; padding: 0.5rem 0.7rem; }
+}
 
 .btn, a.btn { display: inline-flex; align-items: center; gap: 0.4rem; font-family: var(--font-head); font-weight: 600; font-size: 0.95rem;
   padding: 0.7rem 1.15rem; border-radius: 6px; text-decoration: none; border: 1px solid var(--bench-text); background: var(--bench-text); color: #fff; }
@@ -46,3 +48,7 @@
 .badge.confirm { color: var(--bench-text); } .badge.explore { color: #8A4B00; background: #FFF4E0; border-color: #F0C27A; }
 .badge.robust { color: var(--muted); }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; animation: none !important; transition: none !important; } }
+
+.crumbs ol { list-style: none; display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 var(--space-3); padding: 0; font-family: var(--font-head); font-size: 0.85rem; color: var(--muted); }
+.crumbs li + li::before { content: "\203A"; margin-right: 0.4rem; color: var(--muted); }
+.crumbs a { color: var(--bench-text); }

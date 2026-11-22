@@ -517,7 +517,7 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
                           f'<span class="num">{pct(wd["median"], 2)}</span>', str(r["n_firm_events"]), str(r["n_clusters"])])
     flagged = [r for r in riv if r.get("flag")]
     flag_rows = [[e(f'{r["firm"]}'), e(f'{r["vehicle"]}, {day(r["day0"])}'), f'<span class="num">{pct(r["windows"]["primary"]["car"], 2)}</span>',
-                  e(r["flag"]["verdict"].replace("_", " ")), e(r["flag"].get("reason", "")) + (f' <a href="{e(r["flag"]["source"])}">[source]</a>' if r["flag"].get("source") else "")]
+                  e(r["flag"]["verdict"].replace("_", " ")), e(r["flag"].get("reason", "")) + (f' <a href="{e(r["flag"]["source"])}">[source]</a>' if str(r["flag"].get("source") or "").startswith("http") else "")]
                  for r in sorted(flagged, key=lambda r: -abs(r["windows"]["primary"]["car"]))]
     expl_lab = {"H3a": "Competitors: first-flight failures minus other failures", "H3b": "Maker: failures minus successful launches",
                 "H3c": "Competitors over one month (T0 to T+20)"}
@@ -591,6 +591,7 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
     body = f"""<a class="skip-link" href="#main">Skip to the paper</a>
 {SC.header("paper", "", bool(pdf_name), meta.get("repo_url"))}
 <header class="paper-head"><div class="wrap ph-in">
+  <nav class="crumbs screen-only" aria-label="Breadcrumb"><ol><li><a href="index.html">Overview</a></li><li aria-current="page">Research Paper</li></ol></nav>
   <p class="ph-eyebrow">Working paper · Space Shock</p>
   <h1>{e(SC.PAPER_TITLE)}</h1>
   <p class="dek">Evidence from publicly listed launch providers: stock market reactions to orbital launch failures, {e(span)}.</p>
@@ -599,7 +600,7 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
     <div><dt>Status</dt><dd>Working paper, not peer reviewed</dd></div>
     <div><dt>Version</dt><dd>Analysis rules v{e(str(plan_v))} · results {e(updated)}</dd></div>
     <div><dt>Sample</dt><dd>{f['n_failures']} failures · {p['n_firm_events']} rival reactions · {f['n_clusters']} independent events</dd></div>
-    <div><dt>Formats</dt><dd>{f'<a class="btn small" href="{e(pdf_name)}" download>Download PDF</a> ' if pdf_name else ''}<a href="site/index.html">Interactive report</a></dd></div>
+    <div><dt>Formats</dt><dd>{f'<a class="btn small" href="{e(pdf_name)}" download>Download PDF</a> ' if pdf_name else ''}<a href="methods.html#replicate">Replication</a></dd></div>
   </dl>
 </div></header>
 <div class="wrap paper-grid">

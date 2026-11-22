@@ -87,7 +87,7 @@ def bundle(entry: Path) -> str:
 
 
 def build_pages(site_data: Path = SITE / "data", root_out: Path = ROOT) -> list[Path]:
-    """Root article (index.html), working paper (case-study.html/.pdf) and preview image for GitHub Pages."""
+    """Overview (index.html), research paper (case-study.html/.pdf), Data & Methods (methods.html) and preview image."""
     import landing
     data = {k: json.loads((site_data / f).read_text(encoding="utf-8")) for k, f in DATA_FILES.items()}
     meta = json.loads((SITE / "site_meta.json").read_text(encoding="utf-8"))
@@ -111,8 +111,12 @@ def build_pages(site_data: Path = SITE / "data", root_out: Path = ROOT) -> list[
             out.append(pdf)
     except ImportError:
         print("Skipped the LaTeX case study: run  pip install matplotlib  first (it draws the figures).")
-    # the article is written after the PDF, so its "Download PDF" link reflects this build
+    # the homepage and the methods page are written after the PDF, so their "Download PDF" links reflect this build
     a.write_text(landing.article(data, meta, root_out, css), encoding="utf-8")
+    import methods_page
+    mp = root_out / "methods.html"
+    mp.write_text(methods_page.build(data, meta, root_out, cs_css, pdf.name if pdf.exists() else None), encoding="utf-8")
+    out.append(mp)
     try:                                            # link-preview image; optional
         import og_image
         out.append(og_image.make(landing.facts(data), root_out / "og.png", landing.pct, landing.pval))
@@ -178,6 +182,10 @@ if __name__ == "__main__":
         chk = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(chk)
         chk.main(ROOT)
+        spec = importlib.util.spec_from_file_location("site_check", ROOT / "audit" / "check_site.py")
+        sc = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(sc)
+        sc.main(ROOT)
     except FileNotFoundError:
         pass
-    print("Open index.html (the article) in any browser.")
+    print("Open index.html (the overview) in any browser.")

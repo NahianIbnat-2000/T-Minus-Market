@@ -24,8 +24,12 @@ async function start() {
     mountTimeline(document, data);
     mountExplainer(document);
   } catch (err) {
-    main.innerHTML = `<div class="wrap"><p role="alert">The data could not be loaded: ${escapeHtml(err.message)}.
-      Run <code>python pipeline/07_export_site_data.py</code> to create <code>site/data/</code>.</p></div>`;
+    main.innerHTML = `<div class="wrap"><div class="load-error" role="alert"><h2>The interactive report could not load its data</h2>
+      <p>Reason: ${escapeHtml(err.message)}. The main results are still available in the <a href="../index.html">overview</a> and the
+      <a href="../case-study.html">research paper</a>.</p>
+      <p class="muted">For maintainers: rebuild with <code>python pipeline/07_export_site_data.py</code> and <code>python pipeline/08_build_html.py</code>.</p></div></div>`;
+    const ri = document.getElementById("run-info");
+    if (ri) ri.textContent = "data unavailable";
     console.error(err);
   }
 }

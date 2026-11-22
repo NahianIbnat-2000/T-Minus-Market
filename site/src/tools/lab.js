@@ -57,6 +57,7 @@ export function labHtml({ firmEvents, manifest }) {
       <button type="button" class="lab-reset">Back to the main test</button>
     </form>
     <div class="lab-out" aria-live="polite"></div>
+    <p class="tool-source">Estimate: equal-weighted mean CAR with a 95% cluster-robust interval. Test: the prespecified standardized test (BMP with the Kolari-Pynnönen correction). The number is coloured only when the test rejects at the prespecified level. Source: project pipeline; prices are not published. <a href="../methods.html#inference">How the tests work</a></p>
   </div>`;
 }
 
@@ -115,7 +116,7 @@ function render(out, state, base, ctx) {
     ${stat("Reactions / independent events", `${b.n} / ${b.clusters}`, `${res.n} / ${res.clusters}`)}
     </tbody></table>`;
   out.innerHTML = `${status}
-    <div class="lab-big"><span class="lab-num ${signClass(res.mean)}">${pct(res.mean, 2)}</span>
+    <div class="lab-big"><span class="lab-num ${res.p !== null && res.p < 0.05 ? signClass(res.mean) : ""}">${pct(res.mean, 2)}</span>
       <span class="lab-unit">average abnormal return, ${escapeHtml(tLabel(ctx.windows[state.window][0]))} to ${escapeHtml(tLabel(ctx.windows[state.window][1]))}</span></div>
     ${isMain ? "" : compare}
     <dl class="lab-stats">

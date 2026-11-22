@@ -145,3 +145,60 @@ def test_publication_consistency(built, tmp_path):
     art = tmp_path / "index.html"                                   # a planted banned phrase must be caught
     art.write_text(art.read_text(encoding="utf-8").replace("</main>", "<p>Preregistered.</p></main>"), encoding="utf-8")
     assert chk.main(tmp_path) == 1
+
+
+# ---------------------------------------------------------------- site structure (v30)
+import shutil as _shutil  # noqa: E402
+SITE_ROOT = Path(__file__).resolve().parents[1]
+
+
+def _load_root(name, rel):
+    spec = importlib.util.spec_from_file_location(name, SITE_ROOT / rel)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def _build(built, tmp_path):
+    root, _ = built
+    s8 = _load_root("s8s", "pipeline/08_build_html.py")
+    site = tmp_path / "site"
+    _shutil.copytree(root / "site_data", site / "data")
+    _shutil.copy(SITE_ROOT / "site" / "site_meta.json", site / "site_meta.json")
+    _shutil.copy(SITE_ROOT / "site" / "template.html", site / "template.html")
+    _shutil.copytree(SITE_ROOT / "site" / "src", site / "src")
+    s8.build(site_data=site / "data", out=site / "index.html")
+    s8.build_pages(site_data=site / "data", root_out=tmp_path)
+    return tmp_path
+
+
+def test_site_check_passes(built, tmp_path):
+    out = _build(built, tmp_path)
+    chk = _load_root("cs", "audit/check_site.py")
+    fails = [r for r in chk.check(out) if not r[2]]
+    assert not fails, fails
+
+
+def test_site_check_catches_problems(built, tmp_path):
+    out = _build(built, tmp_path)
+    home = out / "index.html"
+    home.write_text(home.read_text(encoding="utf-8").replace("</main>", '<a href="missing.html">x</a>'
+                    '<a href="/abs.html">y</a> https://nahianibnat-2000.github.io/T-Minus-Market/</main>'), encoding="utf-8")
+    chk = _load_root("cs2", "audit/check_site.py")
+    fails = " ".join(w for _, w, ok in chk.check(out) if not ok)
+    assert "broken link missing.html" in fails and "root-absolute" in fails and "outdated" in fails
+
+
+def test_four_destinations_and_methods_page(built, tmp_path):
+    out = _build(built, tmp_path)
+    for page in ("index.html", "site/index.html", "case-study.html", "methods.html"):
+        txt = (out / page).read_text(encoding="utf-8")
+        nav = re.search(r'<nav class="ss-nav"[^>]*>(.*?)</nav>', txt, re.S).group(1)
+        assert re.findall(r">([^<]+)</a>", nav) == ["Overview", "Explore Data", "Research Paper", "Data &amp; Methods"]
+    m = (out / "methods.html").read_text(encoding="utf-8")
+    for h in ("Data sources", "Sample definitions", "Event identification and timing", "Firm classification",
+              "Market model and event windows", "Statistical inference", "Robustness procedures", "Data quality and limitations", "Replication"):
+        assert h in m
+    home = (out / "index.html").read_text(encoding="utf-8")
+    assert home.count('class="sec-h"') == 4 and "space-shock" in home and "T-Minus-Market" not in home
+    assert "does not provide conclusive evidence of either industry contagion or competitive substitution" in home

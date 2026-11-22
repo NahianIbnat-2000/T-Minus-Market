@@ -77,9 +77,69 @@ phones and tablets; equations, figures and tables as cards; scrollable tables fo
 
 ## 5. Remaining issues
 
-* The repository and the live URL still say T-Minus-Market. Renaming the GitHub repository to `space-shock` changes the
-  Pages address; GitHub redirects the repository but not old Pages links, so links already shared would break. If renamed,
-  update `live_url` and `repo_url` in `site/site_meta.json`.
+* (Resolved in v30) The repository was renamed to `space-shock`; `site/site_meta.json` now points at the new address.
 * The report tools do not share one selected event across tools; each keeps its own controls. A shared state would need a
   larger change to the tool code and was left out to avoid risk to the Lab's exact reproduction of the main test.
 * The CRSP supplement (plan v1.2) is not yet shown on the site or in the paper.
+
+
+---
+
+# Second pass (v30, 22 Nov 2026): information architecture
+
+## Audit: verified issues (checked in a real browser at 375, 768, 1280 and 1440 px)
+
+| Issue | Verified how | Fix |
+| --- | --- | --- |
+| "Data & methods" in the navigation went to a section at the end of the report, not a methods destination | link target `site/index.html#methods` | New page `methods.html`; the report section now points to it |
+| Citations, canonical and og:url used the old `/T-Minus-Market/` address | `site_meta.json`, generated pages | `live_url` and `repo_url` now point to `space-shock`; `audit/check_site.py` fails on old URLs |
+| Navigation had six items mixing pages, a download and an external link; the mobile menu repeated the same links in a second `<nav>` | page source | Four destinations (Overview, Explore Data, Research Paper, Data & Methods) in one `<nav>`, which becomes a scrollable row on small screens; PDF and code moved to the footer |
+| The overview carried method detail (sample diagram, unit definitions, weighting table, robustness text) | page length 5,167 px at 1280 | Five sections; details moved to `methods.html` |
+| The competitor estimate was shown in teal (the "gain" colour) in the Event Study Lab although it is not significant | screenshot | The number is coloured only when the test rejects |
+| Corrupt or incomplete report data gave a technical message, and the run line kept saying "Loading" | browser test with a broken data block | Data are validated and missing parts named; visitor-facing message with links; `site/tests/data_validate.test.mjs` |
+| Paper source links were written even when the source was not a URL (test fixture) | `check_site.py` | Only `http` sources are linked |
+
+## Checked and not a defect
+
+* **Report loading.** Data are embedded in the page, so there is no request that can fail under the Pages base path. The
+  loading line is replaced on success; nine charts render; a direct link to `site/index.html#lab` lands on the tool;
+  browser back and forward work between pages. The only console message in testing was the font request blocked by the
+  test machine's network.
+* **Paper Contents / Sections.** Both exist so the table of contents can be a sticky sidebar on desktop and a collapsible
+  list on phones. At every width exactly one is displayed; the other has `display: none`, which also removes it from the
+  accessibility tree.
+
+## Information architecture
+
+| Destination | File | Purpose |
+| --- | --- | --- |
+| Overview | `index.html` | Question, hypotheses, four key-finding cards, two charts, tool previews, what the evidence can and cannot show, resources |
+| Explore Data | `site/index.html` | The four tools in sections 1 to 5; section 6 points to Data & Methods |
+| Research Paper | `case-study.html` (+ PDF) | The full study |
+| Data & Methods | `methods.html` | Sources, sample definitions, event timing, firm classification, model and windows, inference (including why p = 0.40 and the mean-test p differ), robustness, data quality, replication |
+
+## Automated checks added
+
+`audit/check_site.py` (run by step 08 and by `tests/test_phase4_single_file.py`): pages exist and have titles; every
+relative link and anchor resolves; no root-absolute paths; no old project URL; canonical and og:url use the live address;
+navigation has unique destinations and labels, one current page and a single `<nav>`; every inline SVG has an accessible
+name or is hidden. A planted broken link, absolute path and old URL are caught (test).
+
+## Old links
+
+`python pipeline/make_redirects.py` writes `redirect/T-Minus-Market/`: pages that forward the old Pages addresses
+(overview, report, paper, methods, 404) to `space-shock`, keeping `#anchors`. Publish them in a new repository named
+`T-Minus-Market` with GitHub Pages on.
+
+## Results of this pass
+
+Python tests 67 passed; JavaScript tests 16 passed; consistency 56 of 56; site structure check passes; axe-core WCAG 2.2
+A/AA: 0 violations on all four pages at 375, 768, 1280 and 1440 px; no page-level horizontal overflow.
+`audit/verify_published.py` needs the private data and is run on the author's machine.
+
+## Remaining limitations
+
+* Expected vs Actual uses a simulated stock. Real expected and actual returns need prices that may not be republished.
+* Tools keep separate controls; there is no shared event selection across tools.
+* Some sample-diagram unit labels run slightly past their box at the smallest sizes.
+* The CRSP supplement (plan v1.2) is not shown on the site or in the paper.

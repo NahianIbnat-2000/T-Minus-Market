@@ -35,7 +35,7 @@ export function placeboToolHtml({ results }) {
       <li><strong>One date per reaction:</strong> each company gets its own random day, so the same-day co-movement of rivals hit by one failure is not preserved; this makes the spread of placebo averages somewhat too narrow.</li>
       <li><strong>What the percentile means:</strong> the share of random-day averages at or below the real one. It is not the probability that the effect is real, and this is not an exact randomization test, because random days are not exchangeable with launch days.</li>
     </ul>
-    <p class="sim-note">How this works: the draws were computed from real price data on the author's computer (fixed seed ${escapeHtml(String(pl.seed))}), and this page replays them in the same order. Only the resulting averages are published, never the prices.</p>
+    <p class="sim-note"><a href="../methods.html#robust">Robustness procedures</a>. How this works: the draws were computed from real price data on the author's computer (fixed seed ${escapeHtml(String(pl.seed))}), and this page replays them in the same order. Only the resulting averages are published, never the prices.</p>
   </div>`;
 }
 

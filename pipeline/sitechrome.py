@@ -8,7 +8,7 @@ import html
 e = html.escape
 BRAND = "Space Shock"
 TAGLINE = "When rockets fail, who pays the price?"
-SUBTITLE = "Financial contagion and competition in the space industry"
+SUBTITLE = "Financial contagion and competitive effects of rocket launch failures"
 PAPER_TITLE = "When Rockets Fail: Financial Contagion and Competitive Effects in the Space Industry"
 FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
          '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800'
@@ -22,33 +22,43 @@ LOGO = ('<svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true" focu
 
 
 def nav_items(prefix: str, pdf: bool, repo: str | None):
-    items = [("home", "Home", f"{prefix}index.html"), ("report", "Interactive report", f"{prefix}site/index.html"),
-             ("paper", "Working paper", f"{prefix}case-study.html"), ("methods", "Data & methods", f"{prefix}site/index.html#methods")]
-    if repo:
-        items.append(("code", "Code", repo))
+    """Primary navigation: four destinations, each with one purpose."""
+    return [("home", "Overview", f"{prefix}index.html"), ("report", "Explore Data", f"{prefix}site/index.html"),
+            ("paper", "Research Paper", f"{prefix}case-study.html"), ("methods", "Data & Methods", f"{prefix}methods.html")]
+
+
+def extra_items(prefix: str, pdf: bool, repo: str | None):
+    """Secondary links (footer only)."""
+    items = []
     if pdf:
         items.append(("pdf", "Download PDF", f"{prefix}case-study.pdf"))
+    if repo:
+        items.append(("code", "Source code", repo))
     return items
+
+
+def cite(year: str, meta: dict) -> str:
+    url = meta.get("live_url") or ""
+    return f"Ibnat, N. ({year}). {PAPER_TITLE}. Space Shock working paper." + (f" {url}" if url else "")
 
 
 def header(active: str, prefix: str = "", pdf: bool = True, repo: str | None = None) -> str:
     def link(k, label, href):
         cur = ' aria-current="page"' if k == active else ""
-        dl = ' download class="ss-dl"' if k == "pdf" else ""
-        return f'<li><a href="{e(href)}"{cur}{dl}>{e(label)}</a></li>'
+        return f'<li><a href="{e(href)}"{cur}>{e(label)}</a></li>'
     items = "".join(link(*i) for i in nav_items(prefix, pdf, repo))
     return (f'<header class="ss-header"><div class="ss-row">'
             f'<a class="ss-logo" href="{e(prefix)}index.html">{LOGO}<span><span class="ss-name">SPACE <b>SHOCK</b></span>'
             f'<span class="ss-sub">{e(SUBTITLE)}</span></span></a>'
             f'<nav class="ss-nav" aria-label="Site"><ul>{items}</ul></nav>'
-            f'<details class="ss-menu"><summary aria-label="Open site menu">Menu</summary><nav aria-label="Site (menu)"><ul>{items}</ul></nav></details>'
             f'</div></header>')
 
 
 def footer(prefix: str = "", meta: dict | None = None, pdf: bool = True, cite: str = "") -> str:
     meta = meta or {}
     repo = meta.get("repo_url")
-    links = "".join(f'<li><a href="{e(h)}"{" download" if k == "pdf" else ""}>{e(l)}</a></li>' for k, l, h in nav_items(prefix, pdf, repo))
+    links = "".join(f'<li><a href="{e(h)}"{" download" if k == "pdf" else ""}>{e(l)}</a></li>'
+                    for k, l, h in nav_items(prefix, pdf, repo) + extra_items(prefix, pdf, repo))
     return (f'<footer class="ss-footer"><div class="ss-fgrid">'
             f'<div><h2>{e(BRAND)}</h2><p>{e(SUBTITLE)}. An event study of orbital launch failures and the stocks of the companies involved.</p>'
             f'<p>By {e(meta.get("author", "Nahian Ibnat"))}</p></div>'

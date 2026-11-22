@@ -4,7 +4,7 @@
 
 An event study of stock market reactions to orbital launch failures since 2000, with a homepage, an interactive
 report and a working paper (*When Rockets Fail: Financial Contagion and Competitive Effects in the Space Industry*).
-Author: Nahian Ibnat. The project was called T-Minus Markets until November 2026; the repository name is unchanged.
+Author: Nahian Ibnat. The project was called T-Minus Markets until November 2026 (repository `T-Minus-Market`, renamed to `space-shock`). Live site: https://nahianibnat-2000.github.io/space-shock/
 
 Launch data: GCAT (J. McDowell, planet4589.org/space/gcat), CC-BY.
 

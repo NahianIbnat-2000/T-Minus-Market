@@ -98,3 +98,15 @@ body.paper { background: var(--paper); }
 .ph-meta dd a { display: inline-block; padding: 0.25rem 0; }
 .paper .abstract-sec h2, .paper .inshort h2 { font-family: var(--font-head); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 0 0 var(--space-2); }
 .ph-meta dd .btn { margin-right: 0.6rem; }
+
+@media (max-width: 860px) { .paper-toc { top: 0.5rem; } }
+.methods-page table.def caption, .methods-page table caption { text-align: left; font-family: var(--font-head); font-weight: 700; font-size: 0.85rem; color: var(--muted); padding-bottom: 0.4rem; }
+.methods-page table.def th { font-family: var(--font-head); width: 28%; text-transform: none; letter-spacing: 0; font-size: 0.9rem; color: var(--ink); font-weight: 600; }
+.methods-page table.def td { font-size: 0.95rem; line-height: 1.55; }
+.methods-page section { scroll-margin-top: 5rem; }
+.paper .cs section[id] { scroll-margin-top: 5rem; }
+.methods-page table.def code { word-break: break-word; }
+@media (max-width: 600px) {
+  .methods-page table.def th, .methods-page table.def td { display: block; width: auto; border-bottom: 0; padding-left: 0; }
+  .methods-page table.def tr { display: block; border-bottom: var(--hairline); padding: 0.3rem 0; }
+}

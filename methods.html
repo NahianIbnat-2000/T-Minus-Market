@@ -1,0 +1,629 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data &amp; Methods · Space Shock</title>
+<meta name="description" content="Data and methods of Space Shock: sources, sample definitions, event timing, firm classification, the market model, tests, data quality and replication."><meta name="author" content="Nahian Ibnat">
+<meta property="og:type" content="article"><meta property="og:title" content="Data &amp; Methods · Space Shock">
+<meta property="og:description" content="Data and methods of Space Shock: sources, sample definitions, event timing, firm classification, the market model, tests, data quality and replication."><meta property="og:url" content="https://nahianibnat-2000.github.io/space-shock/methods.html">
+<meta name="twitter:card" content="summary"><link rel="canonical" href="https://nahianibnat-2000.github.io/space-shock/methods.html">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400&display=swap">
+<style>
+/* Space Shock design tokens. One system for the homepage, the interactive report and the working paper.
+   Colour semantics: coral = negative abnormal return, teal = positive, blue = benchmark / neutral information,
+   navy = hero and analytics surfaces. Contrast (WCAG 2.2) on --paper #F7F8FA: ink 16.9, muted 7.4,
+   loss-text 5.9, gain-text 5.3, bench-text 6.3 (all text-safe). Marks (--loss, --gain, --bench) are for
+   graphics and large text; on navy use the *-on-navy values. */
+:root {
+  --paper: #F7F8FA;           /* long-form reading surface */
+  --paper-deep: #EEF1F5;      /* panels, table stripes */
+  --card: #FFFFFF;
+  --ink: #0F172A;
+  --muted: #475569;
+  --rule: #D9DEE7;
+  --navy: #0B1B2E;            /* hero and analytics surfaces */
+  --navy-2: #12263D;
+  --on-navy: #E6EDF5;
+  --on-navy-muted: #A9B8CA;
+
+  --loss: #E8604C;            /* coral marks */
+  --loss-text: #B4361F;
+  --gain: #14A38B;            /* teal marks */
+  --gain-text: #0B6E5E;
+  --bench: #2F6FDF;           /* benchmark, intervals, neutral research marks */
+  --bench-text: #1D4ED8;
+  --loss-on-navy: #FF9480; --gain-on-navy: #5EE0C8; --bench-on-navy: #8DB6FF;
+
+  /* legacy names used by older components */
+  --signal: var(--loss);
+  --signal-text: var(--loss-text);
+
+  --font-head: "Inter", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  --font-body: "Source Serif 4", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --head-stretch: 100%;
+
+  --step--1: clamp(0.83rem, 0.8rem + 0.15vw, 0.9rem);
+  --step-0: clamp(1.02rem, 0.98rem + 0.2vw, 1.12rem);
+  --step-1: clamp(1.22rem, 1.12rem + 0.45vw, 1.45rem);
+  --step-2: clamp(1.55rem, 1.3rem + 1vw, 2.1rem);
+  --step-3: clamp(2.1rem, 1.5rem + 2.4vw, 3.4rem);
+
+  --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 1rem; --space-4: 1.5rem;
+  --space-5: 2.5rem;  --space-6: 4rem;   --space-7: 5.5rem;
+
+  --radius: 8px;
+  --measure: 68ch;
+  --page: 74rem;
+  --hairline: 1px solid var(--rule);
+  --inkline: 1px solid var(--ink);
+  --shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 4px 16px rgba(15, 23, 42, 0.05);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--paper); color: var(--ink); scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
+body {
+  margin: 0; font-family: var(--font-body); font-size: var(--step-0); line-height: 1.6;
+  font-optical-sizing: auto; text-rendering: optimizeLegibility;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+h1, h2, h3, .head {
+  font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 700;
+  line-height: 1.12; letter-spacing: -0.02em; margin: 0 0 var(--space-3);
+}
+h1 { font-size: var(--step-3); }
+h2 { font-size: var(--step-2); }
+h3 { font-size: var(--step-1); font-weight: 700; }
+p { margin: 0 0 var(--space-3); max-width: var(--measure); }
+a { color: var(--bench-text); text-underline-offset: 0.15em; }
+strong { font-weight: 700; }
+
+.mono, code, .num { font-family: var(--font-mono); font-size: 0.92em; font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+.loss { color: var(--loss-text); }
+.gain { color: var(--gain-text); }
+
+:focus-visible { outline: 3px solid var(--bench); outline-offset: 3px; }
+
+.skip-link {
+  position: absolute; left: -999px; top: 0; padding: var(--space-2) var(--space-3);
+  background: var(--ink); color: var(--paper); z-index: 100;
+}
+.skip-link:focus { left: var(--space-3); top: var(--space-3); }
+
+.visually-hidden {
+  position: absolute !important; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+.wrap { max-width: var(--page); margin: 0 auto; padding: 0 var(--space-4); }
+
+/* Swiss grid: 12 columns, text sits in 2-9, notes in 10-12 */
+.grid { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: var(--space-4); }
+.col-text { grid-column: 1 / span 8; }
+.col-wide { grid-column: 1 / -1; }
+.col-note { grid-column: 9 / -1; }
+@media (max-width: 52rem) {
+  .grid { grid-template-columns: 1fr; }
+  .col-text, .col-wide, .col-note { grid-column: 1 / -1; }
+}
+
+table { border-collapse: collapse; width: 100%; font-size: var(--step--1); }
+th, td { text-align: left; padding: var(--space-2) var(--space-3); border-bottom: var(--hairline); vertical-align: top; }
+th { font-family: var(--font-head); font-weight: 600; font-size: 0.78rem;
+     text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); border-bottom: 1px solid #B8C1CF; }
+td.num, th.num { text-align: right; }
+
+/* ------------------------------------------------ masthead */
+.masthead { border-bottom: var(--inkline); padding: var(--space-5) 0 var(--space-4); }
+.masthead .kicker {
+  font-family: var(--font-mono); font-size: var(--step--1); letter-spacing: 0.12em; text-transform: uppercase;
+  display: flex; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap;
+  border-bottom: var(--hairline); padding-bottom: var(--space-2); margin-bottom: var(--space-5);
+}
+.masthead h1 { max-width: 18ch; }
+.masthead .dek { font-size: var(--step-1); max-width: 40ch; line-height: 1.35; }
+.byline { font-family: var(--font-mono); font-size: var(--step--1); color: var(--muted); }
+
+/* ------------------------------------------------ stage indicator (countdown) */
+.stage-nav {
+  position: sticky; top: 0; z-index: 50; background: var(--paper);
+  border-bottom: var(--hairline);
+}
+.stage-nav ol {
+  list-style: none; margin: 0 auto; padding: 0 var(--space-4); max-width: var(--page);
+  display: flex; gap: 0; overflow-x: auto;
+}
+.stage-nav a {
+  display: block; padding: var(--space-3) var(--space-3); text-decoration: none; color: var(--muted);
+  font-family: var(--font-mono); font-size: var(--step--1); white-space: nowrap;
+  border-bottom: 3px solid transparent;
+}
+.stage-nav a .t { color: var(--ink); font-weight: 500; margin-right: 0.4em; }
+.stage-nav a[aria-current="step"] { color: var(--ink); border-bottom-color: var(--ink); }
+.stage-nav a:hover { color: var(--ink); }
+
+/* ------------------------------------------------ stages */
+.stage { padding: var(--space-7) 0 var(--space-6); border-bottom: var(--hairline); }
+.stage-label {
+  font-family: var(--font-mono); font-size: var(--step--1); letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: var(--space-3);
+  display: flex; gap: var(--space-3); align-items: baseline;
+}
+.stage-label .t { font-size: var(--step-1); color: var(--ink); letter-spacing: 0; }
+.stage h2 { max-width: 22ch; }
+.lead { font-size: var(--step-1); line-height: 1.4; max-width: 42ch; }
+
+.callout {
+  border-left: 4px solid var(--ink); padding: var(--space-2) var(--space-4); margin: var(--space-4) 0;
+  max-width: var(--measure); background: var(--paper-deep);
+}
+.callout .label { font-family: var(--font-mono); font-size: var(--step--1); text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--muted); display: block; margin-bottom: var(--space-1); }
+
+.placeholder-tool {
+  border: 1.5px dashed var(--rule); padding: var(--space-5) var(--space-4); margin: var(--space-5) 0;
+  font-family: var(--font-mono); font-size: var(--step--1); color: var(--muted); text-align: center;
+}
+
+/* ------------------------------------------------ key figures row */
+.figures-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  border-top: var(--inkline); border-bottom: var(--hairline); margin: var(--space-5) 0; }
+.figures-row > div { padding: var(--space-3) var(--space-3) var(--space-4); border-right: var(--hairline); }
+.figures-row > div:last-child { border-right: none; }
+.figures-row .big { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800;
+  font-size: var(--step-2); display: block; line-height: 1.1; }
+.figures-row .cap { font-size: var(--step--1); color: var(--muted); }
+
+/* ------------------------------------------------ Mission Anomaly Report card */
+.anomaly-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: var(--space-4); margin: var(--space-5) 0; list-style: none; padding: 0; }
+.anomaly {
+  position: relative; background: var(--paper); border: var(--inkline);
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  font-size: var(--step--1); line-height: 1.45;
+}
+.anomaly header { display: flex; justify-content: space-between; align-items: baseline;
+  border-bottom: var(--hairline); padding-bottom: var(--space-2); margin-bottom: var(--space-3); }
+.anomaly .no { font-family: var(--font-mono); letter-spacing: 0.08em; white-space: nowrap; }
+.anomaly .stamp {
+  font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800; font-size: 0.72rem;
+  letter-spacing: 0.14em; color: var(--signal-text); border: 2px solid var(--signal-text); padding: 0.05rem 0.4rem;
+  transform: rotate(-3deg); display: inline-block;
+}
+.anomaly h3 { font-size: var(--step-0); margin-bottom: var(--space-1); }
+.anomaly dl { display: grid; grid-template-columns: auto 1fr; gap: 0.15rem var(--space-3); margin: var(--space-3) 0; }
+.anomaly dt { font-family: var(--font-mono); text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.08em; color: var(--muted); }
+.anomaly dd { margin: 0; }
+.anomaly .finding { border-top: var(--hairline); padding-top: var(--space-3); }
+.anomaly .finding .big { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800; font-size: var(--step-2); }
+.anomaly .flag { margin-top: var(--space-2); font-style: italic; color: var(--muted); }
+
+/* ------------------------------------------------ printed figures */
+figure.plate { margin: var(--space-5) 0; }
+figure.plate .plate-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3);
+  border-top: var(--inkline); padding-top: var(--space-2); margin-bottom: var(--space-3); }
+figure.plate .plate-no { font-family: var(--font-mono); font-size: var(--step--1); letter-spacing: 0.1em; }
+figure.plate .plate-title { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 700; font-size: var(--step-0); }
+figure.plate svg { width: 100%; height: auto; display: block; overflow: visible; }
+figure.plate figcaption { font-size: var(--step--1); color: var(--muted); border-top: var(--hairline);
+  padding-top: var(--space-2); margin-top: var(--space-2); max-width: var(--measure); }
+figure.plate details { margin-top: var(--space-2); font-size: var(--step--1); }
+figure.plate summary { cursor: pointer; font-family: var(--font-mono); }
+
+svg .axis line, svg .axis path { stroke: var(--ink); stroke-width: 1; shape-rendering: crispEdges; }
+svg .axis text { font-family: var(--font-mono); font-size: 11px; fill: var(--ink); }
+svg .grid-line { stroke: var(--rule); stroke-width: 1; shape-rendering: crispEdges; }
+svg .zero-line { stroke: var(--ink); stroke-width: 1; }
+svg .day0-line { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 3 3; }
+svg .series { fill: none; stroke-width: 1.6; }
+svg .series.loss { stroke: var(--signal); }
+svg .series.gain { stroke: var(--gain); }
+svg .series.neutral { stroke: var(--ink); }
+svg .ci-band { stroke: none; }
+svg .label { font-family: var(--font-mono); font-size: 11px; fill: var(--ink); }
+svg .label.muted { fill: var(--muted); }
+svg .dot { stroke: var(--paper); stroke-width: 1; }
+
+/* draw-on animation for CAR lines (the one allowed animation) */
+@keyframes draw { from { stroke-dashoffset: var(--len); } to { stroke-dashoffset: 0; } }
+svg .series.draw { stroke-dasharray: var(--len); animation: draw 1.2s ease-out both; }
+
+/* ------------------------------------------------ footer */
+.site-foot { padding: var(--space-6) 0; font-size: var(--step--1); color: var(--muted); }
+.site-foot .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: var(--space-4); }
+.site-foot h3 { font-size: var(--step-0); color: var(--ink); }
+
+/* ------------------------------------------------ interactive tools */
+.tool { border: var(--inkline); background: var(--paper); padding: var(--space-4); margin: var(--space-5) 0; }
+.tool-head { border-bottom: var(--hairline); padding-bottom: var(--space-3); margin-bottom: var(--space-4); }
+.tool-kicker { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--signal-text); }
+.tool-head h3 { margin: var(--space-1) 0; }
+.tool-head p { margin: 0; color: var(--muted); }
+.lab-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: var(--space-3) var(--space-4); align-items: start; }
+.lab-form fieldset { border: 0; padding: 0; margin: 0; }
+.lab-form legend { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: var(--space-2); }
+.lab-opt { display: block; font-size: var(--step--1); margin: 0.2rem 0; cursor: pointer; }
+.lab-opt input { accent-color: var(--ink); margin-right: 0.35rem; }
+.lab-count { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); }
+.lab-reset { grid-column: 1 / -1; justify-self: start; font-family: var(--font-mono); font-size: var(--step--1);
+  background: var(--paper); color: var(--ink); border: var(--inkline); padding: var(--space-1) var(--space-3); cursor: pointer; }
+.lab-reset:hover, .lab-reset:focus-visible { background: var(--ink); color: var(--paper); }
+.lab-out { border-top: var(--hairline); margin-top: var(--space-4); padding-top: var(--space-4); }
+.lab-status { font-family: var(--font-mono); font-size: var(--step--1); padding: var(--space-2) var(--space-3); margin: 0 0 var(--space-3); }
+.lab-status.main { border-left: 3px solid var(--ink); background: var(--paper-deep); }
+.lab-status.explore { border-left: 3px solid var(--signal); background: var(--paper-deep); color: var(--signal-text); }
+.lab-big { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-3); }
+.lab-num { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800; font-size: var(--step-3); line-height: 1; }
+.lab-unit { color: var(--muted); font-size: var(--step--1); }
+.lab-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: var(--space-3); margin: var(--space-4) 0; }
+.lab-stats dt { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.lab-stats dd { margin: 0; font-family: var(--font-mono); }
+.lab-strip { margin: var(--space-4) 0 0; }
+.lab-strip figcaption { font-size: var(--step--1); color: var(--muted); }
+.lab-empty { font-style: italic; color: var(--muted); }
+.lab-band { fill: var(--paper-deep); }
+.lab-mean { stroke: var(--ink); stroke-width: 2.5; }
+.sim-controls { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-3); }
+.sim-controls button { font-family: var(--font-mono); font-size: var(--step--1); background: var(--ink); color: var(--paper);
+  border: var(--inkline); padding: var(--space-1) var(--space-3); cursor: pointer; }
+.sim-controls button.ghost { background: var(--paper); color: var(--ink); }
+.sim-controls button:hover, .sim-controls button:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
+.sim-ghost { fill: none; stroke: var(--rule); stroke-dasharray: 2 2; }
+.sim-bar { fill: var(--muted); fill-opacity: 0.55; stroke: var(--muted); }
+.sim-bar.beyond { fill: var(--signal); fill-opacity: 0.8; stroke: var(--signal); }
+.sim-actual { stroke: var(--ink); stroke-width: 2; }
+.sim-last { fill: var(--ink); }
+.sim-note { font-size: var(--step--1); color: var(--muted); margin-top: var(--space-3); }
+.tl-form { display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-5); align-items: flex-end; margin-bottom: var(--space-3); }
+.tl-form fieldset { border: 0; padding: 0; margin: 0; }
+.tl-form legend { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: var(--space-2); }
+.tl-search { display: flex; flex-direction: column; gap: var(--space-1); font-family: var(--font-mono); font-size: 0.72rem;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.tl-search input { font-family: var(--font-body); font-size: var(--step--1); padding: var(--space-1) var(--space-2);
+  border: var(--inkline); background: var(--paper); color: var(--ink); min-width: 14rem; text-transform: none; letter-spacing: 0; }
+.tl-key { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 50%; vertical-align: -0.05rem; margin-right: 0.3rem; }
+.tl-key.tl-provider, .tl-mark.tl-provider { fill: var(--signal); background: var(--signal); }
+.tl-key.tl-rival, .tl-mark.tl-rival { fill: var(--gain); background: var(--gain); }
+.tl-key.tl-none { background: transparent; border: 1.5px solid var(--muted); }
+.tl-mark.tl-none { fill: var(--paper); stroke: var(--muted); stroke-width: 1.2; }
+.tl-mark { cursor: pointer; }
+.tl-mark:focus { outline: none; stroke: var(--ink); stroke-width: 2.5; }
+.tl-mark.sel { stroke: var(--ink); stroke-width: 2.5; }
+.tl-count, .tl-hint { font-family: var(--font-mono); font-size: var(--step--1); color: var(--muted); }
+.tl-card { max-width: 30rem; margin-top: var(--space-3); }
+.tl-card h4 { font-family: var(--font-head); font-stretch: var(--head-stretch); font-size: var(--step-0); margin: 0 0 var(--space-1); }
+.ex-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: var(--space-3) var(--space-4); margin-bottom: var(--space-3); }
+.ex-ctl { display: flex; flex-direction: column; gap: var(--space-1); font-size: var(--step--1); }
+.ex-ctl output { font-family: var(--font-mono); font-weight: 500; }
+.ex-ctl input[type=range] { accent-color: var(--ink); width: 100%; }
+.ex-charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: var(--space-4); }
+.ex-dot { fill: var(--muted); fill-opacity: 0.35; }
+.ex-fit { stroke: var(--ink); stroke-width: 2; }
+.ex-gap { stroke: var(--signal); stroke-width: 2; stroke-dasharray: 4 3; }
+.ex-exp { fill: var(--paper); stroke: var(--ink); stroke-width: 2; }
+.ex-act { fill: var(--signal); }
+.ex-act-bar { fill: var(--ink); }
+.ex-exp-bar { fill: none; stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
+.ex-ab-bar { fill: var(--signal); }
+.small-note { font-size: var(--step--1); color: var(--muted); }
+
+/* sample-construction diagram */
+.sample-diagram { margin: var(--space-4) 0; }
+.sd-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2); }
+.sd-box { border: var(--inkline); background: var(--paper); padding: var(--space-2) var(--space-3); min-width: 9rem; display: flex; flex-direction: column; }
+.sd-box.key { background: var(--paper-deep); }
+.sd-n { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800; font-size: var(--step-1); }
+.sd-l { font-size: var(--step--1); }
+.sd-u { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); }
+.sd-arrow { font-family: var(--font-mono); color: var(--muted); }
+.sample-diagram figcaption { font-size: var(--step--1); color: var(--muted); }
+/* lab comparison */
+.lab-compare { width: 100%; border-collapse: collapse; font-size: var(--step--1); margin: var(--space-3) 0; }
+.lab-compare th, .lab-compare td { text-align: left; padding: var(--space-1) var(--space-2); border-bottom: var(--hairline); }
+.lab-compare tr.changed td { background: var(--paper-deep); }
+.lab-compare td.num { font-family: var(--font-mono); }
+.sim-facts { font-size: var(--step--1); padding-left: 1.1rem; }
+/* small screens: wide tables scroll inside their own box instead of widening the page */
+@media (max-width: 640px) {
+  .stage table, .tool table { display: block; max-width: 100%; overflow-x: auto; }
+}
+
+/* Shared site chrome: header, navigation, footer, buttons, focus. Used on all three pages. */
+*:focus-visible { outline: 3px solid var(--bench); outline-offset: 2px; border-radius: 2px; }
+.skip-link { position: absolute; left: -999px; top: 0; z-index: 100; background: var(--card); color: var(--ink); padding: 0.6rem 1rem; }
+.skip-link:focus { left: 1rem; top: 1rem; }
+
+.ss-header { background: var(--navy); color: var(--on-navy); position: sticky; top: 0; z-index: 60; border-bottom: 1px solid #1E334D; }
+.ss-header .ss-row { max-width: var(--page); margin: 0 auto; padding: 0.7rem var(--space-4); display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.ss-logo { display: flex; align-items: center; gap: 0.6rem; color: #fff; text-decoration: none; }
+.ss-logo svg { flex: none; }
+.ss-logo .ss-name { font-family: var(--font-head); font-weight: 800; letter-spacing: 0.06em; font-size: 1.02rem; }
+.ss-logo .ss-name b { color: var(--bench-on-navy); font-weight: 800; }
+.ss-logo .ss-sub { display: block; font-family: var(--font-head); font-size: 0.72rem; color: var(--on-navy-muted); letter-spacing: 0.02em; font-weight: 500; }
+.ss-nav ul { list-style: none; display: flex; gap: 0.15rem; margin: 0; padding: 0; }
+.ss-nav a { display: block; color: var(--on-navy); text-decoration: none; font-family: var(--font-head); font-size: 0.9rem; font-weight: 500; padding: 0.45rem 0.75rem; border-radius: 6px; }
+.ss-nav a:hover { background: var(--navy-2); }
+.ss-nav a[aria-current="page"] { background: var(--navy-2); color: #fff; box-shadow: inset 0 -2px 0 var(--bench-on-navy); }
+.ss-nav a.ss-dl { color: var(--bench-on-navy); }
+/* one navigation for every width: on small screens it becomes a scrollable row under the logo */
+@media (max-width: 860px) {
+  .ss-header { position: static; }
+  .ss-header .ss-row { flex-wrap: wrap; row-gap: 0.35rem; padding-bottom: 0.4rem; }
+  .ss-logo .ss-sub { display: none; }
+  .ss-nav { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .ss-nav ul { flex-wrap: nowrap; }
+  .ss-nav a { white-space: nowrap; padding: 0.5rem 0.7rem; }
+}
+
+.btn, a.btn { display: inline-flex; align-items: center; gap: 0.4rem; font-family: var(--font-head); font-weight: 600; font-size: 0.95rem;
+  padding: 0.7rem 1.15rem; border-radius: 6px; text-decoration: none; border: 1px solid var(--bench-text); background: var(--bench-text); color: #fff; }
+.btn:hover { filter: brightness(1.08); }
+.btn.ghost { background: transparent; color: inherit; border-color: currentColor; }
+.btn.small { font-size: 0.85rem; padding: 0.45rem 0.8rem; }
+.dl-link { font-family: var(--font-head); font-weight: 600; font-size: 0.92rem; }
+.dl-link::before { content: "\2193\00a0"; }
+
+.ss-footer { background: var(--navy); color: var(--on-navy-muted); padding: var(--space-5) 0 var(--space-4); margin-top: 0; }
+.ss-footer .ss-fgrid { max-width: var(--page); margin: 0 auto; padding: 0 var(--space-4); display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: var(--space-4); }
+.ss-footer h2 { font-family: var(--font-head); font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; margin: 0 0 0.6rem; font-weight: 700; }
+.ss-footer p, .ss-footer li { font-family: var(--font-head); font-size: 0.88rem; line-height: 1.55; margin: 0 0 0.4rem; }
+.ss-footer ul { list-style: none; padding: 0; margin: 0; }
+.ss-footer a { color: var(--on-navy); }
+.ss-footer .ss-legal { max-width: var(--page); margin: var(--space-4) auto 0; padding: var(--space-3) var(--space-4) 0; border-top: 1px solid #1E334D; font-size: 0.8rem; font-family: var(--font-head); }
+@media (max-width: 820px) { .ss-footer .ss-fgrid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .ss-footer .ss-fgrid { grid-template-columns: 1fr; } }
+
+.badge { display: inline-block; font-family: var(--font-head); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 0.15rem 0.5rem; border-radius: 999px; border: 1px solid currentColor; vertical-align: middle; }
+.badge.confirm { color: var(--bench-text); } .badge.explore { color: #8A4B00; background: #FFF4E0; border-color: #F0C27A; }
+.badge.robust { color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; animation: none !important; transition: none !important; } }
+
+.crumbs ol { list-style: none; display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 var(--space-3); padding: 0; font-family: var(--font-head); font-size: 0.85rem; color: var(--muted); }
+.crumbs li + li::before { content: "\203A"; margin-right: 0.4rem; color: var(--muted); }
+.crumbs a { color: var(--bench-text); }
+
+/* Interactive report: dashboard layout on the shared Space Shock system. */
+body.report { background: var(--paper); }
+.report-hero { background: var(--navy); color: var(--on-navy); padding: var(--space-5) 0 var(--space-4);
+  background-image: radial-gradient(circle at 88% 10%, rgba(47, 111, 223, 0.16), transparent 45%); }
+.report-hero .eyebrow { font-family: var(--font-head); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--bench-on-navy); margin: 0 0 var(--space-2); }
+.report-hero h1 { color: #fff; font-size: clamp(1.9rem, 1.4rem + 2vw, 2.9rem); max-width: 20ch; }
+.report-hero .dek { color: var(--on-navy); font-size: var(--step-0); max-width: 58ch; }
+.report-hero .byline { color: var(--on-navy-muted); font-family: var(--font-head); font-size: 0.85rem; margin: 0; }
+
+/* section navigation */
+.report .stage-nav { position: sticky; top: 3.9rem; z-index: 40; background: var(--card); border-bottom: var(--hairline); box-shadow: 0 1px 0 rgba(15,23,42,0.03); }
+.report .stage-nav a { font-family: var(--font-head); font-size: 0.9rem; font-weight: 500; color: var(--muted); padding: 0.8rem 0.9rem; }
+.report .stage-nav a .t { display: inline-grid; place-items: center; width: 1.4rem; height: 1.4rem; border-radius: 50%; background: var(--paper-deep); color: var(--ink); font-family: var(--font-mono); font-size: 0.75rem; margin-right: 0.45rem; }
+.report .stage-nav a[aria-current="step"] { color: var(--ink); border-bottom-color: var(--bench); }
+.report .stage-nav a[aria-current="step"] .t { background: var(--bench-text); color: #fff; }
+@media (max-width: 860px) { .report .stage-nav { top: 0; } }
+
+/* sections */
+.report .stage { padding: var(--space-6) 0; border-bottom: var(--hairline); }
+.report .stage:nth-of-type(even) { background: var(--card); }
+.report .stage-label { font-family: var(--font-head); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em; color: var(--bench-text); }
+.report .stage-label .t { font-family: var(--font-mono); font-size: 0.85rem; color: var(--bench-text); }
+.report .stage h2 { font-size: var(--step-2); max-width: 28ch; }
+.report .lead { font-size: var(--step-1); max-width: 52ch; }
+.report .callout { background: var(--card); border: var(--hairline); border-left: 4px solid var(--bench); border-radius: 0 var(--radius) var(--radius) 0; }
+.report .stage:nth-of-type(even) .callout { background: var(--paper); }
+
+/* figures as cards */
+.report figure.plate { background: var(--card); border: var(--hairline); border-radius: var(--radius); padding: var(--space-4); box-shadow: var(--shadow); }
+.report .stage:nth-of-type(even) figure.plate { background: var(--paper); box-shadow: none; }
+.report figure.plate .plate-title { font-stretch: normal; }
+.report figure.plate figcaption { font-family: var(--font-head); font-size: 0.85rem; }
+
+/* tools as dashboard panels */
+.report .tool { background: var(--card); border: 1px solid #CBD3DF; border-radius: 10px; padding: 0; overflow: hidden; box-shadow: var(--shadow); margin: var(--space-5) 0; }
+.report .tool-head { background: var(--navy); color: var(--on-navy); padding: var(--space-3) var(--space-4); margin: 0; border-bottom: 0; }
+.report .tool-head h3 { color: #fff; font-size: 1.25rem; font-stretch: normal; }
+.report .tool-head p { color: var(--on-navy-muted); font-family: var(--font-head); font-size: 0.92rem; max-width: 70ch; }
+.report .tool-kicker { color: var(--bench-on-navy); font-family: var(--font-head); font-weight: 700; }
+.report .tool > :not(.tool-head) { margin-left: var(--space-4); margin-right: var(--space-4); }
+.report .tool > :last-child { margin-bottom: var(--space-4); }
+.report .tool > .tool-head + * { margin-top: var(--space-4); }
+.report .lab-form fieldset { background: var(--paper); border: var(--hairline); border-radius: var(--radius); padding: var(--space-3); }
+.report .lab-form legend { font-family: var(--font-head); font-weight: 700; color: var(--ink); padding: 0 0.3rem; }
+.report .lab-opt input { accent-color: var(--bench-text); }
+.report button, .report .lab-reset { font-family: var(--font-head); font-weight: 600; font-size: 0.9rem; border-radius: 6px; padding: 0.5rem 0.9rem; border: 1px solid var(--bench-text); background: var(--card); color: var(--bench-text); cursor: pointer; min-height: 2.25rem; }
+.report button:hover, .report .lab-reset:hover { background: #EEF4FF; color: var(--bench-text); }
+.report .lab-status.main { border-left-color: var(--bench); background: #EEF4FF; color: var(--ink); }
+.report .lab-status.explore { border-left-color: #D98A00; background: #FFF4E0; color: #7A4300; }
+.report .lab-num { font-family: var(--font-mono); font-weight: 500; font-stretch: normal; letter-spacing: -0.03em; }
+.report .anomaly { background: var(--card); border: var(--hairline); border-radius: var(--radius); }
+.report table { background: transparent; }
+.report .site-foot { display: none; }
+.report .tool-source { font-family: var(--font-head); font-size: 0.84rem; color: var(--muted); border-top: var(--hairline); padding-top: var(--space-3); margin-top: var(--space-4); max-width: none; }
+/* Event Study Lab: controls in a sidebar on wide screens, results beside them */
+@media (min-width: 1100px) {
+  .report .lab { display: grid; grid-template-columns: 19rem minmax(0, 1fr); column-gap: var(--space-4); }
+  .report .lab > .tool-head, .report .lab > .tool-source { grid-column: 1 / -1; }
+  .report .lab > .lab-form { grid-column: 1; display: flex; flex-direction: column; align-self: start; margin-right: 0; }
+  .report .lab > .lab-out { grid-column: 2; margin-top: var(--space-4); border-top: 0; padding-top: 0; margin-left: 0; }
+}
+.report .load-error { margin: var(--space-5) 0; padding: var(--space-4); border: 1px solid #F0B4A8; border-left: 4px solid var(--loss); background: #FFF4F1; border-radius: var(--radius); }
+.report .load-error h2 { font-size: var(--step-1); }
+.report .lab-form fieldset { width: 100%; min-width: 0; }
+
+/* Shared long-form article layout (used by the working paper). */
+.article { padding-top: var(--space-4); padding-bottom: var(--space-6); }
+.article section { margin: var(--space-6) 0 0; }
+.article h2 { font-size: var(--step-2); margin-bottom: var(--space-3); }
+.article p, .article li { font-size: var(--step-0); line-height: 1.65; }
+.method { padding-left: 1.1rem; }
+.method li { margin-bottom: var(--space-2); }
+.mono { font-family: var(--font-mono); font-size: var(--step--1) !important; }
+.table-wrap { overflow-x: auto; }
+
+/* Case study page: screen and A4 print */
+.cs { max-width: 48rem; }
+.cs h3 { font-size: var(--step-1); margin: var(--space-5) 0 var(--space-2); }
+.cs-head .byline a { color: inherit; }
+.inshort { border: var(--inkline); background: var(--paper-deep); padding: var(--space-3) var(--space-4); margin-top: var(--space-4); }
+.inshort h2 { font-size: var(--step-0); font-family: var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 var(--space-2); }
+.inshort ul { margin: 0; padding-left: 1.1rem; }
+.inshort li { margin-bottom: var(--space-1); }
+.toc { margin-top: var(--space-5); border-top: var(--hairline); border-bottom: var(--hairline); padding: var(--space-3) 0; }
+.toc h2 { font-size: var(--step-0); font-family: var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 var(--space-2); }
+.toc ol { columns: 2; column-gap: var(--space-5); margin: 0; padding-left: 1.3rem; font-size: var(--step--1); }
+.cs table { width: 100%; border-collapse: collapse; font-size: var(--step--1); margin: var(--space-3) 0; }
+.cs th { text-align: left; font-family: var(--font-mono); font-weight: 500; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--muted); border-bottom: var(--inkline); padding: var(--space-1) var(--space-2) var(--space-1) 0; }
+.cs td { border-bottom: var(--hairline); padding: var(--space-2) var(--space-2) var(--space-2) 0; vertical-align: top; line-height: 1.45; }
+.cs td .num { font-family: var(--font-mono); white-space: nowrap; }
+.cs table.rq td:first-child { font-family: var(--font-mono); font-weight: 500; }
+.cs-fig { margin: var(--space-4) 0; border-top: var(--inkline); padding-top: var(--space-2); }
+.cs-figtitle { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 700; font-size: var(--step-0); margin-bottom: var(--space-2); }
+.cs-figtitle span { font-family: var(--font-mono); font-weight: 500; color: var(--muted); font-stretch: normal; }
+.cs-cap { font-size: var(--step--1); color: var(--muted); margin-top: var(--space-1); line-height: 1.45; }
+.faq dt { font-weight: 700; margin-top: var(--space-3); }
+.faq dd { margin: var(--space-1) 0 0; }
+.notes ol, .refs { font-size: var(--step--1); line-height: 1.5; }
+.refs li { margin-bottom: var(--space-1); }
+sup a { text-decoration: none; font-family: var(--font-mono); font-size: 0.7em; }
+.signoff { font-size: var(--step--1); color: var(--muted); border-top: var(--hairline); padding-top: var(--space-3); margin-top: var(--space-6); }
+
+@page { size: A4; margin: 16mm 15mm 16mm 15mm; }
+@media print {
+  .screen-only { display: none !important; }
+  html { font-size: 10pt; background: #fff; }
+  .cs p, .cs li, .cs dd, .cs .dek { max-width: none; }
+  body { background: #fff; }
+  .skip-link, .site-foot { display: none !important; }
+  .masthead { padding-top: 0; }
+  .masthead h1 { font-size: 22pt; }
+  .cs { max-width: none; padding: 0; }
+  .cs section { margin-top: 14pt; }
+  .cs h2 { font-size: 14pt; break-after: avoid; }
+  .cs h3 { font-size: 11.5pt; break-after: avoid; }
+  .cs-fig, .cs table, .inshort, .faq dt, .faq dd { break-inside: avoid; }
+  .cs a { color: inherit; text-decoration: none; }
+  .toc ol { columns: 2; }
+}
+.abstract-sec { border-top: var(--inkline); border-bottom: var(--hairline); padding: var(--space-3) 0; margin-top: var(--space-4); }
+.abstract-sec h2 { font-size: var(--step-0); font-family: var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 var(--space-2); }
+.keywords { font-size: var(--step--1); color: var(--muted); }
+.eq { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); margin: var(--space-3) 0; padding: var(--space-2) var(--space-3);
+  background: var(--paper-deep); font-family: var(--font-body); overflow-x: auto; }
+.eq-body { white-space: nowrap; }
+.eq-no { font-family: var(--font-mono); color: var(--muted); }
+.ov { text-decoration: overline; font-style: italic; }
+.tcap { font-size: var(--step--1); margin: var(--space-4) 0 0; }
+.cs table.small { font-size: 0.78rem; }
+.cs table.small td { padding: 0.25rem 0.4rem 0.25rem 0; }
+
+/* ---------------- Space Shock paper interface */
+body.paper { background: var(--paper); }
+.paper-head { background: var(--card); border-bottom: var(--hairline); padding: var(--space-5) 0 var(--space-4); }
+.ph-in { max-width: var(--page); }
+.ph-eyebrow { font-family: var(--font-head); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--bench-text); margin: 0 0 var(--space-2); }
+.paper-head h1 { font-size: clamp(1.8rem, 1.3rem + 1.8vw, 2.7rem); max-width: 30ch; line-height: 1.15; }
+.paper-head .dek { font-size: var(--step-1); color: var(--muted); max-width: 52ch; }
+.paper-head .byline { font-family: var(--font-head); font-size: 0.9rem; color: var(--muted); }
+.ph-meta { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-3); margin: var(--space-4) 0 0; border-top: var(--hairline); padding-top: var(--space-3); }
+.ph-meta dt { font-family: var(--font-head); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.ph-meta dd { margin: 0.25rem 0 0; font-family: var(--font-head); font-size: 0.92rem; }
+.paper-grid { max-width: var(--page); display: grid; grid-template-columns: 15rem minmax(0, 48rem); gap: var(--space-5); align-items: start; padding-top: var(--space-4); padding-bottom: var(--space-6); }
+.paper-toc { position: sticky; top: 4.6rem; max-height: calc(100vh - 5.5rem); overflow-y: auto; font-family: var(--font-head); font-size: 0.88rem; }
+.paper-toc .pt-h { font-weight: 700; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin: 0 0 var(--space-2); }
+.paper-toc ol, .toc-mobile ol { list-style: none; margin: 0; padding: 0; border-left: 2px solid var(--rule); }
+.paper-toc a, .toc-mobile a { display: block; padding: 0.3rem 0 0.3rem 0.8rem; color: var(--ink); text-decoration: none; margin-left: -2px; border-left: 2px solid transparent; }
+.paper-toc a:hover, .paper-toc a:focus-visible { border-left-color: var(--bench); color: var(--bench-text); }
+.toc-mobile { display: none; border: var(--hairline); border-radius: var(--radius); background: var(--card); padding: 0 var(--space-3); grid-column: 1 / -1; }
+.toc-mobile summary { cursor: pointer; font-family: var(--font-head); font-weight: 600; padding: var(--space-2) 0; }
+.paper .cs { max-width: 48rem; margin: 0; padding: 0; }
+.paper .cs h2 { font-size: var(--step-2); margin-top: var(--space-5); }
+.paper .cs p, .paper .cs li { line-height: 1.68; }
+.paper .abstract-sec { background: var(--card); border: var(--hairline); border-radius: var(--radius); padding: var(--space-4); margin-top: 0; }
+.paper .inshort { background: #EEF4FF; border: 1px solid #C7D7F5; border-radius: var(--radius); }
+.paper .eq { background: var(--card); border: var(--hairline); border-radius: 6px; }
+.paper .cs-fig { border-top: 0; background: var(--card); border: var(--hairline); border-radius: var(--radius); padding: var(--space-3); }
+.paper .cs-fig svg { max-width: 100%; height: auto; }
+
+.paper .cs th { border-bottom: 1px solid #B8C1CF; }
+@media (max-width: 980px) {
+  .paper-grid { grid-template-columns: minmax(0, 1fr); }
+  .paper-toc { display: none; }
+  .toc-mobile { display: block; }
+  .ph-meta { grid-template-columns: 1fr 1fr; }
+}
+@media print {
+  .ss-header, .ss-footer, .paper-toc, .toc-mobile, .ph-meta { display: none !important; }
+  .paper-grid { display: block; }
+  .paper-head { border: 0; padding: 0; }
+}
+.ph-meta dd a { display: inline-block; padding: 0.25rem 0; }
+.paper .abstract-sec h2, .paper .inshort h2 { font-family: var(--font-head); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 0 0 var(--space-2); }
+.ph-meta dd .btn { margin-right: 0.6rem; }
+
+@media (max-width: 860px) { .paper-toc { top: 0.5rem; } }
+.methods-page table.def caption, .methods-page table caption { text-align: left; font-family: var(--font-head); font-weight: 700; font-size: 0.85rem; color: var(--muted); padding-bottom: 0.4rem; }
+.methods-page table.def th { font-family: var(--font-head); width: 28%; text-transform: none; letter-spacing: 0; font-size: 0.9rem; color: var(--ink); font-weight: 600; }
+.methods-page table.def td { font-size: 0.95rem; line-height: 1.55; }
+.methods-page section { scroll-margin-top: 5rem; }
+.paper .cs section[id] { scroll-margin-top: 5rem; }
+.methods-page table.def code { word-break: break-word; }
+@media (max-width: 600px) {
+  .methods-page table.def th, .methods-page table.def td { display: block; width: auto; border-bottom: 0; padding-left: 0; }
+  .methods-page table.def tr { display: block; border-bottom: var(--hairline); padding: 0.3rem 0; }
+}
+
+</style>
+</head>
+<body class="paper methods">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="ss-header"><div class="ss-row"><a class="ss-logo" href="index.html"><svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><circle cx="16" cy="16" r="7" fill="none" stroke="#8DB6FF" stroke-width="2.2"/><ellipse cx="16" cy="16" rx="14" ry="5.5" fill="none" stroke="#8DB6FF" stroke-width="1.6" transform="rotate(-28 16 16)"/><circle cx="27.2" cy="9.4" r="2.4" fill="#FF9480"/></svg><span><span class="ss-name">SPACE <b>SHOCK</b></span><span class="ss-sub">Financial contagion and competitive effects of rocket launch failures</span></span></a><nav class="ss-nav" aria-label="Site"><ul><li><a href="index.html">Overview</a></li><li><a href="site/index.html">Explore Data</a></li><li><a href="case-study.html">Research Paper</a></li><li><a href="methods.html" aria-current="page">Data &amp; Methods</a></li></ul></nav></div></header>
+<header class="paper-head"><div class="wrap ph-in">
+  <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Overview</a></li><li aria-current="page">Data &amp; Methods</li></ol></nav>
+  <h1>Data &amp; Methods</h1>
+  <p class="dek">How the sample was built, how events and firms are defined, how abnormal returns are tested, what can go wrong with the data, and how to reproduce every number. The full derivations are in the <a href="case-study.html">research paper</a>.</p>
+  <p class="byline">Rules version v1.0 · results Nov 2026</p>
+</div></header>
+<div class="wrap paper-grid">
+<aside class="paper-toc" aria-label="On this page"><p class="pt-h">On this page</p><ol><li><a href="#sources">1. Data sources</a></li><li><a href="#sample">2. Sample definitions</a></li><li><a href="#events">3. Event identification and timing</a></li><li><a href="#firms">4. Firm classification</a></li><li><a href="#model">5. Market model and event windows</a></li><li><a href="#inference">6. Statistical inference</a></li><li><a href="#robust">7. Robustness procedures</a></li><li><a href="#quality">8. Data quality and limitations</a></li><li><a href="#replicate">9. Replication</a></li></ol></aside>
+<main id="main" class="article cs methods-page">
+<section id="sources"><h2>1. Data sources</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Data sources"><table class="def"><caption>Data sources</caption><tbody><tr><th scope="row">Launches</th><td>data from GCAT (J. McDowell, planet4589.org/space/gcat), CC-BY</td></tr><tr><th scope="row">Prices</th><td>Yahoo Finance via yfinance (used locally only). Used on the author's computer only.</td></tr><tr><th scope="row">Firm map</th><td>Hand-built, point in time, with a source for every row (<code>data/manual/</code>).</td></tr><tr><th scope="row">Disclosure times</th><td>Company statements with sources and confidence (<code>data/manual/disclosure_times.csv</code>).</td></tr></tbody></table></div>
+</section>
+<section id="sample"><h2>2. Sample definitions</h2>
+<p>The counts measure different units. Firm-event reactions are not independent events.</p>
+<figure class="cs-fig"><svg viewBox="0 0 720 250" width="100%" role="img" aria-label="Sample construction: launches, failures, rival reactions and independent events, with the unit of each box." font-family="DM Mono, ui-monospace, monospace" font-size="11" fill="#0F172A"><title>Sample construction: launches, failures, rival reactions and independent events, with the unit of each box.</title><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0F172A"/></marker></defs><path d="M136.0,41.0 L154.0,41.0" stroke="#0F172A" fill="none" marker-end="url(#arr)"/><path d="M282.0,41.0 L300.0,41.0" stroke="#0F172A" fill="none" marker-end="url(#arr)"/><path d="M428.0,41.0 L446.0,41.0" stroke="#0F172A" fill="none" marker-end="url(#arr)"/><path d="M364.0,70.0 L364.0,92.0" stroke="#0F172A" fill="none" marker-end="url(#arr)"/><path d="M428.0,121.0 L446.0,121.0" stroke="#0F172A" fill="none" marker-end="url(#arr)"/><path d="M574.0,121.0 L592.0,121.0" stroke="#0F172A" fill="none" marker-end="url(#arr)"/><path d="M510.0,150.0 L592.0,201.0" stroke="#0F172A" fill="none" marker-end="url(#arr)"/><rect x="8" y="12" width="128" height="58" fill="#FFFFFF" stroke="#0F172A"/><text x="16" y="34" font-size="16" font-weight="700">3,077</text><text x="16" y="49" font-size="9.5">Launch attempts</text><text x="16" y="62" font-size="8.5" fill="#475569">unit: launches</text><rect x="154" y="12" width="128" height="58" fill="#FFFFFF" stroke="#0F172A"/><text x="162" y="34" font-size="16" font-weight="700">138</text><text x="162" y="49" font-size="9.5">Failures</text><text x="162" y="62" font-size="8.5" fill="#475569">unit: launches</text><rect x="300" y="12" width="128" height="58" fill="#FFFFFF" stroke="#0F172A"/><text x="308" y="34" font-size="16" font-weight="700">27</text><text x="308" y="49" font-size="9.5">In the study</text><text x="308" y="62" font-size="8.5" fill="#475569">unit: failures</text><rect x="446" y="12" width="128" height="58" fill="#EEF1F5" stroke="#0F172A"/><text x="454" y="34" font-size="16" font-weight="700">4</text><text x="454" y="49" font-size="9.5">Listed maker</text><text x="454" y="62" font-size="8.5" fill="#475569">unit: failures; case studies</text><rect x="300" y="92" width="128" height="58" fill="#FFFFFF" stroke="#0F172A"/><text x="308" y="114" font-size="16" font-weight="700">24</text><text x="308" y="129" font-size="9.5">Listed rivals</text><text x="308" y="142" font-size="8.5" fill="#475569">unit: failures</text><rect x="446" y="92" width="128" height="58" fill="#FFFFFF" stroke="#0F172A"/><text x="454" y="114" font-size="16" font-weight="700">42</text><text x="454" y="129" font-size="9.5">Rival reactions</text><text x="454" y="142" font-size="8.5" fill="#475569">unit: firm x failure</text><rect x="592" y="92" width="128" height="58" fill="#EEF1F5" stroke="#0F172A"/><text x="600" y="114" font-size="16" font-weight="700">22</text><text x="600" y="129" font-size="9.5">Independent events</text><text x="600" y="142" font-size="8.5" fill="#475569">unit: clusters</text><rect x="592" y="172" width="128" height="58" fill="#FFFFFF" stroke="#0F172A"/><text x="600" y="194" font-size="16" font-weight="700">3</text><text x="600" y="209" font-size="9.5">Rival firms</text><text x="600" y="222" font-size="8.5" fill="#475569">unit: firms</text></svg><figcaption class="cs-cap">Sample construction. Each box gives a count and its unit. Source: GCAT and the project pipeline.</figcaption></figure>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Sample definitions"><table class="def"><caption>Sample definitions</caption><tbody><tr><th scope="row">Historical launch failures</th><td><strong>138</strong> orbital launch attempts, 2000 to 2026, with a GCAT success score below 0.75. Pad explosions before launch are kept separately.</td></tr><tr><th scope="row">Failures in the study</th><td><strong>27</strong> failures with a listed maker or at least one listed Tier 1 or 2 rival.</td></tr><tr><th scope="row">Listed-maker cases</th><td><strong>4</strong> failures whose rocket was built by a listed company (Avio SpA, Rocket Lab). Reported one by one as case studies.</td></tr><tr><th scope="row">Failures with listed rivals</th><td><strong>24</strong> failures with at least one listed rival that has a usable price history.</td></tr><tr><th scope="row">Rival reactions (firm-events)</th><td><strong>42</strong>: one per listed rival per failure. The unit of each CAR, not an independent observation.</td></tr><tr><th scope="row">Independent events (clusters)</th><td><strong>22</strong>: failures that share a firm within 5 trading days form one cluster. The unit of inference.</td></tr><tr><th scope="row">Distinct listed rivals</th><td><strong>3</strong>: Avio SpA, Firefly Aerospace, Rocket Lab.</td></tr></tbody></table></div>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Failures not in the study, by reason (a failure can have several)"><table class="def"><caption>Failures not in the study, by reason (a failure can have several)</caption><tbody><tr><th scope="row">maker not a listed company</th><td>97</td></tr><tr><th scope="row">no listed maker or listed competitor</th><td>13</td></tr><tr><th scope="row">maker not listed, or not the owner, on that date</th><td>1</td></tr></tbody></table></div>
+</section>
+<section id="events"><h2>3. Event identification and timing</h2><div class="table-wrap" tabindex="0" role="region" aria-label="Event timing rules"><table class="def"><caption>Event timing rules</caption><tbody><tr><th scope="row">Day 0</th><td>The first trading session at or after the failure became public, on the stock's own exchange calendar (holidays and half days included).</td></tr><tr><th scope="row">Overnight and after-hours events</th><td>A failure that becomes public after the close, at night or on a non-trading day moves day 0 to the next session of that exchange.</td></tr><tr><th scope="row">Disclosure-time sources</th><td>Company statement, high confidence: 3 rival reactions. Company statement, low confidence: 2. GCAT launch time, not separately verified: 37 (of 42). Maker cases using GCAT time: 4 of 4.</td></tr><tr><th scope="row">When GCAT time is allowed</th><td>Only where day 0 would not change if the true disclosure came 10 minutes earlier or up to 180 minutes later. Otherwise a sourced time is required; no time is invented.</td></tr><tr><th scope="row">Sensitivity</th><td>Check R5 drops or shifts the uncertain disclosure times.</td></tr></tbody></table></div></section>
+<section id="firms"><h2>4. Firm classification</h2><div class="table-wrap" tabindex="0" role="region" aria-label="Firm classification"><table class="def"><caption>Firm classification</caption><tbody><tr><th scope="row">Maker</th><td>The company that built the failed rocket, if listed at the time of the failure.</td></tr><tr><th scope="row">Tier 1 rival</th><td>Listed; launch is a pure-play or major business; sells a rocket of the same size class to the same customer market; has flown that rocket in the previous 730 days.</td></tr><tr><th scope="row">Tier 2 rival</th><td>Listed and close, but missing one Tier 1 condition (recorded per row in the firm map). Enters the test with Tier 1.</td></tr><tr><th scope="row">Tier 3</th><td>Diversified aerospace groups where launch is a minor business. Descriptive only, never in the test.</td></tr><tr><th scope="row">Point in time</th><td>Each link uses listing dates, ownership and exposure as they were on the failure date (<code>data/manual/firm_map.csv</code>, <code>data/manual/vehicle_segments.csv</code>). Prices from before a firm's real listing (a pre-merger shell company) are dropped.</td></tr></tbody></table></div></section>
+<section id="model"><h2>5. Market model and event windows</h2><div class="table-wrap" tabindex="0" role="region" aria-label="Model and windows"><table class="def"><caption>Model and windows</caption><tbody><tr><th scope="row">Returns</th><td>Simple daily returns from adjusted closes; CARs are sums of simple abnormal returns.</td></tr><tr><th scope="row">Benchmark</th><td>Each firm's home market index.</td></tr><tr><th scope="row">Expected return</th><td>Market model by OLS on trading days -250 to -30 before day 0; at least 100 returns. With 30 to 99 returns, a market-adjusted model (alpha 0, beta 1), flagged. Fewer: dropped.</td></tr><tr><th scope="row">Abnormal return</th><td>Actual return minus the market-model prediction.</td></tr><tr><th scope="row">CAR variance</th><td>Includes the prediction error of the estimated model (window length, estimation length and market moves in the window).</td></tr><tr><th scope="row">Main window</th><td>T0 to T+1: the confirmatory test (H2).</td></tr><tr><th scope="row">Wider window</th><td>T−1 to T+3: robustness check R4.</td></tr><tr><th scope="row">One-month window</th><td>T0 to T+20: description only.</td></tr></tbody></table></div>
+<p>Equations: <a href="case-study.html#s5">paper, section 5</a>.</p></section>
+<section id="inference"><h2>6. Statistical inference</h2><div class="table-wrap" tabindex="0" role="region" aria-label="Tests and estimands"><table class="def"><caption>Tests and estimands</caption><tbody><tr><th scope="row">Prespecified test</th><td>Standardized test of Boehmer, Musumeci and Poulsen (1991), with the Kolari and Pynnönen (2010) correction for correlation between rivals reacting to the same failure, applied within clusters. Null: mean standardized CAR is zero. p from a t distribution with clusters minus one degrees of freedom. Result: <strong>p = 0.40</strong>.</td></tr><tr><th scope="row">Mean test</th><td>Cluster-robust test of the plain equal-weighted average CAR (the published estimate, +0.28%, 95% interval −1.62% to +2.18%), <strong>p = 0.76</strong>, with a wild cluster bootstrap as a check.</td></tr><tr><th scope="row">Why two p-values</th><td>The standardized test gives volatile stocks less weight; the mean test weights every reaction equally. They test different quantities, so their p-values are not interchangeable. Each is reported next to the quantity it tests.</td></tr><tr><th scope="row">Weighting</th><td>Averages that weight every event, every firm, or calmer stocks more answer different questions. When one firm has many reactions, weighting firms equally can change the sign. These are sensitivity analyses added after the results; none is statistically preferred.</td></tr><tr><th scope="row">Power</th><td>Minimum detectable average effect about 2.7% (80% power, 5% level); not detecting an effect does not show that there is none.</td></tr><tr><th scope="row">Maker cases</th><td>Each CAR with a 95% interval of CAR ± 1.96 prediction-error standard deviations. No average is tested.</td></tr></tbody></table></div>
+<p>Estimands and the four weightings: <a href="case-study.html#s5">paper, section 5.1</a>; sample concentration: <a href="case-study.html#s6">section 6.3</a>.</p></section>
+<section id="robust"><h2>7. Robustness procedures</h2>
+<p><span class="badge confirm">Prespecified</span> 12 checks fixed before the results:</p><ul class="method"><li>R1 portfolio t-test</li><li>R1 portfolio sign test <span class="muted">(8 of 22 cluster CARs positive)</span></li><li>R2 plain t <span class="muted">(ignores cross-correlation (literature baseline))</span></li><li>R3 rank (simulated p) <span class="muted">(5000 simulations, seed 20261121; ignores cross-correlation)</span></li><li>R4 window [-1,+3] <span class="muted">(unadjusted BMP t = 1.552; adjustment factor = 0.900; df = 21)</span></li><li>R5a drop low-confidence timing <span class="muted">(unadjusted BMP t = 1.005; adjustment factor = 0.913; df = 20)</span></li><li>R5b low-confidence day 0 + 1 session <span class="muted">(unadjusted BMP t = 1.193; adjustment factor = 0.917; df = 21)</span></li><li>R6 drop fallback-model events <span class="muted">(unadjusted BMP t = 1.215; adjustment factor = 0.925; df = 20)</span></li><li>R7 drop multi-failure clusters <span class="muted">(unadjusted BMP t = 0.987; adjustment factor = 0.934; df = 19)</span></li><li>R8 without AVIO.MI <span class="muted">(unadjusted BMP t = 0.318; adjustment factor = 0.932; df = 13)</span></li><li>R8 without FLY <span class="muted">(unadjusted BMP t = 1.123; adjustment factor = 0.945; df = 21)</span></li><li>R8 without RKLB <span class="muted">(unadjusted BMP t = 0.686; adjustment factor = 0.952; df = 21)</span></li></ul>
+<p><span class="badge robust">Benchmark</span> Placebo R9: 1000 sets of random ordinary trading days (seed 20261121), one per reaction. The real result's percentile is a description, not a p-value.</p>
+<p><span class="badge explore">Exploratory</span> Analyses designed after the results (confounding drops E1 to E3, weighting, a shared-date placebo R9b) are labelled wherever they appear and never replace the prespecified test. Results: <a href="case-study.html#s7">paper, sections 7 and 8</a>.</p></section>
+<section id="quality"><h2>8. Data quality and limitations</h2><div class="table-wrap" tabindex="0" role="region" aria-label="Data quality"><table class="def"><caption>Data quality</caption><tbody><tr><th scope="row">Announcement timestamps</th><td>Sourced company statements where available; otherwise GCAT launch times under the rule above.</td></tr><tr><th scope="row">GCAT launch-time proxies</th><td>37 of 42 rival reactions rely on them. Clock or time-zone errors beyond the allowed band would shift day 0.</td></tr><tr><th scope="row">Trading calendars</th><td>Each exchange's own calendar (Milan, Nasdaq, NYSE). A failure can fall on different calendar days for different rivals.</td></tr><tr><th scope="row">Confounding company news</th><td>News around the largest reactions was checked against public sources (2 confounded, 1 sector move, 1 possibly confounded). Flagged reactions stay in the confirmatory test; dropping them is exploratory (E1 to E3).</td></tr><tr><th scope="row">Overlapping launch events</th><td>Failures sharing a firm within 5 trading days are one cluster; check R7 drops multi-failure clusters.</td></tr><tr><th scope="row">Missing return data</th><td>Firm-events without a full window or estimation history are dropped and counted in the paper (Appendix E).</td></tr><tr><th scope="row">Thin trading and volatility</th><td>Young listed firms are volatile; the standardized test scales each CAR by its own uncertainty, and fallback-model events are dropped in check R6.</td></tr><tr><th scope="row">Survivorship</th><td>Listed launch firms that later delisted (Orbital Sciences/Orbital ATK, Astra, Virgin Orbit) are absent from the free price source.</td></tr><tr><th scope="row">What is published</th><td>Only derived statistics are published: CARs, CAR variances, abnormal returns, residual volatility and CAR correlations. No raw prices, raw returns, alphas or betas.</td></tr></tbody></table></div></section>
+<section id="replicate"><h2>9. Replication</h2>
+<p>Python 3.11+, <code>pip install -r requirements.txt</code>, then run the steps in order. Prices are downloaded on your machine and never committed.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Pipeline steps"><table><caption>Pipeline steps</caption><thead><tr><th scope="col">Command</th><th scope="col">What it does</th></tr></thead><tbody><tr><td><code>python pipeline/01_ingest_launches.py</code></td><td>Download GCAT and classify launches</td></tr><tr><td><code>python pipeline/02_map_firms.py</code></td><td>Apply the point-in-time firm map</td></tr><tr><td><code>python pipeline/03_pull_prices.py</code></td><td>Download prices (Yahoo Finance, not redistributed)</td></tr><tr><td><code>python pipeline/04_check_coverage.py</code></td><td>Coverage and feasibility gate</td></tr><tr><td><code>python pipeline/05_event_study.py</code></td><td>Prespecified analysis (H2, checks R1 to R9)</td></tr><tr><td><code>python pipeline/06_confounding_sensitivity.py</code></td><td>Exploratory confounding checks</td></tr><tr><td><code>python pipeline/07_export_site_data.py</code></td><td>Export derived statistics to site/data/</td></tr><tr><td><code>python pipeline/08_build_html.py</code></td><td>Build this site and the paper</td></tr><tr><td><code>python pipeline/09_audit_exploratory.py</code></td><td>Exploratory audit checks (R9b)</td></tr>
+<tr><td><code>python audit/verify_published.py</code></td><td>Recompute every published statistic independently</td></tr>
+<tr><td><code>python -m pytest tests</code></td><td>Test suite</td></tr></tbody></table></div>
+<p class="r-actions"><a class="btn small" href="https://github.com/NahianIbnat-2000/space-shock">Source code on GitHub</a></p><h3>Supporting evidence</h3><ul class="method"><li><a href="https://github.com/NahianIbnat-2000/space-shock/blob/master/reports/04_feasibility_report.md">Feasibility report (written before results)</a></li><li><a href="https://github.com/NahianIbnat-2000/space-shock/blob/master/reports/05_results.md">Results report</a></li><li><a href="https://github.com/NahianIbnat-2000/space-shock/blob/master/docs/CONFOUNDING_NEWS.md">Confounding-news checks</a></li><li><a href="https://github.com/NahianIbnat-2000/space-shock/blob/master/audit/AUDIT_REPORT.md">Independent audit</a></li><li><a href="https://github.com/NahianIbnat-2000/space-shock/blob/master/audit/VERIFICATION.md">Verification of published statistics</a></li><li><a href="https://github.com/NahianIbnat-2000/space-shock/blob/master/README.md">Reproduction guide</a></li></ul>
+<h3>References</h3>
+<ul class="refs">
+<li>Boehmer, E., Musumeci, J. and Poulsen, A. B. (1991). Event-study methodology under conditions of event-induced variance. <em>Journal of Financial Economics</em> 30(2), 253-272.</li>
+<li>Kolari, J. W. and Pynnönen, S. (2010). Event study testing with cross-sectional correlation of abnormal returns. <em>Review of Financial Studies</em> 23(11), 3996-4025.</li>
+<li>Campbell, J. Y., Lo, A. W. and MacKinlay, A. C. (1997). <em>The Econometrics of Financial Markets</em>. Princeton University Press.</li>
+<li>McDowell, J. C. GCAT: General Catalog of Artificial Space Objects. planet4589.org/space/gcat.</li>
+</ul></section>
+</main></div>
+<footer class="ss-footer"><div class="ss-fgrid"><div><h2>Space Shock</h2><p>Financial contagion and competitive effects of rocket launch failures. An event study of orbital launch failures and the stocks of the companies involved.</p><p>By Nahian Ibnat</p></div><div><h2>Explore</h2><ul><li><a href="index.html">Overview</a></li><li><a href="site/index.html">Explore Data</a></li><li><a href="case-study.html">Research Paper</a></li><li><a href="methods.html">Data &amp; Methods</a></li><li><a href="case-study.pdf" download>Download PDF</a></li><li><a href="https://github.com/NahianIbnat-2000/space-shock">Source code</a></li></ul></div><div><h2>Sources</h2><p>Launch data: GCAT, J. McDowell, CC-BY. Prices: Yahoo Finance, used only to compute statistics; no prices are republished.</p></div><div><h2>Cite</h2><p>Ibnat, N. (2026). When Rockets Fail: Financial Contagion and Competitive Effects in the Space Industry. Space Shock working paper. https://nahianibnat-2000.github.io/space-shock/</p></div></div><p class="ss-legal">Independent research, not peer reviewed. Not investment advice.</p></footer>
+</body>
+</html>

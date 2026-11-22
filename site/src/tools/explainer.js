@@ -54,6 +54,7 @@ export function explainerHtml() {
     </form>
     <div class="ex-charts"><div class="ex-scatter"></div><div class="ex-bars"></div></div>
     <div class="ex-out" aria-live="polite"></div>
+    <p class="tool-source">Simulated data only. The study's real expected and actual returns are not shown because the price data may not be republished; the real abnormal returns for each maker case are in the Results section (cumulative paths) and in the <a href="../case-study.html#s6">paper</a>. <a href="../methods.html#model">Market model</a></p>
   </div>`;
 }
 

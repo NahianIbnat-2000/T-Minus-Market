@@ -5,8 +5,8 @@
 <title>When Rockets Fail: Financial Contagion and Competitive Effects in the Space Industry (Space Shock working paper)</title>
 <meta name="description" content="Working paper: 138 orbital launch failures, 2000 to 2026. Listed makers lose −8.8% to −16.3% in two days; listed rivals +0.28% (95% interval −1.62% to +2.18%), not detectable with 22 independent events."><meta name="author" content="Nahian Ibnat">
 <meta property="og:type" content="article"><meta property="og:title" content="When Rockets Fail: Financial Contagion and Competitive Effects in the Space Industry (Space Shock working paper)">
-<meta property="og:description" content="Working paper: 138 orbital launch failures, 2000 to 2026. Listed makers lose −8.8% to −16.3% in two days; listed rivals +0.28% (95% interval −1.62% to +2.18%), not detectable with 22 independent events."><meta property="og:url" content="https://nahianibnat-2000.github.io/T-Minus-Market/case-study.html">
-<meta name="twitter:card" content="summary_large_image"><meta property="og:image" content="https://nahianibnat-2000.github.io/T-Minus-Market/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="When Rockets Fail: Financial Contagion and Competitive Effects in the Space Industry (Space Shock working paper)"><link rel="canonical" href="https://nahianibnat-2000.github.io/T-Minus-Market/case-study.html">
+<meta property="og:description" content="Working paper: 138 orbital launch failures, 2000 to 2026. Listed makers lose −8.8% to −16.3% in two days; listed rivals +0.28% (95% interval −1.62% to +2.18%), not detectable with 22 independent events."><meta property="og:url" content="https://nahianibnat-2000.github.io/space-shock/case-study.html">
+<meta name="twitter:card" content="summary_large_image"><meta property="og:image" content="https://nahianibnat-2000.github.io/space-shock/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="When Rockets Fail: Financial Contagion and Competitive Effects in the Space Industry (Space Shock working paper)"><link rel="canonical" href="https://nahianibnat-2000.github.io/space-shock/case-study.html">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400&display=swap">
 <style>
 /* Space Shock design tokens. One system for the homepage, the interactive report and the working paper.
@@ -350,13 +350,15 @@ svg .series.draw { stroke-dasharray: var(--len); animation: draw 1.2s ease-out b
 .ss-nav a:hover { background: var(--navy-2); }
 .ss-nav a[aria-current="page"] { background: var(--navy-2); color: #fff; box-shadow: inset 0 -2px 0 var(--bench-on-navy); }
 .ss-nav a.ss-dl { color: var(--bench-on-navy); }
-.ss-menu { display: none; }
-.ss-menu summary { list-style: none; cursor: pointer; color: #fff; font-family: var(--font-head); font-weight: 600; font-size: 0.9rem; padding: 0.45rem 0.8rem; border: 1px solid #2B4462; border-radius: 6px; }
-.ss-menu summary::-webkit-details-marker { display: none; }
-.ss-menu[open] ul { position: absolute; right: var(--space-3); top: 3.4rem; background: var(--navy); border: 1px solid #2B4462; border-radius: 8px; padding: 0.4rem; list-style: none; margin: 0; min-width: 13rem; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-.ss-menu[open] a { display: block; color: var(--on-navy); padding: 0.55rem 0.8rem; text-decoration: none; font-family: var(--font-head); border-radius: 6px; }
-.ss-menu[open] a[aria-current="page"] { background: var(--navy-2); }
-@media (max-width: 820px) { .ss-nav { display: none; } .ss-menu { display: block; } .ss-logo .ss-sub { display: none; } }
+/* one navigation for every width: on small screens it becomes a scrollable row under the logo */
+@media (max-width: 860px) {
+  .ss-header { position: static; }
+  .ss-header .ss-row { flex-wrap: wrap; row-gap: 0.35rem; padding-bottom: 0.4rem; }
+  .ss-logo .ss-sub { display: none; }
+  .ss-nav { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .ss-nav ul { flex-wrap: nowrap; }
+  .ss-nav a { white-space: nowrap; padding: 0.5rem 0.7rem; }
+}
 
 .btn, a.btn { display: inline-flex; align-items: center; gap: 0.4rem; font-family: var(--font-head); font-weight: 600; font-size: 0.95rem;
   padding: 0.7rem 1.15rem; border-radius: 6px; text-decoration: none; border: 1px solid var(--bench-text); background: var(--bench-text); color: #fff; }
@@ -382,6 +384,10 @@ svg .series.draw { stroke-dasharray: var(--len); animation: draw 1.2s ease-out b
 .badge.robust { color: var(--muted); }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; animation: none !important; transition: none !important; } }
 
+.crumbs ol { list-style: none; display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 var(--space-3); padding: 0; font-family: var(--font-head); font-size: 0.85rem; color: var(--muted); }
+.crumbs li + li::before { content: "\203A"; margin-right: 0.4rem; color: var(--muted); }
+.crumbs a { color: var(--bench-text); }
+
 /* Interactive report: dashboard layout on the shared Space Shock system. */
 body.report { background: var(--paper); }
 .report-hero { background: var(--navy); color: var(--on-navy); padding: var(--space-5) 0 var(--space-4);
@@ -397,7 +403,7 @@ body.report { background: var(--paper); }
 .report .stage-nav a .t { display: inline-grid; place-items: center; width: 1.4rem; height: 1.4rem; border-radius: 50%; background: var(--paper-deep); color: var(--ink); font-family: var(--font-mono); font-size: 0.75rem; margin-right: 0.45rem; }
 .report .stage-nav a[aria-current="step"] { color: var(--ink); border-bottom-color: var(--bench); }
 .report .stage-nav a[aria-current="step"] .t { background: var(--bench-text); color: #fff; }
-@media (max-width: 820px) { .report .stage-nav { top: 3.5rem; } }
+@media (max-width: 860px) { .report .stage-nav { top: 0; } }
 
 /* sections */
 .report .stage { padding: var(--space-6) 0; border-bottom: var(--hairline); }
@@ -435,6 +441,17 @@ body.report { background: var(--paper); }
 .report .anomaly { background: var(--card); border: var(--hairline); border-radius: var(--radius); }
 .report table { background: transparent; }
 .report .site-foot { display: none; }
+.report .tool-source { font-family: var(--font-head); font-size: 0.84rem; color: var(--muted); border-top: var(--hairline); padding-top: var(--space-3); margin-top: var(--space-4); max-width: none; }
+/* Event Study Lab: controls in a sidebar on wide screens, results beside them */
+@media (min-width: 1100px) {
+  .report .lab { display: grid; grid-template-columns: 19rem minmax(0, 1fr); column-gap: var(--space-4); }
+  .report .lab > .tool-head, .report .lab > .tool-source { grid-column: 1 / -1; }
+  .report .lab > .lab-form { grid-column: 1; display: flex; flex-direction: column; align-self: start; margin-right: 0; }
+  .report .lab > .lab-out { grid-column: 2; margin-top: var(--space-4); border-top: 0; padding-top: 0; margin-left: 0; }
+}
+.report .load-error { margin: var(--space-5) 0; padding: var(--space-4); border: 1px solid #F0B4A8; border-left: 4px solid var(--loss); background: #FFF4F1; border-radius: var(--radius); }
+.report .load-error h2 { font-size: var(--step-1); }
+.report .lab-form fieldset { width: 100%; min-width: 0; }
 
 /* Shared long-form article layout (used by the working paper). */
 .article { padding-top: var(--space-4); padding-bottom: var(--space-6); }
@@ -547,12 +564,25 @@ body.paper { background: var(--paper); }
 .paper .abstract-sec h2, .paper .inshort h2 { font-family: var(--font-head); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 0 0 var(--space-2); }
 .ph-meta dd .btn { margin-right: 0.6rem; }
 
+@media (max-width: 860px) { .paper-toc { top: 0.5rem; } }
+.methods-page table.def caption, .methods-page table caption { text-align: left; font-family: var(--font-head); font-weight: 700; font-size: 0.85rem; color: var(--muted); padding-bottom: 0.4rem; }
+.methods-page table.def th { font-family: var(--font-head); width: 28%; text-transform: none; letter-spacing: 0; font-size: 0.9rem; color: var(--ink); font-weight: 600; }
+.methods-page table.def td { font-size: 0.95rem; line-height: 1.55; }
+.methods-page section { scroll-margin-top: 5rem; }
+.paper .cs section[id] { scroll-margin-top: 5rem; }
+.methods-page table.def code { word-break: break-word; }
+@media (max-width: 600px) {
+  .methods-page table.def th, .methods-page table.def td { display: block; width: auto; border-bottom: 0; padding-left: 0; }
+  .methods-page table.def tr { display: block; border-bottom: var(--hairline); padding: 0.3rem 0; }
+}
+
 </style>
 </head>
 <body class="paper">
 <a class="skip-link" href="#main">Skip to the paper</a>
-<header class="ss-header"><div class="ss-row"><a class="ss-logo" href="index.html"><svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><circle cx="16" cy="16" r="7" fill="none" stroke="#8DB6FF" stroke-width="2.2"/><ellipse cx="16" cy="16" rx="14" ry="5.5" fill="none" stroke="#8DB6FF" stroke-width="1.6" transform="rotate(-28 16 16)"/><circle cx="27.2" cy="9.4" r="2.4" fill="#FF9480"/></svg><span><span class="ss-name">SPACE <b>SHOCK</b></span><span class="ss-sub">Financial contagion and competition in the space industry</span></span></a><nav class="ss-nav" aria-label="Site"><ul><li><a href="index.html">Home</a></li><li><a href="site/index.html">Interactive report</a></li><li><a href="case-study.html" aria-current="page">Working paper</a></li><li><a href="site/index.html#methods">Data &amp; methods</a></li><li><a href="https://github.com/NahianIbnat-2000/T-Minus-Market">Code</a></li><li><a href="case-study.pdf" download class="ss-dl">Download PDF</a></li></ul></nav><details class="ss-menu"><summary aria-label="Open site menu">Menu</summary><nav aria-label="Site (menu)"><ul><li><a href="index.html">Home</a></li><li><a href="site/index.html">Interactive report</a></li><li><a href="case-study.html" aria-current="page">Working paper</a></li><li><a href="site/index.html#methods">Data &amp; methods</a></li><li><a href="https://github.com/NahianIbnat-2000/T-Minus-Market">Code</a></li><li><a href="case-study.pdf" download class="ss-dl">Download PDF</a></li></ul></nav></details></div></header>
+<header class="ss-header"><div class="ss-row"><a class="ss-logo" href="index.html"><svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><circle cx="16" cy="16" r="7" fill="none" stroke="#8DB6FF" stroke-width="2.2"/><ellipse cx="16" cy="16" rx="14" ry="5.5" fill="none" stroke="#8DB6FF" stroke-width="1.6" transform="rotate(-28 16 16)"/><circle cx="27.2" cy="9.4" r="2.4" fill="#FF9480"/></svg><span><span class="ss-name">SPACE <b>SHOCK</b></span><span class="ss-sub">Financial contagion and competitive effects of rocket launch failures</span></span></a><nav class="ss-nav" aria-label="Site"><ul><li><a href="index.html">Overview</a></li><li><a href="site/index.html">Explore Data</a></li><li><a href="case-study.html" aria-current="page">Research Paper</a></li><li><a href="methods.html">Data &amp; Methods</a></li></ul></nav></div></header>
 <header class="paper-head"><div class="wrap ph-in">
+  <nav class="crumbs screen-only" aria-label="Breadcrumb"><ol><li><a href="index.html">Overview</a></li><li aria-current="page">Research Paper</li></ol></nav>
   <p class="ph-eyebrow">Working paper · Space Shock</p>
   <h1>When Rockets Fail: Financial Contagion and Competitive Effects in the Space Industry</h1>
   <p class="dek">Evidence from publicly listed launch providers: stock market reactions to orbital launch failures, 2000 to 2026.</p>
@@ -561,7 +591,7 @@ body.paper { background: var(--paper); }
     <div><dt>Status</dt><dd>Working paper, not peer reviewed</dd></div>
     <div><dt>Version</dt><dd>Analysis rules v1.0 · results Nov 2026</dd></div>
     <div><dt>Sample</dt><dd>138 failures · 42 rival reactions · 22 independent events</dd></div>
-    <div><dt>Formats</dt><dd><a class="btn small" href="case-study.pdf" download>Download PDF</a> <a href="site/index.html">Interactive report</a></dd></div>
+    <div><dt>Formats</dt><dd><a class="btn small" href="case-study.pdf" download>Download PDF</a> <a href="methods.html#replicate">Replication</a></dd></div>
   </dl>
 </div></header>
 <div class="wrap paper-grid">
@@ -736,11 +766,11 @@ body.paper { background: var(--paper); }
 </dl></section>
 
 <section><h2>Where to find the charts, data and code</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table class=""><thead><tr><th>Resource</th><th>What it is</th></tr></thead><tbody><tr><td><a href="index.html">The article (one-page summary)</a></td><td>Key numbers and links</td></tr><tr><td><a href="site/index.html">Interactive report</a></td><td>Five stages and four interactive tools</td></tr><tr><td><a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/reports/04_feasibility_report.md">Feasibility report</a></td><td>Sample and minimum detectable effects, before results</td></tr><tr><td><a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/reports/05_results.md">Results report</a></td><td>All prespecified results</td></tr><tr><td><a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/docs/CONFOUNDING_NEWS.md">Confounding-news checks</a></td><td>News around the largest reactions, with sources</td></tr><tr><td><a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/audit/AUDIT_REPORT.md">Independent audit</a></td><td>Verification of every published statistic</td></tr><tr><td><a href="https://github.com/NahianIbnat-2000/T-Minus-Market">Code and pipeline</a></td><td>Python pipeline, tests and reproduction guide</td></tr><tr><td><a class="screen-only" href="case-study.pdf">Download PDF</a></td><td><span class="screen-only">This paper as a typeset PDF (same text)</span></td></tr></tbody></table></div></section>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table class=""><thead><tr><th>Resource</th><th>What it is</th></tr></thead><tbody><tr><td><a href="index.html">The article (one-page summary)</a></td><td>Key numbers and links</td></tr><tr><td><a href="site/index.html">Interactive report</a></td><td>Five stages and four interactive tools</td></tr><tr><td><a href="https://github.com/NahianIbnat-2000/space-shock/blob/master/reports/04_feasibility_report.md">Feasibility report</a></td><td>Sample and minimum detectable effects, before results</td></tr><tr><td><a href="https://github.com/NahianIbnat-2000/space-shock/blob/master/reports/05_results.md">Results report</a></td><td>All prespecified results</td></tr><tr><td><a href="https://github.com/NahianIbnat-2000/space-shock/blob/master/docs/CONFOUNDING_NEWS.md">Confounding-news checks</a></td><td>News around the largest reactions, with sources</td></tr><tr><td><a href="https://github.com/NahianIbnat-2000/space-shock/blob/master/audit/AUDIT_REPORT.md">Independent audit</a></td><td>Verification of every published statistic</td></tr><tr><td><a href="https://github.com/NahianIbnat-2000/space-shock">Code and pipeline</a></td><td>Python pipeline, tests and reproduction guide</td></tr><tr><td><a class="screen-only" href="case-study.pdf">Download PDF</a></td><td><span class="screen-only">This paper as a typeset PDF (same text)</span></td></tr></tbody></table></div></section>
 
-<p class="signoff">Nahian Ibnat, Nov 2026. Cite as: Ibnat, N. (2026). <em>When Rockets Fail: Financial Contagion and Competitive Effects in the Space Industry.</em> Space Shock working paper. https://nahianibnat-2000.github.io/T-Minus-Market/case-study.html Research, not investment advice.</p>
+<p class="signoff">Nahian Ibnat, Nov 2026. Cite as: Ibnat, N. (2026). <em>When Rockets Fail: Financial Contagion and Competitive Effects in the Space Industry.</em> Space Shock working paper. https://nahianibnat-2000.github.io/space-shock/case-study.html Research, not investment advice.</p>
 </main>
 </div>
-<footer class="ss-footer"><div class="ss-fgrid"><div><h2>Space Shock</h2><p>Financial contagion and competition in the space industry. An event study of orbital launch failures and the stocks of the companies involved.</p><p>By Nahian Ibnat</p></div><div><h2>Explore</h2><ul><li><a href="index.html">Home</a></li><li><a href="site/index.html">Interactive report</a></li><li><a href="case-study.html">Working paper</a></li><li><a href="site/index.html#methods">Data &amp; methods</a></li><li><a href="https://github.com/NahianIbnat-2000/T-Minus-Market">Code</a></li><li><a href="case-study.pdf" download>Download PDF</a></li></ul></div><div><h2>Sources</h2><p>Launch data: GCAT, J. McDowell, CC-BY. Prices: Yahoo Finance, used only to compute statistics; no prices are republished.</p></div><div><h2>Cite</h2><p>Ibnat, N. (2026). When Rockets Fail: Financial Contagion and Competitive Effects in the Space Industry. Space Shock working paper.</p></div></div><p class="ss-legal">Independent research, not peer reviewed. Not investment advice.</p></footer>
+<footer class="ss-footer"><div class="ss-fgrid"><div><h2>Space Shock</h2><p>Financial contagion and competitive effects of rocket launch failures. An event study of orbital launch failures and the stocks of the companies involved.</p><p>By Nahian Ibnat</p></div><div><h2>Explore</h2><ul><li><a href="index.html">Overview</a></li><li><a href="site/index.html">Explore Data</a></li><li><a href="case-study.html">Research Paper</a></li><li><a href="methods.html">Data &amp; Methods</a></li><li><a href="case-study.pdf" download>Download PDF</a></li><li><a href="https://github.com/NahianIbnat-2000/space-shock">Source code</a></li></ul></div><div><h2>Sources</h2><p>Launch data: GCAT, J. McDowell, CC-BY. Prices: Yahoo Finance, used only to compute statistics; no prices are republished.</p></div><div><h2>Cite</h2><p>Ibnat, N. (2026). When Rockets Fail: Financial Contagion and Competitive Effects in the Space Industry. Space Shock working paper.</p></div></div><p class="ss-legal">Independent research, not peer reviewed. Not investment advice.</p></footer>
 </body>
 </html>

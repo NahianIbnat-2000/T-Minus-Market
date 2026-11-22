@@ -10,12 +10,22 @@ async function getJson(name) {
 export async function loadAll() {
   // Single-file build: data is embedded in <script type="application/json" id="site-data">.
   const inline = typeof document !== "undefined" && document.getElementById("site-data");
-  if (inline) return JSON.parse(inline.textContent);
+  if (inline) return validate(JSON.parse(inline.textContent));
   const [manifest, results, firmEvents, failures, rho] = await Promise.all([
     getJson("manifest.json"), getJson("results.json"), getJson("firm_events.json"),
     getJson("failures.json"), getJson("rho.json"),
   ]);
-  return { manifest, results, firmEvents, failures, rho };
+  return validate({ manifest, results, firmEvents, failures, rho });
+}
+
+const REQUIRED = { manifest: "object", results: "object", firmEvents: "array", failures: "array", rho: "object" };
+
+/** Fail loudly, naming what is missing, instead of rendering a half-empty report. */
+export function validate(d) {
+  const bad = Object.entries(REQUIRED).filter(([k, t]) => (t === "array" ? !Array.isArray(d?.[k]) : !d?.[k] || typeof d[k] !== "object")).map(([k]) => k);
+  if (!bad.length && !d.results.primary) bad.push("results.primary");
+  if (bad.length) throw new Error(`missing or invalid: ${bad.join(", ")}`);
+  return d;
 }
 
 /** Derived counts used in the text (never typed by hand). */

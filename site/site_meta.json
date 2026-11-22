@@ -1,8 +1,9 @@
 {
   "author": "Nahian Ibnat",
-  "live_url": "https://nahianibnat-2000.github.io/T-Minus-Market/",
-  "repo_url": "https://github.com/NahianIbnat-2000/T-Minus-Market",
+  "live_url": "https://nahianibnat-2000.github.io/space-shock/",
+  "repo_url": "https://github.com/NahianIbnat-2000/space-shock",
   "portfolio_url": "https://nahianibnat-2000.github.io/",
   "linkedin_url": "https://www.linkedin.com/in/nahian-ibnat",
-  "_notes": "repo_url: the public repository. firm_event_cars.csv (alphas, betas) is never committed (.gitignore)."
+  "_notes": "repo_url: the public repository (renamed from T-Minus-Market in Nov 2026). former_live_url: old Pages address, served by the redirect pages in redirect/. firm_event_cars.csv (alphas, betas) is never committed (.gitignore).",
+  "former_live_url": "https://nahianibnat-2000.github.io/T-Minus-Market/"
 }

@@ -61,6 +61,7 @@ export function timelineHtml({ failures }) {
     </form>
     <div class="tl-chart"></div>
     <div class="tl-detail" aria-live="polite"></div>
+    <p class="tool-source">Source: GCAT (J. McDowell), CC-BY; failure means a GCAT success score below 0.75. Only failures in the lane for the study have stock-market observations; most historical failures involve no listed company. <a href="../methods.html#sample">Sample definitions</a></p>
   </div>`;
 }
 
