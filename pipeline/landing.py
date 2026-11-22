@@ -92,7 +92,7 @@ def _diag(fes, prim, e1):
             "top_firm": firms[0]["firm"], "top_firm_clusters": firms[0]["clusters"]}
 
 
-def _shell(title, desc, url, body, css, canonical=None, image=None):
+def _shell(title, desc, url, body, css, canonical=None, image=None, body_class=""):
     og_url = e(url) if url else ""
     return f"""<!doctype html>
 <html lang="en">
@@ -108,7 +108,7 @@ def _shell(title, desc, url, body, css, canonical=None, image=None):
 {css}
 </style>
 </head>
-<body>
+<body{f' class="{body_class}"' if body_class else ""}>
 {body}
 </body>
 </html>
@@ -246,11 +246,11 @@ def article(data: dict, meta: dict, root: Path, css: str) -> str:
   <p class="mono">Ibnat, N. ({e(str(datetime.fromisoformat(str(m.get('results_run_utc', '2026'))[:10]).year if m.get('results_run_utc') else ''))}). When a rocket blows up, who loses money, and does anyone win? An event study of orbital launch failures. T-Minus Markets.{(' ' + e(cite_url)) if cite_url else ''}</p></section>
 </main>
 <footer class="site-foot"><div class="wrap cols">
-  <div><h3>Author</h3><p>{e(meta.get('author', 'Nahian Ibnat'))}. Economics, data and finance.{' <a href="' + e(meta['portfolio_url']) + '">Portfolio</a>' if meta.get('portfolio_url') else ''}{' · <a href="' + e(meta['linkedin_url']) + '">LinkedIn</a>' if meta.get('linkedin_url') else ''}</p></div>
+  <div><h3>Author</h3><p>{e(meta.get('author', 'Nahian Ibnat'))}</p></div>
   <div><h3>Sources</h3><p>Launch data: GCAT, J. McDowell, CC-BY. Prices: Yahoo Finance, used only to compute statistics.</p></div>
   <div><h3>Note</h3><p>Research, not investment advice.</p></div>
 </div></footer>"""
     desc = (f"Event study of {f['n_failures']} orbital launch failures: the rocket's maker loses {pct(f['case_hi'])} to {pct(f['case_lo'])} in two days; "
             f"listed competitors show no detectable reaction ({pct(p['mean_car'], 2)}, 95% interval {pct(p['ci_low'], 2)} to {pct(p['ci_high'], 2)}).")
     image = (meta["live_url"].rstrip("/") + "/og.png") if meta.get("live_url") else None
-    return _shell("T-Minus Markets: when a rocket blows up, who loses money?", desc, meta.get("live_url"), body, css, meta.get("live_url"), image)
+    return _shell("T-Minus Markets: when a rocket blows up, who loses money?", desc, meta.get("live_url"), body, css, meta.get("live_url"), image, body_class="theme-sky")

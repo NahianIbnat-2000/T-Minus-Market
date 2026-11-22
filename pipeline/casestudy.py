@@ -770,7 +770,7 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
 {_table(["Resource", "What it is"], [[f'<a href="{e(h)}">{e(l)}</a>', e(wh)] for l, h, wh in links]
         + ([[f'<a class="screen-only" href="{e(pdf_row[1])}">{e(pdf_row[0])}</a>', f'<span class="screen-only">{e(pdf_row[2])}</span>']] if pdf_row else []))}</section>
 
-<p class="signoff">{e(meta.get("author", "Nahian Ibnat"))}, {e(updated)}. Cite as: Ibnat, N. ({e(year)}). <em>Rocket Launch Failures and Equity-Market Spillovers: Evidence from Publicly Listed Launch Providers.</em> T-Minus Markets working paper.{(" " + e(meta["live_url"]) + "case-study.html") if meta.get("live_url") else ""} Research, not investment advice.{' <a href="' + e(meta["portfolio_url"]) + '">Portfolio</a>' if meta.get("portfolio_url") else ""}{' · <a href="' + e(meta["linkedin_url"]) + '">LinkedIn</a>' if meta.get("linkedin_url") else ""}</p>
+<p class="signoff">{e(meta.get("author", "Nahian Ibnat"))}, {e(updated)}. Cite as: Ibnat, N. ({e(year)}). <em>Rocket Launch Failures and Equity-Market Spillovers: Evidence from Publicly Listed Launch Providers.</em> T-Minus Markets working paper.{(" " + e(meta["live_url"]) + "case-study.html") if meta.get("live_url") else ""} Research, not investment advice.</p>
 </main>"""
     desc = (f"Working paper: {f['n_failures']} orbital launch failures, {span}. Listed makers lose {pct(f['case_hi'])} to {pct(f['case_lo'])} in two days; "
             f"listed rivals {pct(p['mean_car'], 2)} (95% interval {pct(p['ci_low'], 2)} to {pct(p['ci_high'], 2)}), not detectable with {f['n_clusters']} independent events.")

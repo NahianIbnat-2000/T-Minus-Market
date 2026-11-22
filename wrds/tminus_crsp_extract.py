@@ -10,6 +10,8 @@ WHAT IT WRITES (in the folder you run it from)
                                 residual volatility, model used, number of estimation days
   tminus_crsp_pairs.csv         correlation of model residuals for events close in time (for the cluster test)
   tminus_crsp_run_info.json     PERMNOs used, CRSP tables used, row counts, version of this script
+  ..._vwretd.csv (2 files)      the same with the CRSP value-weighted market return as benchmark (robustness)
+  ..._oa_atk.csv (2 files)      Orbital ATK only, estimated on its full history including Alliant Techsystems (robustness)
 
   It writes NO prices, NO raw returns, NO volumes, NO shares outstanding and NO model coefficients.
   Only derived statistics leave your machine. Please look at the three files before sending them.
@@ -40,7 +42,7 @@ from datetime import datetime, timezone
 import numpy as np
 import pandas as pd
 
-VERSION = "1.1 (22 Nov 2026)"
+VERSION = "1.2 (22 Nov 2026)"
 EST_WINDOW, MIN_OBS, MIN_FALLBACK = (-250, -30), 100, 30
 WINDOWS = {"primary": (0, 1), "robust": (-1, 3), "descriptive": (0, 20)}
 PATH = (-5, 20)
@@ -279,7 +281,7 @@ def load(db, pmap):
         ret = db.raw_sql(f"select permno, date, ret from crsp.dsf where permno in ({plist}) "
                          f"and date between '1998-01-01' and '2024-12-31'", date_cols=["date"])
         dl = db.raw_sql(f"select permno, dlstdt as date, dlret from crsp.dsedelist where permno in ({plist})", date_cols=["date"])
-        idx = db.raw_sql("select date, sprtrn from crsp.dsi where date between '1998-01-01' and '2024-12-31'", date_cols=["date"])
+        idx = db.raw_sql("select date, sprtrn, vwretd from crsp.dsi where date between '1998-01-01' and '2024-12-31'", date_cols=["date"])
         tables = {"stock": "crsp.dsf", "delist": "crsp.dsedelist", "index": "crsp.dsi"}
     except Exception as err:                        # new CIZ format
         print(f"Legacy tables not available ({err}); trying the CIZ tables.")
@@ -290,7 +292,7 @@ def load(db, pmap):
             sys.exit("Could not read CRSP daily stock data (crsp.dsf or crsp.dsf_v2). Please send Nahian the error above.")
         dl = pd.DataFrame(columns=["permno", "date", "dlret"])          # CIZ folds delisting returns into dlyret
         try:
-            idx = db.raw_sql("select date, sprtrn from crsp.dsi where date between '1998-01-01' and '2024-12-31'", date_cols=["date"])
+            idx = db.raw_sql("select date, sprtrn, vwretd from crsp.dsi where date between '1998-01-01' and '2024-12-31'", date_cols=["date"])
         except Exception:
             sys.exit("Could not read the S&P 500 return (crsp.dsi sprtrn). Please send Nahian the error above.")
         tables = {"stock": "crsp.dsf_v2", "delist": "included in dlyret", "index": "crsp.dsi"}
@@ -309,22 +311,33 @@ def load(db, pmap):
         else:
             ret = pd.concat([ret, pd.DataFrame([{"permno": int(d["permno"]), "date": d["date"], "ret": float(d["dlret"])}])], ignore_index=True)
     idx = idx.assign(sprtrn=pd.to_numeric(idx["sprtrn"], errors="coerce").astype("float64"),
+                     vwretd=pd.to_numeric(idx["vwretd"], errors="coerce").astype("float64"),
                      date=pd.to_datetime(idx["date"]))
     return ret, idx, tables
 
 
-def main():
-    events = pd.read_csv(io.StringIO(EVENTS_CSV))
-    db = connect()
-    pmap = permnos(db)
-    ret, idx, tables = load(db, pmap)
-    sessions = pd.DatetimeIndex(sorted(idx["date"].unique()))       # US trading days
-    m = idx.set_index("date")["sprtrn"]
-    series = {tk: ret[ret["permno"] == p].set_index("date")["ret"].sort_index() for tk, p in pmap.items()}
+# Three runs from one download:
+#   main    the rules of the pipeline (S&P 500 benchmark, firm histories start at the real listing)
+#   vwretd  robustness: CRSP value-weighted market return as the benchmark
+#   oa_atk  robustness: Orbital ATK estimated on the full PERMNO history, which includes Alliant Techsystems (ATK)
+#           before the February 2015 merger (ATK was the surviving company). Only OA rows are written.
+SPECS = {
+    "main":   {"bench": "sprtrn", "oa_listing_start": FIRMS["OA"]["listing_start"], "tickers": None, "suffix": ""},
+    "vwretd": {"bench": "vwretd", "oa_listing_start": FIRMS["OA"]["listing_start"], "tickers": None, "suffix": "_vwretd"},
+    "oa_atk": {"bench": "sprtrn", "oa_listing_start": None, "tickers": {"OA"}, "suffix": "_oa_atk"},
+}
+BANNED = {"prc", "price", "vol", "shrout", "ret", "retx", "alpha", "beta", "cfacpr"}
+
+
+def run_spec(events, sessions, series, idx, pmap, spec):
+    m = idx.set_index("date")[spec["bench"]]
     rows, resid, evdays = [], {}, {}
     for _, e in events.iterrows():
         tk = e["ticker"]
-        st = event_stats(sessions, series[tk], m, e["day0"], FIRMS[tk]["listing_start"])
+        if spec["tickers"] and tk not in spec["tickers"]:
+            continue
+        ls = spec["oa_listing_start"] if tk == "OA" else FIRMS[tk]["listing_start"]
+        st = event_stats(sessions, series[tk], m, e["day0"], ls)
         key = f"{e['launch_tag']}|{tk}|{e['role']}"
         base = {k: e[k] for k in ("launch_tag", "ticker", "role", "tier", "outcome", "lv_type", "day0", "disclosure_confidence")}
         if st is None:
@@ -345,18 +358,44 @@ def main():
             rc = 1.0 if same else (float(np.corrcoef(both.iloc[:, 0], both.iloc[:, 1])[0, 1]) if len(both) >= 30 else 0.0)
             pairs.append({"key_i": keys[i], "key_j": keys[j], "resid_corr": rc, "common_est_days": len(both),
                           "common_event_days": len(evdays[keys[i]][1] & evdays[keys[j]][1])})
-    banned = {"prc", "price", "vol", "shrout", "ret", "retx", "alpha", "beta", "cfacpr"}
-    assert not banned & {c.lower() for c in fe.columns}, "refusing to write raw data columns"
-    fe.to_csv("tminus_crsp_firm_events.csv", index=False)
-    pd.DataFrame(pairs).to_csv("tminus_crsp_pairs.csv", index=False)
+    assert not BANNED & {c.lower() for c in fe.columns}, "refusing to write raw data columns"
+    fe.to_csv(f"tminus_crsp_firm_events{spec['suffix']}.csv", index=False)
+    pd.DataFrame(pairs, columns=["key_i", "key_j", "resid_corr", "common_est_days", "common_event_days"]).to_csv(
+        f"tminus_crsp_pairs{spec['suffix']}.csv", index=False)
+    return {"events": len(fe), "events_with_car": int(fe["car_primary"].notna().sum()) if "car_primary" in fe else 0,
+            "pairs": len(pairs), "benchmark": f"crsp.dsi {spec['bench']}",
+            "oa_history": "from 2015-02-10 (Orbital ATK only)" if spec["oa_listing_start"] else "full PERMNO history (includes ATK)"}
+
+
+def name_history(db, permno):
+    """Company names on a PERMNO (no prices), to confirm what the pre-merger history is."""
+    try:
+        df = db.raw_sql(f"select ticker, comnam, namedt, nameenddt from crsp.stocknames where permno = {int(permno)} order by namedt")
+        return [{k: str(v) for k, v in r.items()} for r in df.to_dict("records")]
+    except Exception as err:
+        return [{"error": str(err)}]
+
+
+def main():
+    events = pd.read_csv(io.StringIO(EVENTS_CSV))
+    db = connect()
+    pmap = permnos(db)
+    oa_names = name_history(db, pmap["OA"])
+    print("OA PERMNO name history:")
+    for r in oa_names:
+        print("  ", r)
+    ret, idx, tables = load(db, pmap)
+    sessions = pd.DatetimeIndex(sorted(idx["date"].unique()))       # US trading days
+    series = {tk: ret[ret["permno"] == p].set_index("date")["ret"].sort_index() for tk, p in pmap.items()}
+    runs = {name: run_spec(events, sessions, series, idx, pmap, spec) for name, spec in SPECS.items()}
     info = {"script_version": VERSION, "run_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "permnos": pmap, "crsp_tables": tables, "benchmark": "crsp.dsi sprtrn (S&P 500)",
-            "events": len(fe), "events_with_car": int(fe["car_primary"].notna().sum()) if "car_primary" in fe else 0,
-            "pairs": len(pairs), "contains_raw_data": False}
+            "events": runs["main"]["events"], "events_with_car": runs["main"]["events_with_car"],
+            "pairs": runs["main"]["pairs"], "runs": runs, "oa_name_history": oa_names, "contains_raw_data": False}
     with open("tminus_crsp_run_info.json", "w") as f:
         json.dump(info, f, indent=2)
     print(json.dumps(info, indent=2))
-    print("Done. Please check the three tminus_crsp_* files, then send them.")
+    print("Done. Please check the seven tminus_crsp_* files, then send them.")
 
 
 if __name__ == "__main__":

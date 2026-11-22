@@ -226,6 +226,33 @@ def main(argv=None):
     s2_recs = [r for r in s1_recs if (r["launch_tag"], r["ticker"]) not in drop]
     s2 = run_tests(s2_recs, combined_rho(s2_recs, base_rho, pairs, r_cross), args.draws,
                    "S2 (exploratory): S1 without events flagged 'confounded'")
+    # robustness runs from the same WRDS download (script v1.2); skipped if the files are absent
+    robust = {}
+    vw_path, atk_path = args.crsp / "tminus_crsp_firm_events_vwretd.csv", args.crsp / "tminus_crsp_firm_events_oa_atk.csv"
+    if vw_path.exists():
+        vw = crsp_records(pd.read_csv(vw_path))
+        for r in vw:
+            r["cluster"] = cl.get(r["launch_tag"], -1) if r["outcome"] == "failure" else -1
+        vw_pairs = pd.read_csv(args.crsp / "tminus_crsp_pairs_vwretd.csv")
+        recs = base + vw
+        robust["vwretd"] = {"rival": run_tests(recs, combined_rho(recs, base_rho, vw_pairs, r_cross), args.draws,
+                                               "S1 with CRSP value-weighted benchmark"),
+                            "makers": maker_cases(base, vw)}
+    if atk_path.exists():
+        atk_fe = pd.read_csv(atk_path)
+        merged = pd.concat([fe[fe["ticker"] != "OA"], atk_fe], ignore_index=True)
+        atk = crsp_records(merged)
+        cl_atk = recluster(base, atk)
+        for r in atk:
+            r["cluster"] = cl_atk.get(r["launch_tag"], -1) if r["outcome"] == "failure" else -1
+        atk_pairs = pd.concat([pairs[~pairs["key_i"].str.contains(r"\|OA\|") & ~pairs["key_j"].str.contains(r"\|OA\|")],
+                               pd.read_csv(args.crsp / "tminus_crsp_pairs_oa_atk.csv")], ignore_index=True)
+        recs = base + atk
+        robust["oa_atk"] = {"rival": run_tests(recs, combined_rho(recs, base_rho, atk_pairs, r_cross), args.draws,
+                                               "S1 with Orbital ATK estimated on ATK history"),
+                            "oa_events_with_car": int(atk_fe["car_primary"].notna().sum()),
+                            "oa_events_with_car_main": int(fe[fe["ticker"] == "OA"]["car_primary"].notna().sum())}
+
     sens = {}
     for v in RHO_SENSITIVITY:
         b = bmp_kp_from_records([r for r in s1_recs if r["group"] == "rival" and r["tier"] in H2_TIERS], combined_rho(s1_recs, base_rho, pairs, v), "primary")
@@ -246,6 +273,7 @@ def main(argv=None):
         "dropped_in_S2": sorted(f"{a} {b}" for a, b in drop),
         "rival": {"v1_0": v10, "S1": s1, "S2": s2},
         "makers": maker_cases(base, crsp),
+        "robustness": robust,
     }
     C.PROCESSED.mkdir(parents=True, exist_ok=True)
     (C.PROCESSED / "crsp_supplement.json").write_text(json.dumps(out, indent=2, default=float))
@@ -284,7 +312,23 @@ def report(o):
           f"Cross-source residual correlation (a CRSP firm and a v1.0 firm in one cluster) is not observable; it is set to "
           f"{o['imputed_cross_source_corr']:.3f}, the mean of observed different-firm pairs with the same day 0. "
           "BMP-KP p for S1 with other values: " + ", ".join(f"{k}: {v['p']:.3f}" for k, v in o["rho_sensitivity"].items()) + ".", "",
-          "Dropped in S2: " + ", ".join(o["dropped_in_S2"]) + ".", "",
+          "Dropped in S2: " + ", ".join(o["dropped_in_S2"]) + ".", ""]
+    if o.get("robustness"):
+        L += ["## Robustness of S1", "", "| Run | Reactions | Clusters | Mean CAR | 95% CI | cluster-robust p | BMP-KP p |",
+              "| --- | --- | --- | --- | --- | --- | --- |"]
+        s1 = o["rival"]["S1"]
+        for s in [s1] + [v["rival"] for v in o["robustness"].values()]:
+            b = s["bmp_kp"]["primary"]
+            L.append(f"| {s['label']} | {s['n']} | {s['clusters']} | {pct(b['mean'])} | {pct(b['ci_low'])} to {pct(b['ci_high'])} | "
+                     f"{s['cluster_robust']['p']:.3f} | {b['p']:.3f} |")
+        if "vwretd" in o["robustness"]:
+            mv = o["robustness"]["vwretd"]["makers"]
+            L += ["", f"Maker failures with the value-weighted benchmark: {mv['negative']} of {mv['n']} negative, mean {pct(mv['mean'])}."]
+        if "oa_atk" in o["robustness"]:
+            a = o["robustness"]["oa_atk"]
+            L += ["", f"Orbital ATK events with a CAR: {a['oa_events_with_car_main']} (main rule) and {a['oa_events_with_car']} (with ATK history)."]
+        L += [""]
+    L += [
           "## Maker failures (case series)", "",
           "| Day 0 | Firm | Vehicle | CAR [0,+1] | z | Source |", "| --- | --- | --- | --- | --- | --- |"]
     for c in o["makers"]["cases"]:

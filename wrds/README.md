@@ -28,9 +28,11 @@ type it into `PERMNO_OVERRIDE` near the top of the file (for example `{"OA": 123
 |---|---|
 | `tminus_crsp_firm_events.csv` | One row per launch event (137): CAR and CAR variance for 3 windows, daily abnormal returns from T-5 to T+20, residual volatility, model used, estimation days |
 | `tminus_crsp_pairs.csv` | Residual correlations for events within 30 days of each other (needed for the clustered test) |
-| `tminus_crsp_run_info.json` | PERMNOs, CRSP tables used, counts, script version |
+| `tminus_crsp_run_info.json` | PERMNOs, CRSP tables used, counts, script version, Orbital ATK's company-name history |
+| `..._vwretd.csv` (2 files) | The same statistics with the CRSP value-weighted index as the market benchmark |
+| `..._oa_atk.csv` (2 files) | Orbital ATK only, using its full history including Alliant Techsystems |
 
-Please open the three files before sending them, so you can see that nothing raw is inside.
+Please open the seven files before sending them, so you can see that nothing raw is inside.
 
 ## Why this stays within the licence
 

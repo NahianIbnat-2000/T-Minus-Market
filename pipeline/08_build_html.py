@@ -91,7 +91,7 @@ def build_pages(site_data: Path = SITE / "data", root_out: Path = ROOT) -> list[
     import landing
     data = {k: json.loads((site_data / f).read_text(encoding="utf-8")) for k, f in DATA_FILES.items()}
     meta = json.loads((SITE / "site_meta.json").read_text(encoding="utf-8"))
-    css = "\n".join((SRC / "styles" / f).read_text(encoding="utf-8") for f in STYLES + ["landing.css"])
+    css = "\n".join((SRC / "styles" / f).read_text(encoding="utf-8") for f in STYLES + ["landing.css", "article-sky.css"])
     a = root_out / "index.html"
     a.write_text(landing.article(data, meta, ROOT, css), encoding="utf-8")
     (root_out / "plan.html").unlink(missing_ok=True)            # the plan page is no longer published

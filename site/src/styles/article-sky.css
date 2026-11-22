@@ -1,0 +1,44 @@
+/* Root article only: light "clear sky" theme, so the article reads differently from the cream archive report.
+   Contrast on --paper #F7F9FC (WCAG 2.2): ink 15.9, muted 7.3, signal-text 5.6, gain 6.4 (all text-safe). */
+body.theme-sky {
+  --paper: #F7F9FC;
+  --paper-deep: #FFFFFF;
+  --ink: #14213D;
+  --muted: #4B5563;
+  --rule: #D8DEE8;
+  --signal: #EA580C;
+  --signal-text: #B3400F;
+  --gain: #1D4ED8;
+  --hairline: 1px solid var(--rule);
+  --inkline: 1.5px solid #C9D2E0;
+  background: var(--paper);
+  color: var(--ink);
+}
+.theme-sky .masthead {
+  border-bottom: 1px solid var(--rule);
+  background: linear-gradient(180deg, #DCE8F8 0%, #EEF3FB 60%, #F7F9FC 100%);
+  padding-top: var(--space-6);
+}
+.theme-sky .masthead h1 { max-width: 20ch; letter-spacing: -0.01em; color: #0F1B33; }
+.theme-sky .masthead .kicker { color: var(--signal-text); }
+.theme-sky .masthead::after {             /* launch plume on the horizon */
+  content: ""; display: block; height: 3px; margin-top: var(--space-4);
+  background: linear-gradient(90deg, transparent, var(--signal) 45%, #F59E0B 50%, var(--signal) 55%, transparent);
+}
+.theme-sky a { color: var(--gain); }
+.theme-sky .tiles { border-top: 0; border-bottom: 0; gap: var(--space-3); }
+.theme-sky .tile, .theme-sky .tile + .tile {
+  border: 1px solid var(--rule); border-radius: 8px; padding: var(--space-3) !important;
+  background: #FFFFFF; box-shadow: 0 1px 3px rgba(20, 33, 61, 0.06);
+}
+.theme-sky .tile-num { font-family: var(--font-mono); font-weight: 500; letter-spacing: -0.02em; }
+.theme-sky .article h2::before { content: "\25B2  "; color: var(--signal); font-size: 0.6em; vertical-align: 0.25em; }
+.theme-sky .btn { background: #14213D; color: #FFFFFF; border-color: #14213D; border-radius: 4px; }
+.theme-sky .btn.ghost { background: #FFFFFF; color: var(--ink); border-color: var(--rule); }
+.theme-sky .read-card { background: #FFFFFF; border: 1px solid var(--rule); border-radius: 8px; color: var(--ink);
+  box-shadow: 0 1px 3px rgba(20, 33, 61, 0.06); }
+.theme-sky a.read-card:hover, .theme-sky a.read-card:focus-visible { background: #EEF3FB; }
+.theme-sky .muted-card { border-style: dashed; box-shadow: none; }
+.theme-sky .article figure { background: #FFFFFF; border: 1px solid var(--rule); border-radius: 8px; padding: var(--space-3); }
+.theme-sky table th, .theme-sky table td { border-color: var(--rule); }
+.theme-sky footer { border-top: 1px solid var(--rule); background: #EEF3FB; }

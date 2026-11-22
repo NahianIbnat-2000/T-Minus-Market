@@ -56,6 +56,9 @@ def test_end_to_end_with_fake_wrds(tmp_path, monkeypatch):
     class FakeDB:
         def raw_sql(self, q, date_cols=None):
             q = " ".join(q.split())
+            if "crsp.stocknames" in q and "permno =" in q:
+                return pd.DataFrame({"ticker": ["ATK", "OA"], "comnam": ["ALLIANT TECHSYSTEMS", "ORBITAL A T K"],
+                                     "namedt": ["1990-09-28", "2015-02-10"], "nameenddt": ["2015-02-09", "2018-06-06"]})
             if "crsp.stocknames" in q:
                 tk = q.split("ticker = '")[1].split("'")[0]
                 return pd.DataFrame({"permno": [perm[tk]], "ticker": [tk], "comnam": ["X"], "namedt": ["1990-01-01"], "nameenddt": ["2024-12-31"]})
@@ -65,7 +68,8 @@ def test_end_to_end_with_fake_wrds(tmp_path, monkeypatch):
             if "crsp.dsedelist" in q:
                 return pd.DataFrame({"permno": [4], "date": [pd.Timestamp("2023-04-03")], "dlret": [-0.5]})
             if "crsp.dsi" in q:
-                return pd.DataFrame({"date": sessions, "sprtrn": pd.array(mk, dtype="Float64")})
+                return pd.DataFrame({"date": sessions, "sprtrn": pd.array(mk, dtype="Float64"),
+                                     "vwretd": pd.array(mk * 1.02 + 0.0001, dtype="Float64")})
             raise AssertionError(q)
 
     monkeypatch.setattr(wx, "connect", lambda: FakeDB())
@@ -80,3 +84,19 @@ def test_end_to_end_with_fake_wrds(tmp_path, monkeypatch):
     assert not raw_like & set(c.lower() for c in fe.columns)
     pairs = pd.read_csv(tmp_path / "tminus_crsp_pairs.csv")
     assert {"key_i", "key_j", "resid_corr", "common_event_days"} <= set(pairs.columns)
+
+
+def test_robustness_files(tmp_path, monkeypatch):
+    test_end_to_end_with_fake_wrds(tmp_path, monkeypatch)
+    main = pd.read_csv(tmp_path / "tminus_crsp_firm_events.csv")
+    vw = pd.read_csv(tmp_path / "tminus_crsp_firm_events_vwretd.csv")
+    atk = pd.read_csv(tmp_path / "tminus_crsp_firm_events_oa_atk.csv")
+    info = json.loads((tmp_path / "tminus_crsp_run_info.json").read_text())
+    assert len(vw) == len(main) and set(atk["ticker"]) == {"OA"}
+    assert not (vw["car_primary"].fillna(0) == main["car_primary"].fillna(0)).all()      # benchmark changed
+    oa_main = main[main.ticker == "OA"].set_index("launch_tag")
+    assert (atk.set_index("launch_tag")["est_obs"] >= oa_main["est_obs"].fillna(0)).all()  # longer history
+    assert atk["car_primary"].notna().sum() >= oa_main["car_primary"].notna().sum()
+    assert info["oa_name_history"][0]["ticker"] == "ATK" and set(info["runs"]) == {"main", "vwretd", "oa_atk"}
+    for f in tmp_path.glob("tminus_crsp_*.csv"):
+        assert not {"ret", "prc", "vol", "shrout", "alpha", "beta"} & {c.lower() for c in pd.read_csv(f).columns}
