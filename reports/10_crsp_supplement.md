@@ -2,7 +2,7 @@
 
 Four delisted US launch firms added from CRSP (derived statistics only, run by a WRDS subscriber). The v1.0 result is the headline and is unchanged; S1 and S2 are reported next to it.
 
-CRSP run: script 1.1 (22 Nov 2026), 2026-11-22T01:19:45+00:00, PERMNOs ORB 76139, OA 76477, ASTR 19835, VORB 21321.
+CRSP run: script 1.2 (22 Nov 2026), 2026-11-22T02:00:31+00:00, PERMNOs ORB 76139, OA 76477, ASTR 19835, VORB 21321.
 
 Coverage: 129 of 137 CRSP events have a CAR; 8 dropped (fewer than 30 estimation returns); 12 new rival reactions enter H2.
 
@@ -21,6 +21,18 @@ Firm level (S1): 6 firms, mean of firm means +0.11%, 95% CI -3.14% to +3.35%.
 Cross-source residual correlation (a CRSP firm and a v1.0 firm in one cluster) is not observable; it is set to 0.149, the mean of observed different-firm pairs with the same day 0. BMP-KP p for S1 with other values: 0.0: 0.430, 0.5: 0.458.
 
 Dropped in S2: 2023-202 RKLB, 2023-F04 VORB, 2024-F04 AVIO.MI.
+
+## Robustness of S1
+
+| Run | Reactions | Clusters | Mean CAR | 95% CI | cluster-robust p | BMP-KP p |
+| --- | --- | --- | --- | --- | --- | --- |
+| S1: v1.0 + CRSP firms | 54 | 30 | +0.42% | -1.96% to +2.80% | 0.721 | 0.438 |
+| S1 with CRSP value-weighted benchmark | 54 | 30 | +0.44% | -1.94% to +2.83% | 0.707 | 0.421 |
+| S1 with Orbital ATK estimated on ATK history | 54 | 30 | +0.42% | -1.96% to +2.80% | 0.721 | 0.438 |
+
+Maker failures with the value-weighted benchmark: 11 of 11 negative, mean -13.98%.
+
+Orbital ATK events with a CAR: 19 (main rule) and 20 (with ATK history).
 
 ## Maker failures (case series)
 
@@ -45,3 +57,5 @@ Dropped in S2: 2023-202 RKLB, 2023-F04 VORB, 2024-F04 AVIO.MI.
 - S2 is exploratory. The VORB flag (2023-F04) was found after the CRSP CARs were seen, by checking the largest new reaction. The same news check has not yet been done for every new reaction, so S2 may be tilted.
 - CRSP returns (RET, with delisting returns) and Yahoo adjusted closes are different sources; the S&P 500 benchmark is the same index in both.
 - 2001-U01 ORB (maker case) is flagged possibly confounded: the first week of US trading after 11 Sep 2001.
+- 2017-051 OA: the Northrop Grumman takeover (announced 18 Sep 2017, day +11) lies inside the [0,+20] window only. After it, OA traded close to the cash offer, so OA events from late 2017 on (tier 3 and successes, none in H2) carry no information.
+- The ATK-history run uses Alliant Techsystems returns, a defence and ammunition firm, to estimate Orbital ATK's model: a sensitivity check, not a better estimate.

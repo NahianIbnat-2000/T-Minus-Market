@@ -1,3 +1,4 @@
 launch_tag,ticker,verdict,reason,source_url
 2023-F04,VORB,confounded,"Virgin Orbit had paused operations on 15-16 Mar 2023; reports of a USD 200m rescue offer (Matthew Brown) moved the stock on 22-24 Mar 2023, the Terran 1 event window. The SEC later charged Brown over the offer",https://www.sec.gov/litigation/litreleases/lr-26031
 2001-U01,ORB,possibly_confounded,"Maker failure on 21 Sep 2001, the first week of US trading after the 11 Sep 2001 attacks",
+2017-051,OA,descriptive_window_only,"Northrop Grumman agreed to buy Orbital ATK for USD 134.50 a share, announced 18 Sep 2017 (day +11). The [0,+1] window is clean; the [0,+20] window is not. After this date OA traded close to the cash offer, so later OA events (none in H2) cannot show a reaction",https://investor.northropgrumman.com/node/32551

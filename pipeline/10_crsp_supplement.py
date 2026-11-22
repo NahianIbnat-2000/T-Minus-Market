@@ -341,7 +341,11 @@ def report(o):
           "new reaction. The same news check has not yet been done for every new reaction, so S2 may be tilted.",
           "- CRSP returns (RET, with delisting returns) and Yahoo adjusted closes are different sources; the S&P 500 "
           "benchmark is the same index in both.",
-          "- 2001-U01 ORB (maker case) is flagged possibly confounded: the first week of US trading after 11 Sep 2001.", ""]
+          "- 2001-U01 ORB (maker case) is flagged possibly confounded: the first week of US trading after 11 Sep 2001.",
+          "- 2017-051 OA: the Northrop Grumman takeover (announced 18 Sep 2017, day +11) lies inside the [0,+20] window only. "
+          "After it, OA traded close to the cash offer, so OA events from late 2017 on (tier 3 and successes, none in H2) carry no information.",
+          "- The ATK-history run uses Alliant Techsystems returns, a defence and ammunition firm, to estimate Orbital ATK's model: "
+          "a sensitivity check, not a better estimate.", ""]
     return "\n".join(L)
 
 
