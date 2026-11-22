@@ -1,32 +1,50 @@
-/* T-Minus Markets design tokens: 1960s-70s mission archive.
-   Contrast on --paper (WCAG 2.2): ink 14.7, mission-blue 7.2, muted 6.2, signal-text 5.8 (all text-safe);
-   signal 3.8 (graphics and large text only), rule 1.5 (decorative lines only). */
+/* Space Shock design tokens. One system for the homepage, the interactive report and the working paper.
+   Colour semantics: coral = negative abnormal return, teal = positive, blue = benchmark / neutral information,
+   navy = hero and analytics surfaces. Contrast (WCAG 2.2) on --paper #F7F8FA: ink 16.9, muted 7.4,
+   loss-text 5.9, gain-text 5.3, bench-text 6.3 (all text-safe). Marks (--loss, --gain, --bench) are for
+   graphics and large text; on navy use the *-on-navy values. */
 :root {
-  --paper: #F3EEE4;
-  --paper-deep: #EBE4D6;      /* panels, table stripes */
-  --ink: #1C1C1C;
-  --muted: #5E574C;           /* secondary text */
-  --rule: #C9C1B3;            /* hairlines, grid */
-  --signal: #D9452B;          /* failures, losses: marks and large text only */
-  --signal-text: #A8321C;     /* losses in body-size text */
-  --gain: #1F4E8C;            /* gains: marks and text */
+  --paper: #F7F8FA;           /* long-form reading surface */
+  --paper-deep: #EEF1F5;      /* panels, table stripes */
+  --card: #FFFFFF;
+  --ink: #0F172A;
+  --muted: #475569;
+  --rule: #D9DEE7;
+  --navy: #0B1B2E;            /* hero and analytics surfaces */
+  --navy-2: #12263D;
+  --on-navy: #E6EDF5;
+  --on-navy-muted: #A9B8CA;
 
-  --font-head: "Archivo", "Arial Narrow", sans-serif;
+  --loss: #E8604C;            /* coral marks */
+  --loss-text: #B4361F;
+  --gain: #14A38B;            /* teal marks */
+  --gain-text: #0B6E5E;
+  --bench: #2F6FDF;           /* benchmark, intervals, neutral research marks */
+  --bench-text: #1D4ED8;
+  --loss-on-navy: #FF9480; --gain-on-navy: #5EE0C8; --bench-on-navy: #8DB6FF;
+
+  /* legacy names used by older components */
+  --signal: var(--loss);
+  --signal-text: var(--loss-text);
+
+  --font-head: "Inter", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
   --font-body: "Source Serif 4", Georgia, serif;
-  --font-mono: "DM Mono", ui-monospace, "Courier New", monospace;
-  --head-stretch: 125%;       /* Archivo expanded width */
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --head-stretch: 100%;
 
   --step--1: clamp(0.83rem, 0.8rem + 0.15vw, 0.9rem);
-  --step-0: clamp(1.05rem, 1rem + 0.25vw, 1.2rem);
-  --step-1: clamp(1.3rem, 1.2rem + 0.5vw, 1.6rem);
-  --step-2: clamp(1.7rem, 1.4rem + 1.2vw, 2.4rem);
-  --step-3: clamp(2.2rem, 1.6rem + 2.6vw, 4rem);
+  --step-0: clamp(1.02rem, 0.98rem + 0.2vw, 1.12rem);
+  --step-1: clamp(1.22rem, 1.12rem + 0.45vw, 1.45rem);
+  --step-2: clamp(1.55rem, 1.3rem + 1vw, 2.1rem);
+  --step-3: clamp(2.1rem, 1.5rem + 2.4vw, 3.4rem);
 
   --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 1rem; --space-4: 1.5rem;
-  --space-5: 2.5rem;  --space-6: 4rem;   --space-7: 6rem;
+  --space-5: 2.5rem;  --space-6: 4rem;   --space-7: 5.5rem;
 
-  --measure: 66ch;            /* reading width */
-  --page: 72rem;              /* grid width */
+  --radius: 8px;
+  --measure: 68ch;
+  --page: 74rem;
   --hairline: 1px solid var(--rule);
-  --inkline: 1.5px solid var(--ink);
+  --inkline: 1px solid var(--ink);
+  --shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 4px 16px rgba(15, 23, 42, 0.05);
 }

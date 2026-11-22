@@ -14,7 +14,7 @@ from pathlib import Path
 from landing import MONTHS, day, facts, month, ordinal, pct, pval
 
 e = html.escape
-INK, MUTED, RULE, SIGNAL, GAIN, DEEP = "#1C1C1C", "#5E574C", "#C9C1B3", "#D9452B", "#1F4E8C", "#EBE4D6"
+INK, MUTED, RULE, SIGNAL, GAIN, DEEP = "#0F172A", "#475569", "#D9DEE7", "#E8604C", "#14A38B", "#EEF1F5"
 
 
 # ----------------------------------------------------------------------------- small SVG helpers
@@ -139,7 +139,7 @@ def fig_forest(rows):
         s += f'<text x="{m["l"] - 10}" y="{cy + 4:.1f}" text-anchor="end" fill="{col}" font-size="10.5">{e(lab)}</text>'
         s += f'<line x1="{x(a):.1f}" x2="{x(b):.1f}" y1="{cy:.1f}" y2="{cy:.1f}" stroke="{col}" stroke-width="1.6"/>'
         s += (f'<circle cx="{x(mu):.1f}" cy="{cy:.1f}" r="{4.5 if kind == "primary" else 3.5}" '
-              f'fill="{col if kind != "explore" else "#F3EEE4"}" stroke="{col}" stroke-width="1.4"/>')
+              f'fill="{col if kind != "explore" else "#FFFFFF"}" stroke="{col}" stroke-width="1.4"/>')
     return _svg(W, H, "Average competitor reaction with 95% intervals: main test, prespecified checks and exploratory checks.", s)
 
 
@@ -184,7 +184,7 @@ def _fig(n, title, svg, cap):
 
 
 def _table(head, rows, cls=""):
-    return (f'<div class="table-wrap"><table class="{cls}"><thead><tr>' + "".join(f"<th>{h}</th>" for h in head)
+    return (f'<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table class="{cls}"><thead><tr>' + "".join(f"<th>{h}</th>" for h in head)
             + "</tr></thead><tbody>" + "".join("<tr>" + "".join(f"<td>{c}</td>" for c in r) + "</tr>" for r in rows)
             + "</tbody></table></div>")
 
@@ -243,7 +243,7 @@ def fig_exposure(firms, rows):
             s += (f'<rect x="{x + 1:.1f}" y="{y + 3}" width="{cw - 2:.1f}" height="{rh - 6}" fill="{INK if n else "none"}" '
                   f'stroke="{RULE if not n else INK}"/>')
             if n > 1:
-                s += f'<text x="{x + cw / 2:.1f}" y="{y + rh / 2 + 4}" text-anchor="middle" font-size="10" fill="#F3EEE4">{n}</text>'
+                s += f'<text x="{x + cw / 2:.1f}" y="{y + rh / 2 + 4}" text-anchor="middle" font-size="10" fill="#FFFFFF">{n}</text>'
     for i, f in enumerate(firms):
         s += f'<text x="{m["l"] - 8}" y="{m["t"] + i * rh + rh / 2 + 4}" text-anchor="end" font-size="11">{e(f)}</text>'
     return _svg(W, H, "Which rival firm is present in each independent event, in date order.", s)
@@ -291,7 +291,7 @@ def fig_sample(nodes, edges):
         s += f'<path d="M{ax:.1f},{ay:.1f} L{bx:.1f},{by:.1f}" stroke="{INK}" fill="none" marker-end="url(#arr)"/>'
     for nid, lab, val, unit, c, r in nodes:
         x, y = pos[nid]
-        s += f'<rect x="{x}" y="{y}" width="{bw}" height="{bh}" fill="{"#EBE4D6" if nid in ("maker", "clu") else "#F3EEE4"}" stroke="{INK}"/>'
+        s += f'<rect x="{x}" y="{y}" width="{bw}" height="{bh}" fill="{"#EEF1F5" if nid in ("maker", "clu") else "#FFFFFF"}" stroke="{INK}"/>'
         s += f'<text x="{x + 8}" y="{y + 22}" font-size="16" font-weight="700">{val:,}</text>'
         s += f'<text x="{x + 8}" y="{y + 37}" font-size="9.5">{e(lab)}</text><text x="{x + 8}" y="{y + 50}" font-size="8.5" fill="{MUTED}">unit: {e(unit)}</text>'
     return _svg(W, H, "Sample construction: launches, failures, rival reactions and independent events, with the unit of each box.", s)
@@ -326,7 +326,7 @@ def fig_timing(tm):
     groups = [("Rival reactions", tm["rival_reactions"]), ("Maker cases", tm["maker_cases"])]
     W, rh, m = 720, 34, dict(l=130, r=20, t=10, b=46)
     H = m["t"] + m["b"] + rh * len(groups)
-    shade = {"high": INK, "low": MUTED, "provisional": "#F3EEE4"}
+    shade = {"high": INK, "low": MUTED, "provisional": "#FFFFFF"}
     s = ""
     for i, (lab, g) in enumerate(groups):
         y = m["t"] + i * rh; x0 = m["l"]
@@ -338,7 +338,7 @@ def fig_timing(tm):
             w = (W - m["l"] - m["r"]) * n / g["n"]
             s += f'<rect x="{x0:.1f}" y="{y + 6}" width="{w:.1f}" height="{rh - 12}" fill="{shade[k]}" stroke="{INK}"/>'
             if w > 26:
-                s += f'<text x="{x0 + w / 2:.1f}" y="{y + rh / 2 + 4}" text-anchor="middle" font-size="10" fill="{"#F3EEE4" if k != "provisional" else INK}">{n}</text>'
+                s += f'<text x="{x0 + w / 2:.1f}" y="{y + rh / 2 + 4}" text-anchor="middle" font-size="10" fill="{"#FFFFFF" if k != "provisional" else INK}">{n}</text>'
             x0 += w
     lx = m["l"]
     for k, lab in order:
@@ -585,23 +585,36 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
             r"SE_{CR} = \frac{1}{N}\sqrt{\frac{G}{G-1}\sum_g\Big(\sum_{i\in g}(CAR_i-\overline{CAR})\Big)^2}, \qquad \overline{CAR} \pm t_{G-1,\,0.975}\,SE_{CR}"),
     ]
 
-    body = f"""<header class="masthead cs-head"><div class="wrap">
-  <div class="kicker"><span><a href="index.html">T-Minus Markets</a></span><span>Working paper</span></div>
-  <h1>Rocket Launch Failures and Equity-Market Spillovers: Evidence from Publicly Listed Launch Providers</h1>
-  <p class="dek">A T-Minus Markets case study of stock market reactions to orbital launch failures, {e(span)}.</p>
-  <p class="byline">{e(meta.get("author", "Nahian Ibnat"))} · {e(updated)} · Draft for feedback, not peer reviewed · {nav}</p>
+    import sitechrome as SC
+    plan_v = res.get("plan_version") or ""
+    toc_items = "".join(f'<li><a href="#s{i}">{i}. {e(c)}</a></li>' for i, c in enumerate(contents, 1)) + '<li><a href="#apx">Appendices</a></li>'
+    body = f"""<a class="skip-link" href="#main">Skip to the paper</a>
+{SC.header("paper", "", bool(pdf_name), meta.get("repo_url"))}
+<header class="paper-head"><div class="wrap ph-in">
+  <p class="ph-eyebrow">Working paper · Space Shock</p>
+  <h1>{e(SC.PAPER_TITLE)}</h1>
+  <p class="dek">Evidence from publicly listed launch providers: stock market reactions to orbital launch failures, {e(span)}.</p>
+  <p class="byline">{e(meta.get("author", "Nahian Ibnat"))} · {e(updated)} · Draft for feedback, not peer reviewed</p>
+  <dl class="ph-meta screen-only">
+    <div><dt>Status</dt><dd>Working paper, not peer reviewed</dd></div>
+    <div><dt>Version</dt><dd>Analysis rules v{e(str(plan_v))} · results {e(updated)}</dd></div>
+    <div><dt>Sample</dt><dd>{f['n_failures']} failures · {p['n_firm_events']} rival reactions · {f['n_clusters']} independent events</dd></div>
+    <div><dt>Formats</dt><dd>{f'<a class="btn small" href="{e(pdf_name)}" download>Download PDF</a> ' if pdf_name else ''}<a href="site/index.html">Interactive report</a></dd></div>
+  </dl>
 </div></header>
-<main id="main" class="wrap article cs">
+<div class="wrap paper-grid">
+<aside class="paper-toc screen-only" aria-label="Contents"><nav aria-label="Paper sections"><p class="pt-h">Contents</p><ol>{toc_items}</ol></nav></aside>
+<details class="toc-mobile screen-only"><summary>Sections</summary><nav aria-label="Paper sections (mobile)"><ol>{toc_items}</ol></nav></details>
+<main id="main" class="article cs">
 <section class="abstract-sec"><h2>Abstract</h2><p>{e(abstract)}</p>
 <p class="keywords"><strong>Keywords:</strong> event study; industry spillovers; contagion; competitive effects; launch failures. <strong>JEL:</strong> G14, L13.</p></section>
 
 <aside class="inshort screen-only"><h2>In short</h2><ul>{"".join(f"<li>{b}</li>" for b in inshort)}</ul></aside>
-<nav class="toc screen-only" aria-label="Contents"><h2>Contents</h2><ol>{"".join(f'<li><a href="#s{i}">{e(c)}</a></li>' for i, c in enumerate(contents, 1))}<li><a href="#apx">Appendices</a></li></ol></nav>
 
 <section id="s1"><h2>1. Introduction</h2>
 <p>When a rocket fails, the company that built it loses hardware, often a customer's satellite, and usually months of flights while the cause is investigated. Its competitors face a less obvious outcome. Investors may read the failure as a reminder that spaceflight is risky for every provider, which lowers rivals' values (contagion), or they may expect customers to move to providers whose rockets work, which raises them (competitive gain). The two channels push in opposite directions, so the net reaction of rivals is an empirical question.</p>
 <p>This paper measures both reactions with a short-window event study. Launch failures suit the method: they are sudden, public, precisely timed, and unrelated to the rivals' own decisions. The confirmatory hypothesis (H2) is that the average two-day abnormal return of listed rivals is zero. All rules were fixed and committed to the project repository before any abnormal return was computed (Appendix G).</p>
-<p>The answer is limited by the sample. Only {f['n_rival_firms']} listed launch firms qualify as direct rivals at the time of a failure, so the study observes {f['n_clusters']} independent rival events{f", every one of which involves {e(f['top_firm'])}" if top_all else ""}. {"The average reaction is not distinguishable from zero, but the interval is wide enough to contain economically meaningful losses and gains." if not detect else "The average reaction is distinguishable from zero."} The contribution is therefore a carefully documented, reproducible estimate with honest uncertainty, rather than a general claim about the launch industry.</p>
+<p>The answer is limited by the sample. Only {f['n_rival_firms']} listed launch firms qualify as direct rivals at the time of a failure, so the study observes {f['n_clusters']} independent rival events{f", every one of which involves {e(f['top_firm'])}" if top_all else ""}. {"The average reaction is not distinguishable from zero, but the interval is wide enough to contain economically meaningful losses and gains." if not detect else "The average reaction is distinguishable from zero."} The contribution is therefore a carefully documented, reproducible estimate with its uncertainty stated in full, rather than a general claim about the launch industry.</p>
 <p>Section 2 describes the industry; section 3 relates the study to earlier work; sections 4 and 5 describe data and methods; sections 6 to 8 report results, robustness and confounding news; sections 9 to 11 discuss, list limitations and conclude.</p></section>
 
 <section id="s2"><h2>2. Institutional background</h2>
@@ -770,10 +783,12 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
 {_table(["Resource", "What it is"], [[f'<a href="{e(h)}">{e(l)}</a>', e(wh)] for l, h, wh in links]
         + ([[f'<a class="screen-only" href="{e(pdf_row[1])}">{e(pdf_row[0])}</a>', f'<span class="screen-only">{e(pdf_row[2])}</span>']] if pdf_row else []))}</section>
 
-<p class="signoff">{e(meta.get("author", "Nahian Ibnat"))}, {e(updated)}. Cite as: Ibnat, N. ({e(year)}). <em>Rocket Launch Failures and Equity-Market Spillovers: Evidence from Publicly Listed Launch Providers.</em> T-Minus Markets working paper.{(" " + e(meta["live_url"]) + "case-study.html") if meta.get("live_url") else ""} Research, not investment advice.</p>
-</main>"""
+<p class="signoff">{e(meta.get("author", "Nahian Ibnat"))}, {e(updated)}. Cite as: Ibnat, N. ({e(year)}). <em>{e(SC.PAPER_TITLE)}.</em> Space Shock working paper.{(" " + e(meta["live_url"]) + "case-study.html") if meta.get("live_url") else ""} Research, not investment advice.</p>
+</main>
+</div>
+{SC.footer("", meta, bool(pdf_name), f"Ibnat, N. ({year}). {SC.PAPER_TITLE}. Space Shock working paper.")}"""
     desc = (f"Working paper: {f['n_failures']} orbital launch failures, {span}. Listed makers lose {pct(f['case_hi'])} to {pct(f['case_lo'])} in two days; "
             f"listed rivals {pct(p['mean_car'], 2)} (95% interval {pct(p['ci_low'], 2)} to {pct(p['ci_high'], 2)}), not detectable with {f['n_clusters']} independent events.")
     url = (meta["live_url"].rstrip("/") + "/case-study.html") if meta.get("live_url") else None
     img = (meta["live_url"].rstrip("/") + "/og.png") if meta.get("live_url") else None
-    return landing._shell("Rocket Launch Failures and Equity-Market Spillovers (T-Minus Markets working paper)", desc, url, body, css, url, img)
+    return landing._shell(f"{SC.PAPER_TITLE} (Space Shock working paper)", desc, url, body, css, url, img, body_class="paper")

@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.5.0",
   "type": "module",
-  "description": "Source for the single-file T-Minus Markets report. Built by pipeline/08_build_html.py. No npm install needed.",
+  "description": "Source for the single-file Space Shock report. Built by pipeline/08_build_html.py. No npm install needed.",
   "scripts": {
     "test": "node --test \"tests/**/*.test.mjs\""
   }

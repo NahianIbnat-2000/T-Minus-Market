@@ -84,7 +84,7 @@ export function axisLeft(scale, x, ticks, fmt, y0, y1) {
 
 let hatchCount = 0;
 /** A hatched fill pattern (printed-figure look for confidence intervals). Returns [defs, url]. */
-export function hatch(color = "#1C1C1C") {
+export function hatch(color = "#0F172A") {
   const id = `hatch-${++hatchCount}`;
   return [`<defs><pattern id="${id}" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">` +
     `<line x1="0" y1="0" x2="0" y2="6" stroke="${color}" stroke-width="1.2" stroke-opacity="0.55"/></pattern></defs>`, `url(#${id})`];

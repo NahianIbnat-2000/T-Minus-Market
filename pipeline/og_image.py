@@ -6,7 +6,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-PAPER, INK, MUTED, RULE, SIGNAL, SIGNAL_TEXT, GAIN = "#F3EEE4", "#1C1C1C", "#5E574C", "#C9C1B3", "#D9452B", "#A8321C", "#1F4E8C"
+# Space Shock palette on navy: on-navy text, coral for losses, teal for gains, blue accent
+PAPER, INK, MUTED, RULE, SIGNAL, SIGNAL_TEXT, GAIN = "#0B1B2E", "#FFFFFF", "#A9B8CA", "#2B4462", "#8DB6FF", "#FF9480", "#5EE0C8"
 
 
 def make(facts: dict, out: Path, pct, pval) -> Path:
@@ -22,15 +23,15 @@ def make(facts: dict, out: Path, pct, pval) -> Path:
     L, R = 70, W - 70
 
     ax.add_patch(Rectangle((0, 0), W, 10, color=SIGNAL))                       # countdown bar
-    ax.text(L, 62, "T-MINUS MARKETS", family=mono, size=15, color=INK, weight="bold", va="center")
-    ax.text(R, 62, "RESEARCH ARTICLE · EVENT STUDY", family=mono, size=13, color=MUTED, va="center", ha="right")
+    ax.text(L, 62, "SPACE SHOCK", family=sans, size=17, color=INK, weight="bold", va="center")
+    ax.text(R, 62, "WORKING PAPER · EVENT STUDY", family=mono, size=13, color=MUTED, va="center", ha="right")
     ax.plot([L, R], [86, 86], color=RULE, lw=1.2)
-    ax.text(L, 112, "When a rocket blows up,\nwho loses money, and\ndoes anyone win?", family=sans, weight="bold",
-            size=40, color=INK, va="top", linespacing=1.12)
+    ax.text(L, 118, "When rockets fail,\nwho pays the price?", family=sans, weight="bold",
+            size=46, color=INK, va="top", linespacing=1.12)
 
     p = facts["prim"]
     y0 = 400
-    ax.plot([L, R], [y0 - 22, y0 - 22], color=INK, lw=2)
+    ax.plot([L, R], [y0 - 22, y0 - 22], color=RULE, lw=2)
     mid = (L + R) / 2
     ax.plot([mid, mid], [y0 - 22, y0 + 118], color=RULE, lw=1.2)
     all_fell = facts["case_hi"] is not None and facts["case_hi"] < 0
@@ -48,7 +49,7 @@ def make(facts: dict, out: Path, pct, pval) -> Path:
     span = f"{facts['first_year']} to {facts['last_year']}" if facts["first_year"] else ""
     ax.plot([L, R], [H - 62, H - 62], color=RULE, lw=1.2)
     ax.text(L, H - 36, f"Nahian Ibnat · {facts['n_failures']} orbital launch failures, {span}", family=mono, size=13, color=INK, va="center")
-    ax.text(R, H - 36, "Interactive report", family=mono, size=13, color=MUTED, va="center", ha="right")
+    ax.text(R, H - 36, "Interactive report and working paper", family=mono, size=13, color=MUTED, va="center", ha="right")
     fig.savefig(out, dpi=DPI, facecolor=PAPER)
     plt.close(fig)
     return out

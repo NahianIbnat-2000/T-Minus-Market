@@ -1,9 +1,10 @@
-# T-Minus Markets
+# Space Shock
 
-**When a rocket blows up, who loses money, and does anyone win?**
+**When rockets fail, who pays the price?** Financial contagion and competition in the space industry.
 
-An event study of stock market reactions to orbital launch failures since 2000,
-with an interactive website (later phases). Author: Nahian Ibnat.
+An event study of stock market reactions to orbital launch failures since 2000, with a homepage, an interactive
+report and a working paper (*When Rockets Fail: Financial Contagion and Competitive Effects in the Space Industry*).
+Author: Nahian Ibnat. The project was called T-Minus Markets until November 2026; the repository name is unchanged.
 
 Launch data: GCAT (J. McDowell, planet4589.org/space/gcat), CC-BY.
 
@@ -15,9 +16,9 @@ Static pages, all built by one command, ready for GitHub Pages (branch master, f
 
 | File | What it is |
 | --- | --- |
-| `index.html` | The article: one-page summary with the key numbers, method, and links (the front door) |
-| `site/index.html` | The interactive report: five stages and four tools (Failure Timeline, Expected vs Actual, Event Study Lab, Placebo Simulator) |
-| `case-study.html` | The case study: full write-up with research questions, figures, earlier work, limits, FAQ and references |
+| `index.html` | The homepage: question, headline findings, interpretation, sample, tool previews, limitations, resources |
+| `site/index.html` | The interactive report: six sections and four tools (Failure Timeline, Expected vs Actual, Event Study Lab, Placebo Simulator) |
+| `case-study.html` | The working paper: metadata, abstract, sticky contents, equations, figures, tables, references |
 | `case-study.pdf` | The case study typeset with LaTeX (Times New Roman 12 pt), from the same text as the web page. Needs a LaTeX install (MiKTeX on Windows); without one, step 08 still writes `casestudy/` for Overleaf |
 | `casestudy/` | `case-study.tex` and its four figures (vector PDFs) |
 | `og.png` | Link-preview image for LinkedIn (needs matplotlib; skipped if missing) |
@@ -28,7 +29,7 @@ python pipeline/08_build_html.py         # -> index.html, site/index.html, case-
 ```
 
 Every number on every page comes from `site/data/` (derived statistics only). Edit text and code in
-`site/src/`, the report frame in `site/template.html`, the article in `pipeline/landing.py`, the case study in `pipeline/casestudy.py`, and links in
+`site/src/`, the report frame in `site/template.html`, the shared header and footer in `pipeline/sitechrome.py`, the homepage in `pipeline/landing.py`, the paper in `pipeline/casestudy.py`, the design system in `site/src/styles/` (`tokens.css`, `chrome.css`), and links in
 `site/site_meta.json` (set `repo_url` only once the repository is public). Never edit the generated HTML by hand.
 Optional checks with Node.js: `cd site && npm test`.
 

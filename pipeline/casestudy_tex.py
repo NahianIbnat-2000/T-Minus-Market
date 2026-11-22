@@ -15,7 +15,7 @@ import subprocess
 from html.parser import HTMLParser
 from pathlib import Path
 
-INK, MUTED, RULE, SIGNAL = "#1C1C1C", "#5E574C", "#C9C1B3", "#D9452B"
+INK, MUTED, RULE, SIGNAL = "#0F172A", "#475569", "#D9DEE7", "#E8604C"
 
 # ----------------------------------------------------------------------------- LaTeX escaping
 _ESC = {"\\": r"\textbackslash{}", "&": r"\&", "%": r"\%", "$": r"\$", "#": r"\#", "_": r"\_", "{": r"\{", "}": r"\}",
@@ -230,7 +230,7 @@ def _forest(plt, rows, path):
         yv = len(rows) - 1 - i
         col = INK if kind != "explore" else MUTED
         if kind == "primary":
-            ax.axhspan(yv - 0.5, yv + 0.5, color="#EBE4D6", zorder=0)
+            ax.axhspan(yv - 0.5, yv + 0.5, color="#EEF1F5", zorder=0)
         ax.plot([a, b], [yv, yv], color=col, linewidth=1.3)
         ax.plot([m], [yv], "o", markersize=5.5 if kind == "primary" else 4.5,
                 markerfacecolor=col if kind != "explore" else "white", markeredgecolor=col)
@@ -282,7 +282,7 @@ def make_figures(data: dict, outdir: Path) -> dict:
             ax.annotate("", xy=p2, xytext=p1, arrowprops=dict(arrowstyle="-|>", color=INK, lw=0.8))
         for nid, lab, val, unit, c, r in nodes:
             x, y = pos[nid]
-            ax.add_patch(plt.Rectangle((x, y), bw, bh, facecolor="#EBE4D6" if nid in ("maker", "clu") else "white", edgecolor=INK, linewidth=0.8))
+            ax.add_patch(plt.Rectangle((x, y), bw, bh, facecolor="#EEF1F5" if nid in ("maker", "clu") else "white", edgecolor=INK, linewidth=0.8))
             ax.text(x + 0.06, y + bh - 0.2, f"{val:,}", fontsize=11, fontweight="bold")
             ax.text(x + 0.06, y + bh - 0.4, lab, fontsize=7)
             ax.text(x + 0.06, y + 0.07, unit, fontsize=5.8, color=MUTED)
@@ -298,7 +298,7 @@ def make_figures(data: dict, outdir: Path) -> dict:
         for i, (lab, v) in enumerate(rows_w):
             yv = len(rows_w) - 1 - i
             if i == 0:
-                ax.axhspan(yv - 0.5, yv + 0.5, color="#EBE4D6", zorder=0)
+                ax.axhspan(yv - 0.5, yv + 0.5, color="#EEF1F5", zorder=0)
             ax.plot([0, v], [yv, yv], color=MUTED, linewidth=0.8); ax.plot([v], [yv], "o", color=INK, markersize=5)
             ax.annotate(pct(v, 2), xy=(v, yv), xytext=(6 if v >= 0 else -6, 4), textcoords="offset points", fontsize=8, ha="left" if v >= 0 else "right")
         ax.axvline(0, color=INK, linewidth=0.8)
@@ -370,7 +370,7 @@ def make_figures(data: dict, outdir: Path) -> dict:
     cases = res.get("provider_case_series") or []
     if cases:
         fig, ax = plt.subplots(figsize=(6.3, 3.0))
-        shades = ["#D9452B", "#7A2414", "#1C1C1C", "#A8321C", "#5E574C"]
+        shades = ["#E8604C", "#B4361F", "#0F172A", "#F29A8A", "#475569"]
         ends = []
         for i, c in enumerate(cases):
             pth = _anchored(c["path"])
@@ -446,7 +446,7 @@ PREAMBLE = r"""\documentclass[12pt,a4paper]{article}
 \titlespacing*{\section}{0pt}{14pt}{4pt}
 \titlespacing*{\subsection}{0pt}{10pt}{2pt}
 \usepackage{fancyhdr}\pagestyle{fancy}\fancyhf{}\renewcommand{\headrulewidth}{0pt}
-\fancyfoot[C]{\small\thepage}\fancyhead[R]{\small\textsc{T-Minus Markets}}
+\fancyfoot[C]{\small\thepage}\fancyhead[R]{\small\textsc{Space Shock}}
 """
 
 
@@ -456,7 +456,7 @@ def build_tex(html: str, data: dict, meta: dict, outdir: Path) -> Path:
         old.unlink()
     figs = make_figures(data, outdir)
     tree = _Tree(); tree.feed(html)
-    head = _find(tree.root, lambda n: n.tag == "header")
+    head = _find(tree.root, lambda n: n.tag == "header" and "paper-head" in n.cls)
     main = _find(tree.root, lambda n: n.tag == "main")
     conv = _Conv(figs, meta.get("live_url") or "")
     title = conv.inline(_find(head, lambda n: n.tag == "h1")).strip()

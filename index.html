@@ -2,44 +2,62 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>T-Minus Markets: when a rocket blows up, who loses money?</title>
+<title>Space Shock: when rockets fail, who pays the price?</title>
 <meta name="description" content="Event study of 138 orbital launch failures: the rocket&#x27;s maker loses −8.8% to −16.3% in two days; listed competitors show no detectable reaction (+0.28%, 95% interval −1.62% to +2.18%)."><meta name="author" content="Nahian Ibnat">
-<meta property="og:type" content="article"><meta property="og:title" content="T-Minus Markets: when a rocket blows up, who loses money?">
+<meta property="og:type" content="article"><meta property="og:title" content="Space Shock: when rockets fail, who pays the price?">
 <meta property="og:description" content="Event study of 138 orbital launch failures: the rocket&#x27;s maker loses −8.8% to −16.3% in two days; listed competitors show no detectable reaction (+0.28%, 95% interval −1.62% to +2.18%)."><meta property="og:url" content="https://nahianibnat-2000.github.io/T-Minus-Market/">
-<meta name="twitter:card" content="summary_large_image"><meta property="og:image" content="https://nahianibnat-2000.github.io/T-Minus-Market/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="T-Minus Markets: when a rocket blows up, who loses money?"><link rel="canonical" href="https://nahianibnat-2000.github.io/T-Minus-Market/">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,600..800&family=DM+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400&display=swap">
+<meta name="twitter:card" content="summary_large_image"><meta property="og:image" content="https://nahianibnat-2000.github.io/T-Minus-Market/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Space Shock: when rockets fail, who pays the price?"><link rel="canonical" href="https://nahianibnat-2000.github.io/T-Minus-Market/">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400&display=swap">
 <style>
-/* T-Minus Markets design tokens: 1960s-70s mission archive.
-   Contrast on --paper (WCAG 2.2): ink 14.7, mission-blue 7.2, muted 6.2, signal-text 5.8 (all text-safe);
-   signal 3.8 (graphics and large text only), rule 1.5 (decorative lines only). */
+/* Space Shock design tokens. One system for the homepage, the interactive report and the working paper.
+   Colour semantics: coral = negative abnormal return, teal = positive, blue = benchmark / neutral information,
+   navy = hero and analytics surfaces. Contrast (WCAG 2.2) on --paper #F7F8FA: ink 16.9, muted 7.4,
+   loss-text 5.9, gain-text 5.3, bench-text 6.3 (all text-safe). Marks (--loss, --gain, --bench) are for
+   graphics and large text; on navy use the *-on-navy values. */
 :root {
-  --paper: #F3EEE4;
-  --paper-deep: #EBE4D6;      /* panels, table stripes */
-  --ink: #1C1C1C;
-  --muted: #5E574C;           /* secondary text */
-  --rule: #C9C1B3;            /* hairlines, grid */
-  --signal: #D9452B;          /* failures, losses: marks and large text only */
-  --signal-text: #A8321C;     /* losses in body-size text */
-  --gain: #1F4E8C;            /* gains: marks and text */
+  --paper: #F7F8FA;           /* long-form reading surface */
+  --paper-deep: #EEF1F5;      /* panels, table stripes */
+  --card: #FFFFFF;
+  --ink: #0F172A;
+  --muted: #475569;
+  --rule: #D9DEE7;
+  --navy: #0B1B2E;            /* hero and analytics surfaces */
+  --navy-2: #12263D;
+  --on-navy: #E6EDF5;
+  --on-navy-muted: #A9B8CA;
 
-  --font-head: "Archivo", "Arial Narrow", sans-serif;
+  --loss: #E8604C;            /* coral marks */
+  --loss-text: #B4361F;
+  --gain: #14A38B;            /* teal marks */
+  --gain-text: #0B6E5E;
+  --bench: #2F6FDF;           /* benchmark, intervals, neutral research marks */
+  --bench-text: #1D4ED8;
+  --loss-on-navy: #FF9480; --gain-on-navy: #5EE0C8; --bench-on-navy: #8DB6FF;
+
+  /* legacy names used by older components */
+  --signal: var(--loss);
+  --signal-text: var(--loss-text);
+
+  --font-head: "Inter", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
   --font-body: "Source Serif 4", Georgia, serif;
-  --font-mono: "DM Mono", ui-monospace, "Courier New", monospace;
-  --head-stretch: 125%;       /* Archivo expanded width */
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --head-stretch: 100%;
 
   --step--1: clamp(0.83rem, 0.8rem + 0.15vw, 0.9rem);
-  --step-0: clamp(1.05rem, 1rem + 0.25vw, 1.2rem);
-  --step-1: clamp(1.3rem, 1.2rem + 0.5vw, 1.6rem);
-  --step-2: clamp(1.7rem, 1.4rem + 1.2vw, 2.4rem);
-  --step-3: clamp(2.2rem, 1.6rem + 2.6vw, 4rem);
+  --step-0: clamp(1.02rem, 0.98rem + 0.2vw, 1.12rem);
+  --step-1: clamp(1.22rem, 1.12rem + 0.45vw, 1.45rem);
+  --step-2: clamp(1.55rem, 1.3rem + 1vw, 2.1rem);
+  --step-3: clamp(2.1rem, 1.5rem + 2.4vw, 3.4rem);
 
   --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 1rem; --space-4: 1.5rem;
-  --space-5: 2.5rem;  --space-6: 4rem;   --space-7: 6rem;
+  --space-5: 2.5rem;  --space-6: 4rem;   --space-7: 5.5rem;
 
-  --measure: 66ch;            /* reading width */
-  --page: 72rem;              /* grid width */
+  --radius: 8px;
+  --measure: 68ch;
+  --page: 74rem;
   --hairline: 1px solid var(--rule);
-  --inkline: 1.5px solid var(--ink);
+  --inkline: 1px solid var(--ink);
+  --shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 4px 16px rgba(15, 23, 42, 0.05);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -54,22 +72,22 @@ body {
 }
 
 h1, h2, h3, .head {
-  font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800;
-  line-height: 1.08; letter-spacing: -0.01em; margin: 0 0 var(--space-3);
+  font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 700;
+  line-height: 1.12; letter-spacing: -0.02em; margin: 0 0 var(--space-3);
 }
 h1 { font-size: var(--step-3); }
 h2 { font-size: var(--step-2); }
 h3 { font-size: var(--step-1); font-weight: 700; }
 p { margin: 0 0 var(--space-3); max-width: var(--measure); }
-a { color: var(--gain); text-underline-offset: 0.15em; }
+a { color: var(--bench-text); text-underline-offset: 0.15em; }
 strong { font-weight: 700; }
 
 .mono, code, .num { font-family: var(--font-mono); font-size: 0.92em; font-variant-numeric: tabular-nums; }
 .muted { color: var(--muted); }
-.loss { color: var(--signal-text); }
-.gain { color: var(--gain); }
+.loss { color: var(--loss-text); }
+.gain { color: var(--gain-text); }
 
-:focus-visible { outline: 3px solid var(--gain); outline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--bench); outline-offset: 3px; }
 
 .skip-link {
   position: absolute; left: -999px; top: 0; padding: var(--space-2) var(--space-3);
@@ -96,8 +114,8 @@ strong { font-weight: 700; }
 
 table { border-collapse: collapse; width: 100%; font-size: var(--step--1); }
 th, td { text-align: left; padding: var(--space-2) var(--space-3); border-bottom: var(--hairline); vertical-align: top; }
-th { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 700; font-size: 0.78rem;
-     text-transform: uppercase; letter-spacing: 0.06em; border-bottom: var(--inkline); }
+th { font-family: var(--font-head); font-weight: 600; font-size: 0.78rem;
+     text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); border-bottom: 1px solid #B8C1CF; }
 td.num, th.num { text-align: right; }
 
 /* ------------------------------------------------ masthead */
@@ -315,317 +333,320 @@ svg .series.draw { stroke-dasharray: var(--len); animation: draw 1.2s ease-out b
   .stage table, .tool table { display: block; max-width: 100%; overflow-x: auto; }
 }
 
-/* Root article page and plan page (static, no JavaScript) */
-.article { max-width: 46rem; padding-top: var(--space-5); padding-bottom: var(--space-6); }
-.article section { margin: var(--space-6) 0 0; }
-.article h2 { font-size: var(--step-2); margin-bottom: var(--space-3); }
-.article p, .article li { font-size: var(--step-0); line-height: 1.6; }
-.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); border-top: var(--inkline); border-bottom: var(--hairline); margin-top: 0 !important; }
-.tile { padding: var(--space-3) var(--space-3) var(--space-3) 0; border-right: var(--hairline); }
-.tile:last-child { border-right: 0; }
-.tile + .tile { padding-left: var(--space-3); }
-.tile-num { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800; font-size: var(--step-2); line-height: 1.1; }
-.tile.loss .tile-num { color: var(--signal-text); }
-.tile.gain .tile-num { color: var(--gain); }
-.tile p { font-size: var(--step--1) !important; color: var(--muted); margin: var(--space-2) 0 0; line-height: 1.45 !important; }
-.abstract p:first-of-type { font-size: var(--step-1); line-height: 1.5; }
-.cta { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-.btn { font-family: var(--font-mono); font-size: var(--step--1); text-decoration: none; background: var(--ink); color: var(--paper);
-  border: var(--inkline); padding: var(--space-2) var(--space-3); }
-.btn.ghost { background: var(--paper); color: var(--ink); }
-.btn:hover, .btn:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
-.read-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: var(--space-3); }
-.read-card { display: flex; flex-direction: column; border: var(--inkline); padding: var(--space-3) var(--space-4); text-decoration: none; color: var(--ink); background: var(--paper); }
-a.read-card:hover, a.read-card:focus-visible { background: var(--paper-deep); outline: 2px solid var(--signal); outline-offset: 2px; }
-.read-card h3 { font-size: var(--step-1); margin: var(--space-1) 0; }
-.read-card p { font-size: var(--step--1) !important; margin: 0 0 var(--space-3); flex: 1; }
-.rc-kicker { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--signal-text); }
-.rc-go { font-family: var(--font-mono); font-size: var(--step--1); border-top: var(--hairline); padding-top: var(--space-2); }
-.rc-go::after { content: " \2192"; }
-.muted-card { border-style: dashed; border-color: var(--muted); color: var(--muted); }
-.muted-card .rc-kicker { color: var(--muted); }
-.method { padding-left: 1.1rem; }
-.method li { margin-bottom: var(--space-2); }
-.mono { font-family: var(--font-mono); font-size: var(--step--1) !important; }
-.plan table { font-size: var(--step--1); }
-.table-wrap { overflow-x: auto; }
-.masthead .kicker a { color: inherit; }
-@media (max-width: 640px) {
-  .tile { border-right: 0; border-bottom: var(--hairline); padding: var(--space-3) 0 !important; }
-  .tile:last-child { border-bottom: 0; }
-}
-.rc-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: baseline; border-top: var(--hairline); padding-top: var(--space-2); }
-.rc-actions .rc-go { border-top: 0; padding-top: 0; color: inherit; }
-.rc-dl, .dl-link { font-family: var(--font-mono); font-size: var(--step--1); color: var(--gain); }
-.rc-dl::before, .dl-link::before { content: "\2193  "; }
-.dl-link { align-self: center; margin-left: var(--space-2); }
+/* Shared site chrome: header, navigation, footer, buttons, focus. Used on all three pages. */
+*:focus-visible { outline: 3px solid var(--bench); outline-offset: 2px; border-radius: 2px; }
+.skip-link { position: absolute; left: -999px; top: 0; z-index: 100; background: var(--card); color: var(--ink); padding: 0.6rem 1rem; }
+.skip-link:focus { left: 1rem; top: 1rem; }
 
-/* Root article only: "launch control" theme. White page, signal red, navy ink, monospace countdown details.
-   Contrast on #FFFFFF (WCAG 2.2): ink 17.6, muted 7.6, red-text 6.0, blue 6.7, green 5.9 (all text-safe). */
-body.theme-sky {
-  --paper: #FFFFFF;
-  --paper-deep: #F4F6F9;
-  --ink: #0B1324;
-  --muted: #475467;
-  --rule: #E3E7EE;
-  --signal: #E0301E;
-  --signal-text: #B42318;
-  --gain: #1D4ED8;
-  --ok: #067647;
-  --hairline: 1px solid var(--rule);
-  --inkline: 1px solid #CDD4DF;
-  --font-body: "Source Serif 4", Georgia, serif;
-  background: var(--paper); color: var(--ink);
-}
-.theme-sky .wrap { max-width: 72rem; }
-.theme-sky a { color: var(--gain); }
+.ss-header { background: var(--navy); color: var(--on-navy); position: sticky; top: 0; z-index: 60; border-bottom: 1px solid #1E334D; }
+.ss-header .ss-row { max-width: var(--page); margin: 0 auto; padding: 0.7rem var(--space-4); display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.ss-logo { display: flex; align-items: center; gap: 0.6rem; color: #fff; text-decoration: none; }
+.ss-logo svg { flex: none; }
+.ss-logo .ss-name { font-family: var(--font-head); font-weight: 800; letter-spacing: 0.06em; font-size: 1.02rem; }
+.ss-logo .ss-name b { color: var(--bench-on-navy); font-weight: 800; }
+.ss-logo .ss-sub { display: block; font-family: var(--font-head); font-size: 0.72rem; color: var(--on-navy-muted); letter-spacing: 0.02em; font-weight: 500; }
+.ss-nav ul { list-style: none; display: flex; gap: 0.15rem; margin: 0; padding: 0; }
+.ss-nav a { display: block; color: var(--on-navy); text-decoration: none; font-family: var(--font-head); font-size: 0.9rem; font-weight: 500; padding: 0.45rem 0.75rem; border-radius: 6px; }
+.ss-nav a:hover { background: var(--navy-2); }
+.ss-nav a[aria-current="page"] { background: var(--navy-2); color: #fff; box-shadow: inset 0 -2px 0 var(--bench-on-navy); }
+.ss-nav a.ss-dl { color: var(--bench-on-navy); }
+.ss-menu { display: none; }
+.ss-menu summary { list-style: none; cursor: pointer; color: #fff; font-family: var(--font-head); font-weight: 600; font-size: 0.9rem; padding: 0.45rem 0.8rem; border: 1px solid #2B4462; border-radius: 6px; }
+.ss-menu summary::-webkit-details-marker { display: none; }
+.ss-menu[open] ul { position: absolute; right: var(--space-3); top: 3.4rem; background: var(--navy); border: 1px solid #2B4462; border-radius: 8px; padding: 0.4rem; list-style: none; margin: 0; min-width: 13rem; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+.ss-menu[open] a { display: block; color: var(--on-navy); padding: 0.55rem 0.8rem; text-decoration: none; font-family: var(--font-head); border-radius: 6px; }
+.ss-menu[open] a[aria-current="page"] { background: var(--navy-2); }
+@media (max-width: 820px) { .ss-nav { display: none; } .ss-menu { display: block; } .ss-logo .ss-sub { display: none; } }
 
-/* top status bar */
-.theme-sky .topbar { background: var(--ink); color: #C9D1DE; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
-.theme-sky .tb { display: flex; justify-content: space-between; gap: var(--space-3); padding: 0.45rem 0; flex-wrap: wrap; }
-.theme-sky .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--signal); margin-right: 0.5rem; vertical-align: 1px; }
+.btn, a.btn { display: inline-flex; align-items: center; gap: 0.4rem; font-family: var(--font-head); font-weight: 600; font-size: 0.95rem;
+  padding: 0.7rem 1.15rem; border-radius: 6px; text-decoration: none; border: 1px solid var(--bench-text); background: var(--bench-text); color: #fff; }
+.btn:hover { filter: brightness(1.08); }
+.btn.ghost { background: transparent; color: inherit; border-color: currentColor; }
+.btn.small { font-size: 0.85rem; padding: 0.45rem 0.8rem; }
+.dl-link { font-family: var(--font-head); font-weight: 600; font-size: 0.92rem; }
+.dl-link::before { content: "\2193\00a0"; }
 
-/* brand row */
-.theme-sky .brand { border-bottom: 1px solid var(--rule); }
-.theme-sky .brand-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); padding: var(--space-3) 0; flex-wrap: wrap; }
-.theme-sky .logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: var(--ink); }
-.theme-sky .logo-mark { display: grid; place-items: center; width: 2.6rem; height: 2.6rem; background: var(--signal); color: #fff;
-  font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800; font-size: 1.05rem; border-radius: 3px; }
-.theme-sky .logo-text { display: flex; flex-direction: column; line-height: 1.15; }
-.theme-sky .logo-name { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800; font-size: 1.15rem; letter-spacing: 0.01em; text-transform: uppercase; }
-.theme-sky .logo-tag { font-family: var(--font-body); font-style: italic; color: var(--muted); font-size: 0.9rem; }
-.theme-sky .cd-nav { display: flex; gap: 0.25rem; flex-wrap: wrap; }
-.theme-sky .cd-nav a { font-family: var(--font-mono); font-size: 0.78rem; color: var(--ink); text-decoration: none; padding: 0.4rem 0.6rem; border-radius: 3px; }
-.theme-sky .cd-nav a b { font-weight: 500; color: var(--signal-text); margin-right: 0.3rem; }
-.theme-sky .cd-nav a:hover, .theme-sky .cd-nav a:focus-visible { background: var(--paper-deep); }
+.ss-footer { background: var(--navy); color: var(--on-navy-muted); padding: var(--space-5) 0 var(--space-4); margin-top: 0; }
+.ss-footer .ss-fgrid { max-width: var(--page); margin: 0 auto; padding: 0 var(--space-4); display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: var(--space-4); }
+.ss-footer h2 { font-family: var(--font-head); font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; margin: 0 0 0.6rem; font-weight: 700; }
+.ss-footer p, .ss-footer li { font-family: var(--font-head); font-size: 0.88rem; line-height: 1.55; margin: 0 0 0.4rem; }
+.ss-footer ul { list-style: none; padding: 0; margin: 0; }
+.ss-footer a { color: var(--on-navy); }
+.ss-footer .ss-legal { max-width: var(--page); margin: var(--space-4) auto 0; padding: var(--space-3) var(--space-4) 0; border-top: 1px solid #1E334D; font-size: 0.8rem; font-family: var(--font-head); }
+@media (max-width: 820px) { .ss-footer .ss-fgrid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .ss-footer .ss-fgrid { grid-template-columns: 1fr; } }
 
-/* ticker */
-.theme-sky .ticker { display: flex; align-items: stretch; border-bottom: 1px solid var(--rule); background: var(--paper-deep); font-family: var(--font-mono); font-size: 0.8rem; overflow: hidden; }
-.theme-sky .ticker-label { flex: none; background: var(--signal); color: #fff; padding: 0.5rem 0.9rem; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.72rem; display: flex; align-items: center; }
-.theme-sky .ticker-track { overflow: hidden; flex: 1; display: flex; align-items: center; }
-.theme-sky .ticker-run { display: inline-flex; white-space: nowrap; animation: tm-tick 70s linear infinite; }
-.theme-sky .tk { padding: 0 1.4rem; border-right: 1px solid var(--rule); }
-.theme-sky .tk-d { color: var(--muted); }
-.theme-sky .tk-role { font-size: 0.68rem; text-transform: uppercase; color: var(--muted); border: 1px solid var(--rule); padding: 0 0.3rem; border-radius: 2px; }
-.theme-sky .dn { color: var(--signal-text); font-weight: 500; }
-.theme-sky .up { color: var(--ok); font-weight: 500; }
-@keyframes tm-tick { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-@media (prefers-reduced-motion: reduce) { .theme-sky .ticker-run { animation: none; } }
+.badge { display: inline-block; font-family: var(--font-head); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 0.15rem 0.5rem; border-radius: 999px; border: 1px solid currentColor; vertical-align: middle; }
+.badge.confirm { color: var(--bench-text); } .badge.explore { color: #8A4B00; background: #FFF4E0; border-color: #F0C27A; }
+.badge.robust { color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; animation: none !important; transition: none !important; } }
 
-/* hero */
-.theme-sky .hero { padding: var(--space-6) 0 var(--space-5);
-  background: radial-gradient(60rem 22rem at 85% 0%, #EEF3FB 0%, rgba(255,255,255,0) 70%); }
-.theme-sky .hero-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: var(--space-5); align-items: start; }
-.theme-sky .eyebrow { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--signal-text); margin: 0 0 var(--space-2); }
-.theme-sky .eyebrow::before { content: ""; display: inline-block; width: 1.2rem; height: 2px; background: var(--signal); margin-right: 0.5rem; vertical-align: 0.25em; }
-.theme-sky .hero h1 { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800; font-size: clamp(2.4rem, 1.6rem + 3.4vw, 4.4rem);
-  line-height: 1.02; letter-spacing: -0.02em; margin: 0 0 var(--space-3); max-width: 14ch; }
-.theme-sky .dek { font-size: var(--step-1); line-height: 1.45; max-width: 36ch; margin: 0 0 var(--space-3); }
-.theme-sky .byline { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); }
-.theme-sky .cta { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; margin-top: var(--space-4); }
-.theme-sky .btn { background: var(--ink); color: #fff; border: 1px solid var(--ink); border-radius: 3px; text-transform: uppercase; letter-spacing: 0.04em; padding: 0.7rem 1.1rem; }
-.theme-sky .btn.ghost { background: #fff; color: var(--ink); border-color: #CDD4DF; }
-.theme-sky .dl-link { font-family: var(--font-mono); font-size: 0.8rem; margin-left: var(--space-2); }
-.theme-sky .dl-link::before { content: "\2193  "; }
+/* Interactive report: dashboard layout on the shared Space Shock system. */
+body.report { background: var(--paper); }
+.report-hero { background: var(--navy); color: var(--on-navy); padding: var(--space-5) 0 var(--space-4);
+  background-image: radial-gradient(circle at 88% 10%, rgba(47, 111, 223, 0.16), transparent 45%); }
+.report-hero .eyebrow { font-family: var(--font-head); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--bench-on-navy); margin: 0 0 var(--space-2); }
+.report-hero h1 { color: #fff; font-size: clamp(1.9rem, 1.4rem + 2vw, 2.9rem); max-width: 20ch; }
+.report-hero .dek { color: var(--on-navy); font-size: var(--step-0); max-width: 58ch; }
+.report-hero .byline { color: var(--on-navy-muted); font-family: var(--font-head); font-size: 0.85rem; margin: 0; }
 
-/* status panel */
-.theme-sky .status { border: 1px solid var(--rule); border-top: 3px solid var(--signal); border-radius: 4px; background: #fff; box-shadow: 0 8px 24px rgba(11, 19, 36, 0.06); }
-.theme-sky .st-head { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding: 0.7rem 1rem; border-bottom: 1px solid var(--rule); }
-.theme-sky .st-head span:first-child { color: var(--signal-text); }
-.theme-sky .status ul { list-style: none; margin: 0; padding: 0 1rem; }
-.theme-sky .status li { display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto; padding: 0.6rem 0; border-bottom: 1px solid var(--rule); }
-.theme-sky .status li:last-child { border-bottom: 0; }
-.theme-sky .st-k { font-family: var(--font-head); font-size: 0.9rem; }
-.theme-sky .st-v { font-family: var(--font-mono); font-size: 1.3rem; grid-row: span 2; align-self: center; }
-.theme-sky .st-n { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); }
-.theme-sky .st-note { font-size: 0.8rem; color: var(--muted); margin: 0; padding: 0.7rem 1rem; border-top: 1px solid var(--rule); background: var(--paper-deep); }
+/* section navigation */
+.report .stage-nav { position: sticky; top: 3.9rem; z-index: 40; background: var(--card); border-bottom: var(--hairline); box-shadow: 0 1px 0 rgba(15,23,42,0.03); }
+.report .stage-nav a { font-family: var(--font-head); font-size: 0.9rem; font-weight: 500; color: var(--muted); padding: 0.8rem 0.9rem; }
+.report .stage-nav a .t { display: inline-grid; place-items: center; width: 1.4rem; height: 1.4rem; border-radius: 50%; background: var(--paper-deep); color: var(--ink); font-family: var(--font-mono); font-size: 0.75rem; margin-right: 0.45rem; }
+.report .stage-nav a[aria-current="step"] { color: var(--ink); border-bottom-color: var(--bench); }
+.report .stage-nav a[aria-current="step"] .t { background: var(--bench-text); color: #fff; }
+@media (max-width: 820px) { .report .stage-nav { top: 3.5rem; } }
 
 /* sections */
-.theme-sky main section { padding: var(--space-6) 0; margin: 0; }
-.theme-sky .band { background: var(--paper-deep); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
-.theme-sky h2 { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800; font-size: var(--step-2); letter-spacing: -0.01em; margin: 0 0 var(--space-4); }
-.theme-sky h3 { font-family: var(--font-head); font-weight: 700; }
-.theme-sky .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); gap: var(--space-5); }
-.theme-sky .lede-text p { font-size: var(--step-0); line-height: 1.6; margin-top: 0; }
-.theme-sky .muted { color: var(--muted); }
+.report .stage { padding: var(--space-6) 0; border-bottom: var(--hairline); }
+.report .stage:nth-of-type(even) { background: var(--card); }
+.report .stage-label { font-family: var(--font-head); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em; color: var(--bench-text); }
+.report .stage-label .t { font-family: var(--font-mono); font-size: 0.85rem; color: var(--bench-text); }
+.report .stage h2 { font-size: var(--step-2); max-width: 28ch; }
+.report .lead { font-size: var(--step-1); max-width: 52ch; }
+.report .callout { background: var(--card); border: var(--hairline); border-left: 4px solid var(--bench); border-radius: 0 var(--radius) var(--radius) 0; }
+.report .stage:nth-of-type(even) .callout { background: var(--paper); }
+
+/* figures as cards */
+.report figure.plate { background: var(--card); border: var(--hairline); border-radius: var(--radius); padding: var(--space-4); box-shadow: var(--shadow); }
+.report .stage:nth-of-type(even) figure.plate { background: var(--paper); box-shadow: none; }
+.report figure.plate .plate-title { font-stretch: normal; }
+.report figure.plate figcaption { font-family: var(--font-head); font-size: 0.85rem; }
+
+/* tools as dashboard panels */
+.report .tool { background: var(--card); border: 1px solid #CBD3DF; border-radius: 10px; padding: 0; overflow: hidden; box-shadow: var(--shadow); margin: var(--space-5) 0; }
+.report .tool-head { background: var(--navy); color: var(--on-navy); padding: var(--space-3) var(--space-4); margin: 0; border-bottom: 0; }
+.report .tool-head h3 { color: #fff; font-size: 1.25rem; font-stretch: normal; }
+.report .tool-head p { color: var(--on-navy-muted); font-family: var(--font-head); font-size: 0.92rem; max-width: 70ch; }
+.report .tool-kicker { color: var(--bench-on-navy); font-family: var(--font-head); font-weight: 700; }
+.report .tool > :not(.tool-head) { margin-left: var(--space-4); margin-right: var(--space-4); }
+.report .tool > :last-child { margin-bottom: var(--space-4); }
+.report .tool > .tool-head + * { margin-top: var(--space-4); }
+.report .lab-form fieldset { background: var(--paper); border: var(--hairline); border-radius: var(--radius); padding: var(--space-3); }
+.report .lab-form legend { font-family: var(--font-head); font-weight: 700; color: var(--ink); padding: 0 0.3rem; }
+.report .lab-opt input { accent-color: var(--bench-text); }
+.report button, .report .lab-reset { font-family: var(--font-head); font-weight: 600; font-size: 0.9rem; border-radius: 6px; padding: 0.5rem 0.9rem; border: 1px solid var(--bench-text); background: var(--card); color: var(--bench-text); cursor: pointer; min-height: 2.25rem; }
+.report button:hover, .report .lab-reset:hover { background: #EEF4FF; color: var(--bench-text); }
+.report .lab-status.main { border-left-color: var(--bench); background: #EEF4FF; color: var(--ink); }
+.report .lab-status.explore { border-left-color: #D98A00; background: #FFF4E0; color: #7A4300; }
+.report .lab-num { font-family: var(--font-mono); font-weight: 500; font-stretch: normal; letter-spacing: -0.03em; }
+.report .anomaly { background: var(--card); border: var(--hairline); border-radius: var(--radius); }
+.report table { background: transparent; }
+.report .site-foot { display: none; }
+
+/* Homepage. Light reading surface with a navy hero and one navy analytics band. */
+body.home { background: var(--paper); }
+.home .wrap { max-width: var(--page); }
+.home .narrow { max-width: 52rem; }
+.home main section { padding: var(--space-6) 0; }
+.home .band { background: var(--card); border-top: var(--hairline); border-bottom: var(--hairline); }
+.home .band.dark { background: var(--navy); color: var(--on-navy); border: 0; }
+.home .sec-h { font-size: var(--step-2); display: flex; align-items: baseline; gap: 0.75rem; margin-bottom: var(--space-3); }
+.home .sec-n { font-family: var(--font-mono); font-size: 0.85rem; font-weight: 500; color: var(--bench-text); letter-spacing: 0.05em; }
+.home .dark .sec-n { color: var(--bench-on-navy); }
+.home .sec-intro { color: var(--muted); max-width: 60ch; margin-bottom: var(--space-4); }
+.home .dark .sec-intro { color: var(--on-navy-muted); }
+.home .sec-note { color: var(--muted); margin-top: var(--space-4); }
+.home .note-s { font-size: 0.86rem; color: var(--muted); }
+
+/* hero */
+.home .hero { background: var(--navy); color: var(--on-navy); padding: var(--space-6) 0 var(--space-5);
+  background-image: radial-gradient(circle at 85% 20%, rgba(47, 111, 223, 0.18), transparent 45%); }
+.home .eyebrow { font-family: var(--font-head); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--bench-on-navy); margin: 0 0 var(--space-3); }
+.home .hero h1 { color: #fff; font-size: var(--step-3); font-weight: 800; max-width: 18ch; letter-spacing: -0.025em; }
+.home .dek { font-size: var(--step-1); color: var(--on-navy); max-width: 46ch; line-height: 1.45; }
+.home .cta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin: var(--space-4) 0 var(--space-3); max-width: none; }
+.home .hero .btn.ghost { color: #fff; border-color: #4A6385; }
+.home .hero .dl-link { color: var(--bench-on-navy); }
+.home .meta-line { font-family: var(--font-head); font-size: 0.85rem; color: var(--on-navy-muted); margin: 0; }
 
 /* findings */
-.theme-sky .find-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
-.theme-sky .panel { border: 1px solid var(--rule); border-radius: 6px; padding: var(--space-4); background: #fff; }
-.theme-sky .loss-panel { border-top: 3px solid var(--signal); }
-.theme-sky .panel-kicker { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin: 0; }
-.theme-sky .big { font-family: var(--font-mono); font-size: clamp(2rem, 1.4rem + 2.4vw, 3.2rem); line-height: 1.1; margin: var(--space-2) 0; color: var(--signal-text); letter-spacing: -0.03em; }
-.theme-sky .big.neutral { color: var(--ink); }
-.theme-sky .panel > p { line-height: 1.55; }
-.theme-sky .small { font-size: 0.9rem; color: var(--muted); }
-.theme-sky figure { margin: var(--space-3) 0 0; }
-.theme-sky figcaption { font-size: 0.82rem; color: var(--muted); margin-top: var(--space-2); line-height: 1.45; }
-.theme-sky .chart { width: 100%; height: auto; display: block; }
-.theme-sky .chart .grid { stroke: #EEF1F5; } .theme-sky .chart .zero { stroke: #98A2B3; stroke-width: 1.2; }
-.theme-sky .chart .ax { font-family: var(--font-mono); font-size: 11px; fill: #475467; }
-.theme-sky .chart .lab { font-family: var(--font-mono); font-size: 11px; fill: #0B1324; }
-.theme-sky .chart .win { fill: #FDECEA; }
-.theme-sky .chart .mk { fill: none; stroke: #E0301E; stroke-width: 2; }
-.theme-sky .chart .mkd { fill: #E0301E; }
-.theme-sky .chart .ci { stroke: #0B1324; stroke-width: 2; }
-.theme-sky .chart .pt { fill: #1D4ED8; }
-.theme-sky .chart .mde { fill: #EEF3FB; stroke: #C7D7F2; stroke-dasharray: 3 3; }
+.home .find-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
+.home .res-card { background: var(--card); border: var(--hairline); border-radius: var(--radius); padding: var(--space-4); box-shadow: var(--shadow); border-top: 4px solid var(--bench); }
+.home .res-card.is-loss { border-top-color: var(--loss); }
+.home .res-k { font-family: var(--font-head); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin: 0 0 var(--space-2); }
+.home .res-big { font-family: var(--font-mono); font-weight: 500; font-size: clamp(1.9rem, 1.3rem + 2.2vw, 2.9rem); letter-spacing: -0.03em; color: var(--loss-text); margin: 0 0 var(--space-2); }
+.home .res-big.neutral { color: var(--ink); }
+.home .res-def { font-size: 1rem; line-height: 1.55; }
+.home figure { margin: var(--space-3) 0 0; }
+.home figcaption { font-family: var(--font-head); font-size: 0.82rem; color: var(--muted); line-height: 1.5; margin-top: var(--space-2); }
+.home .chart { width: 100%; height: auto; display: block; }
+.home .chart .grid { stroke: #EDF0F4; } .home .chart .zero { stroke: #8A95A8; stroke-width: 1.2; }
+.home .chart .ax, .home .chart .lab { font-family: var(--font-mono); font-size: 11px; fill: #475569; } .home .chart .lab { fill: #0F172A; }
+.home .chart .win { fill: #FDEDEA; }
+.home .chart .loss-line { fill: none; stroke: var(--loss); stroke-width: 2.2; } .home .chart .loss-dot { fill: var(--loss); }
+.home .chart .ci { stroke: var(--ink); stroke-width: 2; } .home .chart .pt { fill: var(--bench); }
+.home .chart .mde { fill: #EAF1FE; stroke: #B9CFF5; stroke-dasharray: 3 3; }
+.home .tests { display: grid; gap: var(--space-3); margin-top: var(--space-3); border-top: var(--hairline); padding-top: var(--space-3); }
+.home .tests p { margin: 0.35rem 0 0; font-size: 0.95rem; line-height: 1.5; }
 
-/* steps */
-.theme-sky .steps { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); counter-reset: none; }
-.theme-sky .steps li { background: #fff; border: 1px solid var(--rule); border-radius: 6px; padding: var(--space-4); }
-.theme-sky .step-n { font-family: var(--font-mono); font-size: 0.8rem; color: #fff; background: var(--ink); width: 1.8rem; height: 1.8rem; border-radius: 50%; display: inline-grid; place-items: center; }
-.theme-sky .steps h3 { margin: var(--space-2) 0 var(--space-1); font-size: 1.1rem; }
-.theme-sky .steps p { margin: 0; line-height: 1.5; font-size: 0.98rem; }
+/* interpretation */
+.home .lede { font-size: var(--step-1); line-height: 1.55; max-width: 60ch; }
 
-/* details */
-.theme-sky details.more { margin-top: var(--space-4); border: 1px solid var(--rule); border-radius: 6px; background: #fff; padding: 0 var(--space-4); }
-.theme-sky details.more summary { cursor: pointer; font-family: var(--font-mono); font-size: 0.85rem; padding: var(--space-3) 0; color: var(--ink); }
-.theme-sky details.more summary::marker { color: var(--signal); }
-.theme-sky details.more[open] { padding-bottom: var(--space-3); }
-.theme-sky details.more p, .theme-sky details.more li { line-height: 1.6; }
-.theme-sky details.more figure { background: #fff; }
+/* contagion vs competition */
+.home .vs-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: var(--space-4); align-items: stretch; }
+.home .vs-card { border-radius: var(--radius); padding: var(--space-4); border: var(--hairline); background: var(--paper); }
+.home .vs-card.is-loss { border-left: 5px solid var(--loss); } .home .vs-card.is-gain { border-left: 5px solid var(--gain); }
+.home .vs-arrow { font-size: 2rem; line-height: 1; margin: 0 0 var(--space-2); }
+.home .vs-card.is-loss .vs-arrow, .home .vs-card.is-loss strong, .home .vs-card.is-loss h3 { color: var(--loss-text); }
+.home .vs-card.is-gain .vs-arrow, .home .vs-card.is-gain strong, .home .vs-card.is-gain h3 { color: var(--gain-text); }
+.home .vs-mid { align-self: center; font-family: var(--font-head); font-weight: 700; color: var(--muted); }
 
-/* meaning */
-.theme-sky .mean-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); }
-.theme-sky .mean-card { border-left: 3px solid var(--rule); padding: 0 0 0 var(--space-3); }
-.theme-sky .mean-card h3 { margin: 0 0 var(--space-2); font-size: 1.05rem; }
-.theme-sky .mean-card p { margin: 0; line-height: 1.55; }
-.theme-sky .mean-card.ok { border-color: var(--ok); } .theme-sky .mean-card.no { border-color: var(--signal); } .theme-sky .mean-card.why { border-color: var(--gain); }
+/* sample */
+.home .sample-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: var(--space-5); align-items: start; }
+.home .card-fig { background: var(--card); border: var(--hairline); border-radius: var(--radius); padding: var(--space-3); margin: 0; }
+.home .card-fig svg { width: 100%; height: auto; }
+.home .units { margin: 0; display: grid; gap: var(--space-2); }
+.home .units div { display: grid; grid-template-columns: 4.2rem 1fr; gap: var(--space-3); align-items: baseline; border-bottom: var(--hairline); padding-bottom: var(--space-2); }
+.home .units dt { font-family: var(--font-mono); font-size: 1.5rem; color: var(--bench-text); text-align: right; }
+.home .units dd { margin: 0; font-size: 0.97rem; line-height: 1.5; }
 
-/* explore */
-.theme-sky .explore-grid { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: var(--space-4); }
-.theme-sky .card { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--rule); border-radius: 6px; padding: var(--space-4); color: var(--ink); text-decoration: none; }
-.theme-sky a.card:hover, .theme-sky a.card:focus-visible { border-color: var(--ink); }
-.theme-sky .card.feature { background: var(--ink); color: #fff; border-color: var(--ink); }
-.theme-sky .card.feature .card-k { color: #FF9B8F; } .theme-sky .card.feature .card-go { color: #fff; }
-.theme-sky .card-k { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--signal-text); }
-.theme-sky .card h3 { font-size: 1.3rem; margin: var(--space-2) 0; }
-.theme-sky .card p { flex: 1; line-height: 1.5; margin: 0 0 var(--space-3); }
-.theme-sky .card-go { font-family: var(--font-mono); font-size: 0.85rem; text-decoration: none; }
-.theme-sky .card-go::after { content: " \2192"; }
-.theme-sky .card-actions { display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: baseline; }
-.theme-sky .evidence { margin-top: var(--space-4); font-size: 0.9rem; color: var(--muted); }
+/* tools */
+.home .tool-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-3); }
+.home .tool-card { display: flex; flex-direction: column; background: var(--navy-2); border: 1px solid #22395A; border-radius: var(--radius); padding: var(--space-3); color: var(--on-navy); text-decoration: none; }
+.home .tool-card:hover, .home .tool-card:focus-visible { border-color: var(--bench-on-navy); }
+.home .tool-card h3 { font-size: 1.05rem; color: #fff; margin: var(--space-3) 0 var(--space-2); }
+.home .tool-card p { font-family: var(--font-head); font-size: 0.88rem; line-height: 1.5; color: var(--on-navy-muted); flex: 1; }
+.home .tool-card .go { font-family: var(--font-head); font-weight: 600; font-size: 0.88rem; color: var(--bench-on-navy); }
+.home .tool-card .go::after { content: " \2192"; }
+.home .mini { width: 100%; height: 72px; background: #0E2136; border-radius: 6px; }
+.home .mini .bar { fill: var(--bench-on-navy); } .home .mini .bar.soft { fill: #4A6A95; }
+.home .mini .zero { stroke: #5B7192; } .home .mini .pos { fill: var(--gain-on-navy); } .home .mini .neg { fill: var(--loss-on-navy); }
+.home .mini .mark { stroke: var(--loss-on-navy); stroke-width: 2.5; }
+.home .mini .exp { fill: none; stroke: var(--bench-on-navy); stroke-width: 2; stroke-dasharray: 4 3; } .home .mini .act { fill: none; stroke: var(--loss-on-navy); stroke-width: 2.2; }
 
-/* footer */
-.theme-sky .site-foot { background: var(--ink); color: #C9D1DE; border-top: 0; padding: var(--space-5) 0; }
-.theme-sky .site-foot h3 { color: #fff; font-size: 0.8rem; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.1em; }
-.theme-sky .site-foot p { font-size: 0.9rem; }
-.theme-sky .site-foot .mono { font-size: 0.8rem !important; }
-.theme-sky .foot-grid { display: grid; grid-template-columns: 1fr 1.4fr 2fr 1fr; gap: var(--space-4); }
+/* limitations */
+.home .lim-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); }
+.home .lim { background: var(--card); border: var(--hairline); border-radius: var(--radius); padding: var(--space-4); }
+.home .lim h3 { font-size: 1.05rem; }
+.home .lim p { font-size: 0.97rem; line-height: 1.55; margin-bottom: var(--space-2); }
+.home .wtab td, .home .wtab th { padding: 0.35rem 0; font-size: 0.88rem; text-transform: none; letter-spacing: 0; color: var(--ink); font-weight: 400; border-bottom: var(--hairline); }
+.home .wtab td.num { text-align: right; font-family: var(--font-mono); }
+.home .wtab .neg { color: var(--loss-text); } .home .wtab .pos { color: var(--gain-text); }
 
-@media (max-width: 860px) {
-  .theme-sky .hero-grid, .theme-sky .two, .theme-sky .find-grid, .theme-sky .steps, .theme-sky .mean-grid, .theme-sky .explore-grid, .theme-sky .foot-grid { grid-template-columns: 1fr; }
-  .theme-sky .cd-nav { display: none; }
+/* resources */
+.home .res-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); }
+.home .r-card { border: var(--hairline); border-radius: var(--radius); padding: var(--space-4); background: var(--paper); display: flex; flex-direction: column; }
+.home .r-card h3 { font-size: 1.12rem; line-height: 1.3; }
+.home .r-card p { font-size: 0.97rem; line-height: 1.55; }
+.home .r-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; margin-top: auto; }
+.home details.more { margin-top: var(--space-4); border: var(--hairline); border-radius: var(--radius); padding: 0 var(--space-4); background: var(--paper); }
+.home details.more summary { cursor: pointer; font-family: var(--font-head); font-weight: 600; padding: var(--space-3) 0; }
+.home .ev { columns: 2; font-size: 0.95rem; padding-left: 1.1rem; }
+
+@media (max-width: 980px) { .home .tool-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .home .lim-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 760px) {
+  .home .find-grid, .home .sample-grid, .home .res-grid, .home .lim-grid, .home .tool-grid { grid-template-columns: 1fr; }
+  .home .vs-grid { grid-template-columns: 1fr; } .home .vs-mid { justify-self: center; }
+  .home .ev { columns: 1; }
 }
 
 </style>
 </head>
-<body class="theme-sky">
-<a class="skip-link" href="#main">Skip to the article</a>
-<div class="topbar"><div class="wrap tb">
-  <span><span class="dot" aria-hidden="true"></span>T-Minus Markets · research log</span>
-  <span>Results Nov 2026 · 138 failures · 42 rival reactions</span>
-</div></div>
-<header class="brand"><div class="wrap brand-row">
-  <a class="logo" href="index.html" aria-label="T-Minus Markets, home"><span class="logo-mark" aria-hidden="true">T&#8722;</span>
-    <span class="logo-text"><span class="logo-name">T-Minus Markets</span><span class="logo-tag">What a failed launch costs on the stock market</span></span></a>
-  <nav class="cd-nav" aria-label="Sections">
-    <a href="#question"><b>T&#8722;4</b> Question</a><a href="#findings"><b>T&#8722;3</b> Findings</a><a href="#method"><b>T&#8722;2</b> Method</a>
-    <a href="#meaning"><b>T&#8722;1</b> Meaning</a><a href="#explore"><b>T&#8722;0</b> Explore</a>
-  </nav>
-</div></header>
-<div class="ticker" aria-hidden="true"><span class="ticker-label">Two-day abnormal returns</span><div class="ticker-track"><div class="ticker-run"><span class="tk"><span class="tk-d">2026-01-12</span> PSLV-DL fails <span class="tk-role">rival</span> FLY <span class="dn">−7.0%</span></span><span class="tk"><span class="tk-d">2025-12-23</span> HANBIT-NANO fails <span class="tk-role">rival</span> FLY <span class="dn">−6.1%</span></span><span class="tk"><span class="tk-d">2025-04-29</span> Firefly Alpha fails <span class="tk-role">rival</span> RKLB <span class="dn">−7.4%</span></span><span class="tk"><span class="tk-d">2025-03-31</span> Spectrum fails <span class="tk-role">rival</span> RKLB <span class="dn">−6.5%</span></span><span class="tk"><span class="tk-d">2024-12-18</span> Kairos fails <span class="tk-role">rival</span> AVIO.MI <span class="up">+14.5%</span></span><span class="tk"><span class="tk-d">2024-12-18</span> Kairos fails <span class="tk-role">rival</span> RKLB <span class="dn">−7.3%</span></span><span class="tk"><span class="tk-d">2023-12-27</span> Firefly Alpha fails <span class="tk-role">rival</span> AVIO.MI <span class="up">+6.4%</span></span><span class="tk"><span class="tk-d">2023-12-22</span> Firefly Alpha fails <span class="tk-role">rival</span> RKLB <span class="up">+25.3%</span></span><span class="tk"><span class="tk-d">2023-09-19</span> Electron fails <span class="tk-role">maker</span> RKLB <span class="dn">−10.5%</span></span><span class="tk"><span class="tk-d">2023-01-11</span> RS1 fails <span class="tk-role">rival</span> RKLB <span class="up">+7.3%</span></span><span class="tk"><span class="tk-d">2022-12-21</span> Vega C fails <span class="tk-role">maker</span> AVIO.MI <span class="dn">−8.8%</span></span><span class="tk"><span class="tk-d">2022-06-13</span> Astra Rocket 3.3 fails <span class="tk-role">rival</span> AVIO.MI <span class="dn">−7.3%</span></span><span class="tk"><span class="tk-d">2020-11-17</span> Vega fails <span class="tk-role">maker</span> AVIO.MI <span class="dn">−16.3%</span></span><span class="tk"><span class="tk-d">2019-07-11</span> Vega fails <span class="tk-role">maker</span> AVIO.MI <span class="dn">−12.3%</span></span><span class="tk"><span class="tk-d">2026-01-12</span> PSLV-DL fails <span class="tk-role">rival</span> FLY <span class="dn">−7.0%</span></span><span class="tk"><span class="tk-d">2025-12-23</span> HANBIT-NANO fails <span class="tk-role">rival</span> FLY <span class="dn">−6.1%</span></span><span class="tk"><span class="tk-d">2025-04-29</span> Firefly Alpha fails <span class="tk-role">rival</span> RKLB <span class="dn">−7.4%</span></span><span class="tk"><span class="tk-d">2025-03-31</span> Spectrum fails <span class="tk-role">rival</span> RKLB <span class="dn">−6.5%</span></span><span class="tk"><span class="tk-d">2024-12-18</span> Kairos fails <span class="tk-role">rival</span> AVIO.MI <span class="up">+14.5%</span></span><span class="tk"><span class="tk-d">2024-12-18</span> Kairos fails <span class="tk-role">rival</span> RKLB <span class="dn">−7.3%</span></span><span class="tk"><span class="tk-d">2023-12-27</span> Firefly Alpha fails <span class="tk-role">rival</span> AVIO.MI <span class="up">+6.4%</span></span><span class="tk"><span class="tk-d">2023-12-22</span> Firefly Alpha fails <span class="tk-role">rival</span> RKLB <span class="up">+25.3%</span></span><span class="tk"><span class="tk-d">2023-09-19</span> Electron fails <span class="tk-role">maker</span> RKLB <span class="dn">−10.5%</span></span><span class="tk"><span class="tk-d">2023-01-11</span> RS1 fails <span class="tk-role">rival</span> RKLB <span class="up">+7.3%</span></span><span class="tk"><span class="tk-d">2022-12-21</span> Vega C fails <span class="tk-role">maker</span> AVIO.MI <span class="dn">−8.8%</span></span><span class="tk"><span class="tk-d">2022-06-13</span> Astra Rocket 3.3 fails <span class="tk-role">rival</span> AVIO.MI <span class="dn">−7.3%</span></span><span class="tk"><span class="tk-d">2020-11-17</span> Vega fails <span class="tk-role">maker</span> AVIO.MI <span class="dn">−16.3%</span></span><span class="tk"><span class="tk-d">2019-07-11</span> Vega fails <span class="tk-role">maker</span> AVIO.MI <span class="dn">−12.3%</span></span></div></div></div>
+<body class="home">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="ss-header"><div class="ss-row"><a class="ss-logo" href="index.html"><svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><circle cx="16" cy="16" r="7" fill="none" stroke="#8DB6FF" stroke-width="2.2"/><ellipse cx="16" cy="16" rx="14" ry="5.5" fill="none" stroke="#8DB6FF" stroke-width="1.6" transform="rotate(-28 16 16)"/><circle cx="27.2" cy="9.4" r="2.4" fill="#FF9480"/></svg><span><span class="ss-name">SPACE <b>SHOCK</b></span><span class="ss-sub">Financial contagion and competition in the space industry</span></span></a><nav class="ss-nav" aria-label="Site"><ul><li><a href="index.html" aria-current="page">Home</a></li><li><a href="site/index.html">Interactive report</a></li><li><a href="case-study.html">Working paper</a></li><li><a href="site/index.html#methods">Data &amp; methods</a></li><li><a href="https://github.com/NahianIbnat-2000/T-Minus-Market">Code</a></li><li><a href="case-study.pdf" download class="ss-dl">Download PDF</a></li></ul></nav><details class="ss-menu"><summary aria-label="Open site menu">Menu</summary><nav aria-label="Site (menu)"><ul><li><a href="index.html" aria-current="page">Home</a></li><li><a href="site/index.html">Interactive report</a></li><li><a href="case-study.html">Working paper</a></li><li><a href="site/index.html#methods">Data &amp; methods</a></li><li><a href="https://github.com/NahianIbnat-2000/T-Minus-Market">Code</a></li><li><a href="case-study.pdf" download class="ss-dl">Download PDF</a></li></ul></nav></details></div></header>
 <main id="main">
-<section class="hero"><div class="wrap hero-grid">
-  <div>
-    <p class="eyebrow">Space · Finance · Event study</p>
-    <h1>When a rocket fails, who loses money?</h1>
-    <p class="dek">An event study of 138 orbital launch failures, 2000 to 2026: the stock of the company that built the rocket, and the stocks of its listed competitors.</p>
-    <p class="byline">Nahian Ibnat · Independent research · Updated Nov 2026</p>
-    <p class="cta"><a class="btn" href="site/index.html">Open the interactive report</a><a class="btn ghost" href="case-study.html">Read the working paper</a><a class="dl-link" href="case-study.pdf" download>Download PDF</a></p>
-  </div>
-  <aside class="status" aria-label="Sample at a glance"><div class="st-head"><span>Mission data</span><span>from the pipeline</span></div>
-    <ul><li><span class="st-k">Launch failures</span><span class="st-v">138</span><span class="st-n">orbital, 2000 to 2026</span></li><li><span class="st-k">Listed-maker cases</span><span class="st-v">4</span><span class="st-n">2 firms</span></li><li><span class="st-k">Rival reactions</span><span class="st-v">42</span><span class="st-n">3 listed rivals</span></li><li><span class="st-k">Independent events</span><span class="st-v">22</span><span class="st-n">clusters</span></li><li><span class="st-k">Prespecified checks</span><span class="st-v">12</span><span class="st-n">none significant</span></li></ul><p class="st-note">Every number on this page is read from the published results. Prices are never published.</p></aside>
+<section class="hero" aria-labelledby="title"><div class="wrap hero-in">
+  <p class="eyebrow">Space finance · Event study · Working paper</p>
+  <h1 id="title">When rockets fail, who pays the price?</h1>
+  <p class="dek">What happens to stock prices when an orbital rocket fails: for the company that built it, and for its listed competitors. 138 failures, 2000 to 2026.</p>
+  <p class="cta"><a class="btn" href="site/index.html">Explore the interactive report</a><a class="btn ghost" href="case-study.html">Read the working paper</a><a class="dl-link" href="case-study.pdf" download>Download PDF</a></p>
+  <p class="meta-line">Nahian Ibnat · Independent working paper, not peer reviewed · Results Nov 2026</p>
 </div></section>
 
-<section id="question" class="band"><div class="wrap two">
-  <div><p class="eyebrow">T&#8722;4 · The question</p><h2>Contagion or a gain for rivals?</h2></div>
-  <div class="lede-text">
-    <p>A failed launch destroys a rocket and often a customer's satellite, so the builder should lose value. The open question is its <strong>listed competitors</strong>. If investors read a failure as a sign that spaceflight is risky for everyone, rival stocks fall: <strong>contagion</strong>. If they expect customers to move to a rocket that works, rival stocks rise: <strong>competitive gain</strong>.</p>
-    <p class="muted">The same question comes up when a bank fails or a product is recalled. Launch failures are useful because they are sudden, public and easy to date.</p>
-  </div>
-</div></section>
-
-<section id="findings" class="findings"><div class="wrap">
-  <p class="eyebrow">T&#8722;3 · What the data show</p><h2>Two findings</h2>
+<section class="findings" aria-labelledby="h-find"><div class="wrap">
+  <h2 id="h-find" class="sec-h"><span class="sec-n">01</span>Headline findings</h2>
   <div class="find-grid">
-    <article class="panel loss-panel"><p class="panel-kicker">01 · The rocket's maker</p>
-      <p class="big">−8.8% to −16.3%</p>
-      <p>In all 4 listed cases, the maker&#x27;s shares fell 8.8% to 16.3% more than the market in the two trading days after the failure.</p>
-      <figure><svg viewBox="0 0 560 250" class="chart" role="img" aria-label="Cumulative abnormal return of the rocket maker after each failure. Vega 2019: −12.3% over days 0 to 1; Vega 2020: −16.3% over days 0 to 1; Vega C 2022: −8.8% over days 0 to 1; Electron 2023: −10.5% over days 0 to 1"><line x1="44" x2="440" y1="16.0" y2="16.0" class="grid"/><text x="38" y="20.0" text-anchor="end" class="ax">+5%</text><line x1="44" x2="440" y1="56.8" y2="56.8" class="zero"/><text x="38" y="60.8" text-anchor="end" class="ax">0%</text><line x1="44" x2="440" y1="97.6" y2="97.6" class="grid"/><text x="38" y="101.6" text-anchor="end" class="ax">−5%</text><line x1="44" x2="440" y1="138.4" y2="138.4" class="grid"/><text x="38" y="142.4" text-anchor="end" class="ax">−10%</text><line x1="44" x2="440" y1="179.2" y2="179.2" class="grid"/><text x="38" y="183.2" text-anchor="end" class="ax">−15%</text><line x1="44" x2="440" y1="220.0" y2="220.0" class="grid"/><text x="38" y="224.0" text-anchor="end" class="ax">−20%</text><text x="80.0" y="240" text-anchor="middle" class="ax">Day 0</text><text x="116.0" y="240" text-anchor="middle" class="ax">+1</text><text x="260.0" y="240" text-anchor="middle" class="ax">+5</text><text x="440.0" y="240" text-anchor="middle" class="ax">+10</text><rect x="80.0" y="16" width="36.0" height="204" class="win"/><path d="M44.0,56.8 L80.0,179.4 L116.0,157.0 L152.0,140.1 L188.0,153.4 L224.0,154.6 L260.0,161.4 L296.0,155.3 L332.0,150.9 L368.0,159.8 L404.0,157.4 L440.0,153.5" class="mk"/><circle cx="440.0" cy="153.5" r="3" class="mkd"/><text x="448.0" y="157.5" class="lab">Vega 2019</text><path d="M44.0,56.8 L80.0,196.2 L116.0,189.5 L152.0,162.2 L188.0,171.2 L224.0,189.1 L260.0,204.1 L296.0,212.9 L332.0,207.2 L368.0,204.1 L404.0,198.9 L440.0,184.7" class="mk"/><circle cx="440.0" cy="184.7" r="3" class="mkd"/><text x="448.0" y="188.7" class="lab">Vega 2020</text><path d="M44.0,56.8 L80.0,139.2 L116.0,128.7 L152.0,152.4 L188.0,127.3 L224.0,140.2 L260.0,128.1 L296.0,135.6 L332.0,122.8 L368.0,97.6 L404.0,89.4 L440.0,79.9" class="mk"/><circle cx="440.0" cy="79.9" r="3" class="mkd"/><text x="448.0" y="83.9" class="lab">Vega C 2022</text><path d="M44.0,56.8 L80.0,115.2 L116.0,142.3 L152.0,104.8 L188.0,101.4 L224.0,132.1 L260.0,129.0 L296.0,118.2 L332.0,120.7 L368.0,109.2 L404.0,107.8 L440.0,126.6" class="mk"/><circle cx="440.0" cy="126.6" r="3" class="mkd"/><text x="448.0" y="130.6" class="lab">Electron 2023</text></svg><figcaption>Cumulative abnormal return from the day before (0%) to day +10. Shaded: the two-day window. 4 cases from 2 firms, so these are case studies.</figcaption></figure>
+    <article class="res-card is-loss" aria-labelledby="h-maker">
+      <p class="res-k">The rocket's maker</p>
+      <h3 id="h-maker" class="res-big">−8.8% to −16.3%</h3>
+      <p class="res-def">Two-day abnormal return (cumulative, day 0 to +1) in each of the <strong>4 listed-maker cases</strong>, from 2 firms.</p>
+      <figure><svg viewBox="0 0 560 240" class="chart" role="img" aria-label="Cumulative abnormal return of the rocket maker after each failure. Vega 2019: −12.3% over days 0 to +1; Vega 2020: −16.3% over days 0 to +1; Vega C 2022: −8.8% over days 0 to +1; Electron 2023: −10.5% over days 0 to +1"><rect x="82.0" y="14" width="36.0" height="196" class="win"/><line x1="46" x2="442" y1="14.0" y2="14.0" class="grid"/><text x="40" y="18.0" text-anchor="end" class="ax">+5%</text><line x1="46" x2="442" y1="53.2" y2="53.2" class="zero"/><text x="40" y="57.2" text-anchor="end" class="ax">0%</text><line x1="46" x2="442" y1="92.4" y2="92.4" class="grid"/><text x="40" y="96.4" text-anchor="end" class="ax">−5%</text><line x1="46" x2="442" y1="131.6" y2="131.6" class="grid"/><text x="40" y="135.6" text-anchor="end" class="ax">−10%</text><line x1="46" x2="442" y1="170.8" y2="170.8" class="grid"/><text x="40" y="174.8" text-anchor="end" class="ax">−15%</text><line x1="46" x2="442" y1="210.0" y2="210.0" class="grid"/><text x="40" y="214.0" text-anchor="end" class="ax">−20%</text><text x="82.0" y="230" text-anchor="middle" class="ax">Day 0</text><text x="118.0" y="230" text-anchor="middle" class="ax">+1</text><text x="262.0" y="230" text-anchor="middle" class="ax">+5</text><text x="442.0" y="230" text-anchor="middle" class="ax">+10</text><path d="M46.0,53.2 L82.0,171.0 L118.0,149.5 L154.0,133.2 L190.0,146.0 L226.0,147.1 L262.0,153.7 L298.0,147.8 L334.0,143.6 L370.0,152.2 L406.0,149.9 L442.0,146.1" class="loss-line"/><circle cx="442.0" cy="146.1" r="3" class="loss-dot"/><text x="450.0" y="150.1" class="lab">Vega 2019</text><path d="M46.0,53.2 L82.0,187.1 L118.0,180.7 L154.0,154.5 L190.0,163.1 L226.0,180.3 L262.0,194.8 L298.0,203.2 L334.0,197.7 L370.0,194.7 L406.0,189.7 L442.0,176.1" class="loss-line"/><circle cx="442.0" cy="176.1" r="3" class="loss-dot"/><text x="450.0" y="180.1" class="lab">Vega 2020</text><path d="M46.0,53.2 L82.0,132.4 L118.0,122.2 L154.0,145.1 L190.0,120.9 L226.0,133.3 L262.0,121.7 L298.0,128.9 L334.0,116.6 L370.0,92.4 L406.0,84.6 L442.0,75.4" class="loss-line"/><circle cx="442.0" cy="75.4" r="3" class="loss-dot"/><text x="450.0" y="79.4" class="lab">Vega C 2022</text><path d="M46.0,53.2 L82.0,109.3 L118.0,135.3 L154.0,99.3 L190.0,96.1 L226.0,125.5 L262.0,122.6 L298.0,112.2 L334.0,114.6 L370.0,103.5 L406.0,102.2 L442.0,120.3" class="loss-line"/><circle cx="442.0" cy="120.3" r="3" class="loss-dot"/><text x="450.0" y="124.3" class="lab">Electron 2023</text></svg><figcaption>Each line is one failure: cumulative abnormal return from the close before the failure (0%) to day +10. Shaded: the two-day window. With 4 cases these are case studies, not a general estimate.</figcaption></figure>
     </article>
-    <article class="panel"><p class="panel-kicker">02 · Its listed competitors</p>
-      <p class="big neutral">+0.28%</p>
-      <p>Listed competitors moved +0.28% on average (95% interval −1.62% to +2.18%, p = 0.76). That is not statistically detectable. 22 independent events, 3 firms.</p>
-      <figure><svg viewBox="0 0 560 120" class="chart" role="img" aria-label="Average two-day reaction of listed competitors +0.28%, 95% interval −1.62% to +2.18%, which includes zero."><line x1="280.0" x2="280.0" y1="14" y2="90" class="zero"/><text x="72.0" y="110" text-anchor="middle" class="ax">−4%</text><text x="176.0" y="110" text-anchor="middle" class="ax">−2%</text><text x="384.0" y="110" text-anchor="middle" class="ax">+2%</text><text x="488.0" y="110" text-anchor="middle" class="ax">+4%</text><text x="280.0" y="110" text-anchor="middle" class="ax">0%</text><rect x="140.3" y="22" width="279.5" height="44" class="mde"/><line x1="195.7" x2="393.4" y1="44" y2="44" class="ci"/><line x1="195.7" x2="195.7" y1="37" y2="51" class="ci"/><line x1="393.4" x2="393.4" y1="37" y2="51" class="ci"/><circle cx="294.5" cy="44" r="6" class="pt"/></svg><figcaption>Dot: average two-day reaction. Bar: 95% interval. Shaded: average effects up to about 2.7% either way could not be reliably detected.</figcaption></figure>
-      <p class="small">The prespecified standardized test gives p = 0.40. On random ordinary days the real average sits at the 61st percentile.</p>
+    <article class="res-card" aria-labelledby="h-rival">
+      <p class="res-k">Its listed competitors</p>
+      <h3 id="h-rival" class="res-big neutral">+0.28%</h3>
+      <p class="res-def">Average two-day abnormal return, <strong>95% interval −1.62% to +2.18%</strong>. 42 reactions of 3 listed competitor firms to 24 failures, grouped into 22 independent events.</p>
+      <figure><svg viewBox="0 0 560 118" class="chart" role="img" aria-label="Average two-day reaction of listed competitors +0.28%, 95% interval −1.62% to +2.18%, which includes zero."><rect x="142.4" y="18" width="275.2" height="54" class="mde"/><line x1="280.0" x2="280.0" y1="10" y2="90" class="zero"/><text x="75.2" y="110" text-anchor="middle" class="ax">−4%</text><text x="177.6" y="110" text-anchor="middle" class="ax">−2%</text><text x="280.0" y="110" text-anchor="middle" class="ax">0%</text><text x="382.4" y="110" text-anchor="middle" class="ax">+2%</text><text x="484.8" y="110" text-anchor="middle" class="ax">+4%</text><line x1="197.0" x2="391.7" y1="45" y2="45" class="ci"/><line x1="197.0" x2="197.0" y1="37" y2="53" class="ci"/><line x1="391.7" x2="391.7" y1="37" y2="53" class="ci"/><circle cx="294.3" cy="45" r="6.5" class="pt"/></svg><figcaption>Dot: average. Bar: 95% interval (cluster-robust). Shaded: average effects up to about 2.7% in either direction that this sample could not reliably detect.</figcaption></figure>
+      <div class="tests">
+        <div><span class="badge confirm">Prespecified test</span><p>Standardized (BMP) test with a correction for events on nearby days: <strong>p = 0.40</strong>. It gives volatile stocks less weight.</p></div>
+        <div><span class="badge robust">Mean test</span><p>Cluster-robust test of the plain average shown above: <strong>p = 0.76</strong>. Same data, a different question, so the two p-values are not interchangeable.</p></div>
+      </div>
     </article>
   </div>
 </div></section>
 
-<section id="method" class="band"><div class="wrap">
-  <p class="eyebrow">T&#8722;2 · How it works</p><h2>Three steps</h2>
-  <ol class="steps">
-    <li><span class="step-n">1</span><h3>Find every failure</h3><p>138 orbital launch failures from GCAT, each dated to the first trading day after the news became public.</p></li>
-    <li><span class="step-n">2</span><h3>Predict a normal day</h3><p>A market model, fitted on about a year of earlier returns, predicts each stock's return from its home index.</p></li>
-    <li><span class="step-n">3</span><h3>Measure the gap</h3><p>The abnormal return is actual minus predicted, added up over the two trading days after the failure.</p></li>
-  </ol>
-  <details class="more"><summary>The sample in detail</summary><figure class="cs-fig"><svg viewBox="0 0 720 250" width="100%" role="img" aria-label="Sample construction: launches, failures, rival reactions and independent events, with the unit of each box." font-family="DM Mono, ui-monospace, monospace" font-size="11" fill="#1C1C1C"><title>Sample construction: launches, failures, rival reactions and independent events, with the unit of each box.</title><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1C1C1C"/></marker></defs><path d="M136.0,41.0 L154.0,41.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><path d="M282.0,41.0 L300.0,41.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><path d="M428.0,41.0 L446.0,41.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><path d="M364.0,70.0 L364.0,92.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><path d="M428.0,121.0 L446.0,121.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><path d="M574.0,121.0 L592.0,121.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><path d="M510.0,150.0 L592.0,201.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><rect x="8" y="12" width="128" height="58" fill="#F3EEE4" stroke="#1C1C1C"/><text x="16" y="34" font-size="16" font-weight="700">3,077</text><text x="16" y="49" font-size="9.5">Launch attempts</text><text x="16" y="62" font-size="8.5" fill="#5E574C">unit: launches</text><rect x="154" y="12" width="128" height="58" fill="#F3EEE4" stroke="#1C1C1C"/><text x="162" y="34" font-size="16" font-weight="700">138</text><text x="162" y="49" font-size="9.5">Failures</text><text x="162" y="62" font-size="8.5" fill="#5E574C">unit: launches</text><rect x="300" y="12" width="128" height="58" fill="#F3EEE4" stroke="#1C1C1C"/><text x="308" y="34" font-size="16" font-weight="700">27</text><text x="308" y="49" font-size="9.5">In the study</text><text x="308" y="62" font-size="8.5" fill="#5E574C">unit: failures</text><rect x="446" y="12" width="128" height="58" fill="#EBE4D6" stroke="#1C1C1C"/><text x="454" y="34" font-size="16" font-weight="700">4</text><text x="454" y="49" font-size="9.5">Listed maker</text><text x="454" y="62" font-size="8.5" fill="#5E574C">unit: failures; case studies</text><rect x="300" y="92" width="128" height="58" fill="#F3EEE4" stroke="#1C1C1C"/><text x="308" y="114" font-size="16" font-weight="700">24</text><text x="308" y="129" font-size="9.5">Listed rivals</text><text x="308" y="142" font-size="8.5" fill="#5E574C">unit: failures</text><rect x="446" y="92" width="128" height="58" fill="#F3EEE4" stroke="#1C1C1C"/><text x="454" y="114" font-size="16" font-weight="700">42</text><text x="454" y="129" font-size="9.5">Rival reactions</text><text x="454" y="142" font-size="8.5" fill="#5E574C">unit: firm x failure</text><rect x="592" y="92" width="128" height="58" fill="#EBE4D6" stroke="#1C1C1C"/><text x="600" y="114" font-size="16" font-weight="700">22</text><text x="600" y="129" font-size="9.5">Independent events</text><text x="600" y="142" font-size="8.5" fill="#5E574C">unit: clusters</text><rect x="592" y="172" width="128" height="58" fill="#F3EEE4" stroke="#1C1C1C"/><text x="600" y="194" font-size="16" font-weight="700">3</text><text x="600" y="209" font-size="9.5">Rival firms</text><text x="600" y="222" font-size="8.5" fill="#5E574C">unit: firms</text></svg><figcaption class="cs-cap">Each box gives a count and its unit. Source: GCAT and the project pipeline.</figcaption></figure>
-    <ul class="method">
-      <li><strong>Listed-maker cases (4):</strong> failures whose rocket was built by a listed company.</li>
-      <li><strong>Rival-eligible failures (24):</strong> failures with at least one listed direct competitor.</li>
-      <li><strong>Rival reactions (42):</strong> one per listed rival per failure.</li>
-      <li><strong>Independent events (22):</strong> failures that share a firm within a few trading days count as one event.</li>
-      <li><strong>Rival firms (3):</strong> Avio SpA, Firefly Aerospace, Rocket Lab.</li>
-    </ul>
-    <p>The rules were committed to the public repository before the results (record in the working paper, Appendix G); they were not filed with an independent registry. Only derived statistics are published.</p></details>
+<section class="interpret" aria-labelledby="h-int"><div class="wrap narrow">
+  <h2 id="h-int" class="sec-h"><span class="sec-n">02</span>In plain language</h2>
+  <p class="lede">A failed launch is expensive for the company that built the rocket: in every listed case its shares fell sharply, more than the market, over the next two trading days. For its competitors the picture is unclear. Their average reaction is close to zero, but the interval runs from −1.62% to +2.18%, so losses or gains of up to about 2.7% cannot be ruled out. <strong>Not finding an effect is not the same as finding no effect.</strong></p>
 </div></section>
 
-<section id="meaning" class="meaning"><div class="wrap">
-  <p class="eyebrow">T&#8722;1 · What it means</p><h2>What the evidence can and cannot say</h2>
-  <div class="mean-grid">
-    <div class="mean-card ok"><h3>Shown</h3><p>Large two-day losses for the maker in every listed case. No detectable average reaction among the 3 listed competitors.</p></div>
-    <div class="mean-card no"><h3>Not shown</h3><p>That rivals lose or gain on average; that the effect is zero; that customers switch rockets; that the pattern holds for private or state-owned firms.</p></div>
-    <div class="mean-card why"><h3>Why so uncertain</h3><p>Only 3 listed rivals, and Avio SpA is in all 22 events. Effects below about 2.7% either way would usually be missed.</p></div>
+<section class="versus band" aria-labelledby="h-vs"><div class="wrap">
+  <h2 id="h-vs" class="sec-h"><span class="sec-n">03</span>Contagion or competition?</h2>
+  <p class="sec-intro">When one company's rocket fails, investors can read the news about its competitors in two opposite ways.</p>
+  <div class="vs-grid">
+    <div class="vs-card is-loss"><p class="vs-arrow" aria-hidden="true">&#8600;</p><h3>Contagion</h3><p>The failure is a reminder that spaceflight is risky for everyone: insurance, delays, customer doubts. <strong>Rival stocks fall.</strong></p></div>
+    <div class="vs-mid" aria-hidden="true">or</div>
+    <div class="vs-card is-gain"><p class="vs-arrow" aria-hidden="true">&#8599;</p><h3>Competitive gain</h3><p>Customers may move their satellites to a rocket that works. <strong>Rival stocks rise.</strong></p></div>
   </div>
-  <details class="more"><summary>Reliability and robustness</summary>
-    <p>With this sample, an average effect smaller than about 2.7% either way would usually go undetected (80% power at the 5% level); the chance of detecting a true 1% effect is about 18%. "Not detectable" here does not mean "no effect".</p>
-    <p><strong>Prespecified checks.</strong> None of the 12 checks fixed in advance detects a significant average at the 5% level; the estimates range from −0.15% to +1.84%, so the lack of an effect is stable but its direction and size are not.</p>
-    <p><strong>Weighting (added after the results).</strong> +0.28% with every reaction equal (prespecified), +0.21% with every event equal, +0.87% weighting calm stocks more, −1.16% with every firm equal.</p>
-    <p><strong>Exploratory.</strong> An exploratory check added after the results leaves out the 2 days when competitors announced large contracts: the average moves to −0.70% (95% interval −1.80% to +0.39%), while the median moves only from +0.28% to +0.09%, so the average is sensitive to a few large moves. It is exploratory and does not replace the main result.</p>
-    <p>Possible explanations the data cannot separate: contagion and competitive gain cancelling out, customers unable to switch quickly, or investors treating a failure as news about the failed firm only.</p></details>
+  <p class="sec-note">Both can happen at once and partly cancel out, so an average near zero is consistent with either story, with both, or with neither.</p>
 </div></section>
 
-<section id="explore" class="band"><div class="wrap">
-  <p class="eyebrow">T&#8722;0 · Explore</p><h2>Go deeper</h2>
-  <div class="explore-grid">
-    <a class="card feature" href="site/index.html"><span class="card-k">Interactive report</span><h3>Run the study yourself</h3>
-      <p>Failure Timeline, Expected vs Actual, Event Study Lab and Placebo Simulator, in five countdown stages.</p><span class="card-go">Open the report</span></a>
-    <div class="card"><span class="card-k">Working paper</span><h3>The full study</h3>
-      <p><em>Rocket Launch Failures and Equity-Market Spillovers.</em> Methods, results, robustness and appendices. The same paper as a web page and as a PDF.</p>
-      <span class="card-actions"><a class="card-go" href="case-study.html">Read the paper</a><a class="dl-link" href="case-study.pdf" download>Download PDF</a></span></div>
-    <div class="card"><span class="card-k">Code</span><h3>Pipeline and tests</h3>
-      <p>Python pipeline from raw launch records to every published number, with an independent verification.</p><a class="card-go" href="https://github.com/NahianIbnat-2000/T-Minus-Market">View the code</a></div>
+<section class="sample" aria-labelledby="h-sample"><div class="wrap">
+  <h2 id="h-sample" class="sec-h"><span class="sec-n">04</span>Sample and coverage</h2>
+  <p class="sec-intro">The counts below measure different things (failures, firm reactions, independent events), so they are not one shrinking funnel.</p>
+  <div class="sample-grid">
+    <figure class="card-fig"><svg viewBox="0 0 720 250" width="100%" role="img" aria-label="Sample construction: launches, failures, rival reactions and independent events, with the unit of each box." font-family="DM Mono, ui-monospace, monospace" font-size="11" fill="#0F172A"><title>Sample construction: launches, failures, rival reactions and independent events, with the unit of each box.</title><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0F172A"/></marker></defs><path d="M136.0,41.0 L154.0,41.0" stroke="#0F172A" fill="none" marker-end="url(#arr)"/><path d="M282.0,41.0 L300.0,41.0" stroke="#0F172A" fill="none" marker-end="url(#arr)"/><path d="M428.0,41.0 L446.0,41.0" stroke="#0F172A" fill="none" marker-end="url(#arr)"/><path d="M364.0,70.0 L364.0,92.0" stroke="#0F172A" fill="none" marker-end="url(#arr)"/><path d="M428.0,121.0 L446.0,121.0" stroke="#0F172A" fill="none" marker-end="url(#arr)"/><path d="M574.0,121.0 L592.0,121.0" stroke="#0F172A" fill="none" marker-end="url(#arr)"/><path d="M510.0,150.0 L592.0,201.0" stroke="#0F172A" fill="none" marker-end="url(#arr)"/><rect x="8" y="12" width="128" height="58" fill="#FFFFFF" stroke="#0F172A"/><text x="16" y="34" font-size="16" font-weight="700">3,077</text><text x="16" y="49" font-size="9.5">Launch attempts</text><text x="16" y="62" font-size="8.5" fill="#475569">unit: launches</text><rect x="154" y="12" width="128" height="58" fill="#FFFFFF" stroke="#0F172A"/><text x="162" y="34" font-size="16" font-weight="700">138</text><text x="162" y="49" font-size="9.5">Failures</text><text x="162" y="62" font-size="8.5" fill="#475569">unit: launches</text><rect x="300" y="12" width="128" height="58" fill="#FFFFFF" stroke="#0F172A"/><text x="308" y="34" font-size="16" font-weight="700">27</text><text x="308" y="49" font-size="9.5">In the study</text><text x="308" y="62" font-size="8.5" fill="#475569">unit: failures</text><rect x="446" y="12" width="128" height="58" fill="#EEF1F5" stroke="#0F172A"/><text x="454" y="34" font-size="16" font-weight="700">4</text><text x="454" y="49" font-size="9.5">Listed maker</text><text x="454" y="62" font-size="8.5" fill="#475569">unit: failures; case studies</text><rect x="300" y="92" width="128" height="58" fill="#FFFFFF" stroke="#0F172A"/><text x="308" y="114" font-size="16" font-weight="700">24</text><text x="308" y="129" font-size="9.5">Listed rivals</text><text x="308" y="142" font-size="8.5" fill="#475569">unit: failures</text><rect x="446" y="92" width="128" height="58" fill="#FFFFFF" stroke="#0F172A"/><text x="454" y="114" font-size="16" font-weight="700">42</text><text x="454" y="129" font-size="9.5">Rival reactions</text><text x="454" y="142" font-size="8.5" fill="#475569">unit: firm x failure</text><rect x="592" y="92" width="128" height="58" fill="#EEF1F5" stroke="#0F172A"/><text x="600" y="114" font-size="16" font-weight="700">22</text><text x="600" y="129" font-size="9.5">Independent events</text><text x="600" y="142" font-size="8.5" fill="#475569">unit: clusters</text><rect x="592" y="172" width="128" height="58" fill="#FFFFFF" stroke="#0F172A"/><text x="600" y="194" font-size="16" font-weight="700">3</text><text x="600" y="209" font-size="9.5">Rival firms</text><text x="600" y="222" font-size="8.5" fill="#475569">unit: firms</text></svg><figcaption>Sample construction. Each box gives a count and its unit. Source: GCAT and the project pipeline.</figcaption></figure>
+    <dl class="units">
+      <div><dt>138</dt><dd><strong>Orbital launch failures</strong> identified, 2000 to 2026 (GCAT success score below 0.75).</dd></div>
+      <div><dt>4</dt><dd><strong>Listed-maker cases</strong>: the rocket was built by a listed company.</dd></div>
+      <div><dt>24</dt><dd><strong>Failures with listed competitors</strong>, the rival sample.</dd></div>
+      <div><dt>42</dt><dd><strong>Firm-event reactions</strong>: one per competitor per failure.</dd></div>
+      <div><dt>22</dt><dd><strong>Independent events</strong>: failures that share a firm within a few trading days count once.</dd></div>
+      <div><dt>3</dt><dd><strong>Listed competitor firms</strong>: Avio SpA, Firefly Aerospace, Rocket Lab.</dd></div>
+    </dl>
   </div>
-  <p class="evidence"><strong>Evidence:</strong> <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/reports/04_feasibility_report.md">Feasibility report (before results)</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/reports/05_results.md">Results report</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/docs/CONFOUNDING_NEWS.md">Confounding-news checks</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/reports/06_confounding_sensitivity.md">Exploratory confounding sensitivity</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/audit/AUDIT_REPORT.md">Independent audit and verification</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/README.md">Reproduction guide</a></p>
+</div></section>
+
+<section class="tools band dark" aria-labelledby="h-tools"><div class="wrap">
+  <h2 id="h-tools" class="sec-h"><span class="sec-n">05</span>Interactive tools</h2>
+  <p class="sec-intro">Four tools in the interactive report let you check the study yourself. Changing a setting gives an exploratory result; the prespecified test stays fixed.</p>
+  <div class="tool-grid">
+    <a class="tool-card" href="site/index.html#timeline"><svg viewBox="0 0 240 72" class="mini" aria-hidden="true"><rect x="1.0" y="46.7" width="6.9" height="23.3" class="bar"/><rect x="9.9" y="58.4" width="6.9" height="11.6" class="bar"/><rect x="18.8" y="46.7" width="6.9" height="23.3" class="bar"/><rect x="27.7" y="58.4" width="6.9" height="11.6" class="bar"/><rect x="36.6" y="52.5" width="6.9" height="17.5" class="bar"/><rect x="45.4" y="46.7" width="6.9" height="23.3" class="bar"/><rect x="54.3" y="46.7" width="6.9" height="23.3" class="bar"/><rect x="63.2" y="52.5" width="6.9" height="17.5" class="bar"/><rect x="72.1" y="52.5" width="6.9" height="17.5" class="bar"/><rect x="81.0" y="46.7" width="6.9" height="23.3" class="bar"/><rect x="89.9" y="46.7" width="6.9" height="23.3" class="bar"/><rect x="98.8" y="35.1" width="6.9" height="34.9" class="bar"/><rect x="107.7" y="40.9" width="6.9" height="29.1" class="bar"/><rect x="116.6" y="52.5" width="6.9" height="17.5" class="bar"/><rect x="125.4" y="52.5" width="6.9" height="17.5" class="bar"/><rect x="134.3" y="40.9" width="6.9" height="29.1" class="bar"/><rect x="143.2" y="58.4" width="6.9" height="11.6" class="bar"/><rect x="152.1" y="35.1" width="6.9" height="34.9" class="bar"/><rect x="161.0" y="52.5" width="6.9" height="17.5" class="bar"/><rect x="169.9" y="40.9" width="6.9" height="29.1" class="bar"/><rect x="178.8" y="11.8" width="6.9" height="58.2" class="bar"/><rect x="187.7" y="6.0" width="6.9" height="64.0" class="bar"/><rect x="196.6" y="29.3" width="6.9" height="40.7" class="bar"/><rect x="205.4" y="11.8" width="6.9" height="58.2" class="bar"/><rect x="214.3" y="35.1" width="6.9" height="34.9" class="bar"/><rect x="223.2" y="6.0" width="6.9" height="64.0" class="bar"/><rect x="232.1" y="23.5" width="6.9" height="46.5" class="bar"/></svg><h3>Failure Timeline</h3><p>Every failure since 2000, filtered by year, rocket and whether it enters the study.</p><span class="go">Open</span></a>
+    <a class="tool-card" href="site/index.html#explainer"><svg viewBox="0 0 240 72" class="mini" aria-hidden="true"><polyline points="0,40 40,36 80,42 120,34 160,38 200,35 240,37" class="exp"/><polyline points="0,40 40,37 80,41 120,33 140,58 160,62 200,60 240,61" class="act"/></svg><h3>Expected vs Actual</h3><p>How an abnormal return is measured: the predicted path against what happened.</p><span class="go">Open</span></a>
+    <a class="tool-card" href="site/index.html#lab"><svg viewBox="0 0 240 72" class="mini" aria-hidden="true"><line x1="120" x2="120" y1="4" y2="68" class="zero"/><circle cx="110.4" cy="20" r="3.4" class="neg"/><circle cx="85.5" cy="57" r="3.4" class="neg"/><circle cx="119.0" cy="54" r="3.4" class="neg"/><circle cx="71.6" cy="51" r="3.4" class="neg"/><circle cx="153.5" cy="48" r="3.4" class="pos"/><circle cx="134.5" cy="45" r="3.4" class="pos"/><circle cx="137.9" cy="42" r="3.4" class="pos"/><circle cx="77.8" cy="39" r="3.4" class="neg"/><circle cx="123.0" cy="36" r="3.4" class="pos"/><circle cx="52.8" cy="33" r="3.4" class="neg"/><circle cx="38.8" cy="30" r="3.4" class="neg"/><circle cx="124.8" cy="27" r="3.4" class="pos"/><circle cx="76.0" cy="24" r="3.4" class="neg"/><circle cx="157.1" cy="21" r="3.4" class="pos"/><circle cx="100.0" cy="58" r="3.4" class="neg"/><circle cx="202.1" cy="55" r="3.4" class="pos"/><circle cx="109.6" cy="52" r="3.4" class="neg"/><circle cx="128.1" cy="49" r="3.4" class="pos"/><circle cx="113.7" cy="46" r="3.4" class="neg"/><circle cx="191.2" cy="43" r="3.4" class="pos"/><circle cx="232.0" cy="40" r="3.4" class="pos"/><circle cx="172.1" cy="37" r="3.4" class="pos"/><circle cx="88.9" cy="34" r="3.4" class="neg"/><circle cx="232.0" cy="31" r="3.4" class="pos"/><circle cx="38.1" cy="28" r="3.4" class="neg"/><circle cx="150.2" cy="25" r="3.4" class="pos"/><circle cx="47.3" cy="22" r="3.4" class="neg"/><circle cx="132.5" cy="59" r="3.4" class="pos"/><circle cx="36.6" cy="56" r="3.4" class="neg"/><circle cx="157.7" cy="53" r="3.4" class="pos"/><circle cx="129.5" cy="50" r="3.4" class="pos"/><circle cx="124.5" cy="47" r="3.4" class="pos"/><circle cx="170.9" cy="44" r="3.4" class="pos"/><circle cx="103.3" cy="41" r="3.4" class="neg"/><circle cx="52.0" cy="38" r="3.4" class="neg"/><circle cx="88.3" cy="35" r="3.4" class="neg"/><circle cx="153.6" cy="32" r="3.4" class="pos"/><circle cx="41.8" cy="29" r="3.4" class="neg"/><circle cx="140.5" cy="26" r="3.4" class="pos"/><circle cx="123.3" cy="23" r="3.4" class="pos"/><circle cx="102.8" cy="20" r="3.4" class="neg"/><circle cx="124.8" cy="57" r="3.4" class="pos"/></svg><h3>Event Study Lab</h3><p>Change the window, firms or events and see how the average moves. Labelled exploratory.</p><span class="go">Open</span></a>
+    <a class="tool-card" href="site/index.html#placebo-sim"><svg viewBox="0 0 240 72" class="mini" aria-hidden="true"><rect x="1.0" y="69.5" width="8.0" height="0.5" class="bar soft"/><rect x="11.0" y="69.5" width="8.0" height="0.5" class="bar soft"/><rect x="21.0" y="69.5" width="8.0" height="0.5" class="bar soft"/><rect x="31.0" y="70.0" width="8.0" height="0.0" class="bar soft"/><rect x="41.0" y="67.2" width="8.0" height="2.8" class="bar soft"/><rect x="51.0" y="63.5" width="8.0" height="6.5" class="bar soft"/><rect x="61.0" y="63.0" width="8.0" height="7.0" class="bar soft"/><rect x="71.0" y="53.7" width="8.0" height="16.3" class="bar soft"/><rect x="81.0" y="50.0" width="8.0" height="20.0" class="bar soft"/><rect x="91.0" y="36.5" width="8.0" height="33.5" class="bar soft"/><rect x="101.0" y="32.3" width="8.0" height="37.7" class="bar soft"/><rect x="111.0" y="10.9" width="8.0" height="59.1" class="bar soft"/><rect x="121.0" y="18.4" width="8.0" height="51.6" class="bar soft"/><rect x="131.0" y="10.0" width="8.0" height="60.0" class="bar soft"/><rect x="141.0" y="22.6" width="8.0" height="47.4" class="bar soft"/><rect x="151.0" y="31.4" width="8.0" height="38.6" class="bar soft"/><rect x="161.0" y="35.6" width="8.0" height="34.4" class="bar soft"/><rect x="171.0" y="46.7" width="8.0" height="23.3" class="bar soft"/><rect x="181.0" y="57.9" width="8.0" height="12.1" class="bar soft"/><rect x="191.0" y="64.0" width="8.0" height="6.0" class="bar soft"/><rect x="201.0" y="66.7" width="8.0" height="3.3" class="bar soft"/><rect x="211.0" y="68.6" width="8.0" height="1.4" class="bar soft"/><rect x="221.0" y="68.1" width="8.0" height="1.9" class="bar soft"/><rect x="231.0" y="69.1" width="8.0" height="0.9" class="bar soft"/><line x1="138.1" x2="138.1" y1="2" y2="70" class="mark"/></svg><h3>Placebo Simulator</h3><p>Draw random ordinary days and compare them with the real failures.</p><span class="go">Open</span></a>
+  </div>
+</div></section>
+
+<section class="limits" aria-labelledby="h-lim"><div class="wrap">
+  <h2 id="h-lim" class="sec-h"><span class="sec-n">06</span>Limitations and uncertainty</h2>
+  <div class="lim-grid">
+    <div class="lim"><h3>Low statistical power</h3><p>Average effects smaller than about <strong>2.7%</strong> in either direction would usually be missed (80% power, 5% level). The chance of detecting a true 1% effect is about 18%.</p></div>
+    <div class="lim"><h3>Few firms</h3><p>Only 3 listed competitors, and <strong>Avio SpA</strong> appears in all 22 independent events. Results may not hold for private or state-owned launch firms.</p></div>
+    <div class="lim"><h3>Weighting changes the sign</h3><table class="wtab"><caption class="visually-hidden">Average two-day reaction under different weightings</caption><tbody><tr><th scope="row">Every reaction equal (prespecified)</th><td class="num pos">+0.28%</td></tr><tr><th scope="row">Every event equal</th><td class="num pos">+0.21%</td></tr><tr><th scope="row">Calmer stocks weigh more</th><td class="num pos">+0.87%</td></tr><tr><th scope="row">Every firm equal</th><td class="num neg">−1.16%</td></tr><tr><th scope="row">Median reaction</th><td class="num pos">+0.28%</td></tr></tbody></table><p class="note-s">Sensitivity added after the results. No weighting is statistically preferred.</p></div>
+    <div class="lim"><h3>Confounding news <span class="badge explore">Exploratory</span></h3><p>Dropping the 2 reactions on days when competitors announced large contracts moves the average to <strong>−0.70%</strong> (95% interval −1.80% to +0.39%); the median moves only from +0.28% to +0.09%. Chosen after the results, so it does not replace the main test.</p></div>
+    <div class="lim"><h3>Robustness</h3><p>None of the 12 prespecified checks finds a significant average at the 5% level; their estimates range from −0.15% to +1.84%. On random ordinary days the real average sits at the 61st percentile.</p></div>
+    <div class="lim"><h3>What an abnormal return is not</h3><p>It is the return beyond what the market model predicts, not an exact money loss caused by the failure. The rules were committed to the public repository before the results, not filed with an independent registry.</p></div>
+  </div>
+</div></section>
+
+<section class="resources band" aria-labelledby="h-res"><div class="wrap">
+  <h2 id="h-res" class="sec-h"><span class="sec-n">07</span>Paper, data and reproducibility</h2>
+  <div class="res-grid">
+    <div class="r-card"><p class="res-k">Working paper</p><h3>When Rockets Fail: Financial Contagion and Competitive Effects in the Space Industry</h3><p>Methods, results, power, robustness, confounding news and appendices. The same paper as a web page and as a PDF.</p>
+      <p class="r-actions"><a class="btn small" href="case-study.html">Read online</a><a class="dl-link" href="case-study.pdf" download>Download PDF</a></p></div>
+    <div class="r-card"><p class="res-k">Data and methods</p><h3>How the numbers are made</h3><p>Sources, event dating, the market model, the tests and the rules fixed before the results.</p>
+      <p class="r-actions"><a class="btn small ghost" href="site/index.html#methods">Data &amp; methods</a></p></div>
+    <div class="r-card"><p class="res-k">Reproducibility</p><h3>Code, tests, verification</h3><p>A Python pipeline from raw launch records to every published number, with tests and an independent check of the published statistics.</p>
+      <p class="r-actions"><a class="btn small ghost" href="https://github.com/NahianIbnat-2000/T-Minus-Market">View the code</a></p></div>
+  </div>
+  <details class="more"><summary>Evidence documents</summary><ul class="ev"><li><a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/reports/04_feasibility_report.md">Feasibility report (written before results)</a></li><li><a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/reports/05_results.md">Results report</a></li><li><a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/docs/CONFOUNDING_NEWS.md">Confounding-news checks</a></li><li><a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/reports/06_confounding_sensitivity.md">Exploratory confounding sensitivity</a></li><li><a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/audit/AUDIT_REPORT.md">Independent audit and verification</a></li><li><a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/README.md">Reproduction guide</a></li></ul></details>
 </div></section>
 </main>
-<footer class="site-foot"><div class="wrap foot-grid">
-  <div><h3>Author</h3><p>Nahian Ibnat</p></div>
-  <div><h3>Sources</h3><p>Launch data: GCAT, J. McDowell, CC-BY. Prices: Yahoo Finance, used only to compute statistics.</p></div>
-  <div><h3>Cite</h3><p class="mono">Ibnat, N. (2026). When a rocket blows up, who loses money, and does anyone win? An event study of orbital launch failures. T-Minus Markets. https://nahianibnat-2000.github.io/T-Minus-Market/</p></div>
-  <div><h3>Note</h3><p>Research, not investment advice.</p></div>
-</div></footer>
+<footer class="ss-footer"><div class="ss-fgrid"><div><h2>Space Shock</h2><p>Financial contagion and competition in the space industry. An event study of orbital launch failures and the stocks of the companies involved.</p><p>By Nahian Ibnat</p></div><div><h2>Explore</h2><ul><li><a href="index.html">Home</a></li><li><a href="site/index.html">Interactive report</a></li><li><a href="case-study.html">Working paper</a></li><li><a href="site/index.html#methods">Data &amp; methods</a></li><li><a href="https://github.com/NahianIbnat-2000/T-Minus-Market">Code</a></li><li><a href="case-study.pdf" download>Download PDF</a></li></ul></div><div><h2>Sources</h2><p>Launch data: GCAT, J. McDowell, CC-BY. Prices: Yahoo Finance, used only to compute statistics; no prices are republished.</p></div><div><h2>Cite</h2><p>Ibnat, N. (2026). When Rockets Fail: Financial Contagion and Competitive Effects in the Space Industry. Space Shock working paper. https://nahianibnat-2000.github.io/T-Minus-Market/</p></div></div><p class="ss-legal">Independent research, not peer reviewed. Not investment advice.</p></footer>
 </body>
 </html>

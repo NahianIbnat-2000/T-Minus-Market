@@ -1,4 +1,4 @@
-"""Central settings for the T-Minus Markets pipeline.
+"""Central settings for the Space Shock (formerly T-Minus Markets) pipeline.
 
 Every number that shapes the sample or the tests lives here, so it is set
 once, before any abnormal return is computed. Change it here, never inside

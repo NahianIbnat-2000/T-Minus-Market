@@ -123,7 +123,7 @@ def main(site_data: Path = SITE_DATA):
     shutil.copy(C.PROCESSED / "results.json", site_data / "results.json")
     res = json.loads((C.PROCESSED / "results.json").read_text())
     (site_data / "manifest.json").write_text(json.dumps({
-        "project": "T-Minus Markets", "author": "Nahian Ibnat",
+        "project": "Space Shock", "author": "Nahian Ibnat",
         "plan_version": res.get("plan_version"), "results_run_utc": res.get("run_utc"),
         "exported_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "windows": C.EVENT_WINDOWS, "path_range": [-5, 20], "min_rival_clusters": C.GATE_MIN_RIVAL_EVENTS, "returns": C.RETURN_TYPE,

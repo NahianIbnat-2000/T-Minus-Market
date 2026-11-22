@@ -1,11 +1,11 @@
-// Countdown stage indicator: T-3 ... T+1. Marks the stage in view with aria-current="step".
+// Report section navigation (sticky). Marks the stage in view with aria-current="step".
 export const STAGES = [
-  { id: "t-3", t: "T−3", name: "The Question" },
-  { id: "t-2", t: "T−2", name: "The Failures" },
-  { id: "t-1", t: "T−1", name: "The Method" },
-  { id: "t0", t: "T0", name: "The Reaction" },
-  { id: "t+1", t: "T+1", name: "Is It Real?" },
-  { id: "methods", t: "\u00a7", name: "Methods" },
+  { id: "t-3", t: "1", name: "Question" },
+  { id: "t-2", t: "2", name: "Failures" },
+  { id: "t-1", t: "3", name: "Method" },
+  { id: "t0", t: "4", name: "Results" },
+  { id: "t+1", t: "5", name: "Checks" },
+  { id: "methods", t: "6", name: "Data & methods" },
 ];
 
 export function stageNavHtml() {

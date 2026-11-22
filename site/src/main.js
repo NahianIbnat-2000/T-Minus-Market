@@ -13,6 +13,8 @@ async function start() {
   try {
     const data = await loadAll();
     main.innerHTML = renderReport(data);
+    // tables scroll sideways on phones: make them reachable by keyboard
+    main.querySelectorAll("table").forEach((t) => t.setAttribute("tabindex", "0"));
     const m = data.manifest;
     document.getElementById("run-info").innerHTML =
       `Results computed ${date(m.results_run_utc)} · data exported ${date(m.exported_utc)}`;

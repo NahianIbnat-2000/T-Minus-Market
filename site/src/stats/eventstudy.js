@@ -1,4 +1,4 @@
-// T-Minus Markets: browser event-study statistics.
+// Space Shock: browser event-study statistics.
 //
 // Works only from exported derived statistics (site/data/*.json): per firm-event CARs and
 // their variances, and same-cluster CAR correlations. It re-runs the prespecified primary test

@@ -1,5 +1,6 @@
 // Data and methods: the final section of the single page. All values come from data.
 import { escapeHtml, tLabel } from "../format.js";
+import { STAGES } from "../components/stageNav.js";
 
 const win = (w) => `${tLabel(w[0])} to ${tLabel(w[1])}`;
 
@@ -7,7 +8,7 @@ export function methodsSection({ manifest: m, results: r }) {
   const s = r.settings || {};
   const checks = (r.robustness || []).map((x) => `<li>${escapeHtml(x.name)}${x.note ? ` <span class="muted">(${escapeHtml(x.note)})</span>` : ""}</li>`).join("");
   return `<section class="stage methods" id="methods" aria-labelledby="h-methods"><div class="wrap">
-  <div class="stage-label"><span class="t">Appendix</span><span>Data and methods</span></div>
+  <div class="stage-label"><span class="t">${STAGES.find((x) => x.id === "methods").t}</span><span>Data and methods</span></div>
   <h2 id="h-methods">How this study was done</h2>
   <h3>The rules came first</h3>
   <p>Every choice below was fixed and committed to version control before any stock reaction was measured (commit record: working paper, Appendix G). It was not filed with an independent registry. Checks added after seeing results are labelled exploratory everywhere in this report.</p>

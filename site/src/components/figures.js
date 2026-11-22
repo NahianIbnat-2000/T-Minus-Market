@@ -46,7 +46,7 @@ export function carPathsPlate({ title, series, caption, from = -5, to = 20, note
   for (const n of notes) {                                   // small numbered marker on a line
     const p = series.find((q) => q.label === n.series)?.points.find((q) => q.t === n.t);
     if (!p || p.car === null) continue;
-    s += `<circle cx="${x(p.t).toFixed(2)}" cy="${y(p.car).toFixed(2)}" r="9" fill="none" stroke="#1C1C1C" stroke-width="1"/>`;
+    s += `<circle cx="${x(p.t).toFixed(2)}" cy="${y(p.car).toFixed(2)}" r="9" fill="none" stroke="#0F172A" stroke-width="1"/>`;
     s += text(x(p.t) - 4, y(p.car) + 22, n.mark, "label");
   }
   s += "</svg>";
@@ -72,10 +72,10 @@ export function intervalPlate({ title, rows, caption }) {
     s += text(0, cy + 4, r.label, r.emphasis ? "label" : "label muted", r.emphasis ? 'font-weight="700"' : "");
     if (Number.isFinite(r.lo) && Number.isFinite(r.hi)) {
       s += rect(x(r.lo), cy - 7, Math.max(1, x(r.hi) - x(r.lo)), 14, `class="ci-band" fill="${fill}"`);
-      s += line(x(r.lo), cy, x(r.hi), cy, "", 'stroke="#1C1C1C"');
+      s += line(x(r.lo), cy, x(r.hi), cy, "", 'stroke="#0F172A"');
     }
     if (Number.isFinite(r.mean)) {
-      s += `<circle class="dot" cx="${x(r.mean).toFixed(2)}" cy="${cy}" r="${r.emphasis ? 5.5 : 4.5}" fill="${r.mean < 0 ? "#D9452B" : "#1F4E8C"}"/>`;
+      s += `<circle class="dot" cx="${x(r.mean).toFixed(2)}" cy="${cy}" r="${r.emphasis ? 5.5 : 4.5}" fill="${r.mean < 0 ? "#E8604C" : "#14A38B"}"/>`;
     }
   });
   s += axisBottom(x, H - m.b, niceTicks(d0, d1, 6), (v) => pct(v, 0), m.l, W - m.r) + "</svg>";
@@ -105,8 +105,8 @@ export function yearBarsPlate({ title, failures, caption }) {
   for (const t of niceTicks(0, top, 4)) s += line(m.l, y(t), W - m.r, y(t), "grid-line");
   for (const yr of years) {
     const v = by.get(yr);
-    s += rect(x(yr), y(v.all), x.bandwidth, y(0) - y(v.all), 'fill="none" stroke="#1C1C1C"');
-    if (v.inStudy) s += rect(x(yr), y(v.inStudy), x.bandwidth, y(0) - y(v.inStudy), 'fill="#1C1C1C"');
+    s += rect(x(yr), y(v.all), x.bandwidth, y(0) - y(v.all), 'fill="none" stroke="#0F172A"');
+    if (v.inStudy) s += rect(x(yr), y(v.inStudy), x.bandwidth, y(0) - y(v.inStudy), 'fill="#0F172A"');
   }
   s += `<g class="axis">${line(m.l, H - m.b, W - m.r, H - m.b)}${years.filter((yr) => yr % 5 === 0)
     .map((yr) => text(x(yr) + x.bandwidth / 2, H - m.b + 18, String(yr), "", 'text-anchor="middle"')).join("")}</g>`;
@@ -126,8 +126,8 @@ export function placeboPlate({ title, distribution, actual, caption }) {
   const top = niceDomain(0, Math.max(1, ...bs.map((b) => b.n)), 4)[1];
   const y = linear([0, top], [H - m.b, m.t]);
   let s = svgOpen(W, H, `${title}. Average two-day abnormal returns on random non-event days; the vertical line marks the real failures.`);
-  for (const b of bs) if (b.n) s += rect(x(b.x0) + 0.5, y(b.n), x(b.x1) - x(b.x0) - 1, y(0) - y(b.n), 'fill="none" stroke="#5E574C"');
-  s += line(x(actual), m.t, x(actual), H - m.b, "", 'stroke="#1C1C1C" stroke-width="2"');
+  for (const b of bs) if (b.n) s += rect(x(b.x0) + 0.5, y(b.n), x(b.x1) - x(b.x0) - 1, y(0) - y(b.n), 'fill="none" stroke="#64748B"');
+  s += line(x(actual), m.t, x(actual), H - m.b, "", 'stroke="#0F172A" stroke-width="2"');
   s += text(x(actual) + 6, m.t + 12, `Real failures ${pct(actual)}`);
   s += axisBottom(x, H - m.b, niceTicks(d0, d1, 7), (v) => pct(v, 1), m.l, W - m.r) + "</svg>";
   return plate({ title, svg: s, caption, table: null });

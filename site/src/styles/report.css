@@ -1,0 +1,53 @@
+/* Interactive report: dashboard layout on the shared Space Shock system. */
+body.report { background: var(--paper); }
+.report-hero { background: var(--navy); color: var(--on-navy); padding: var(--space-5) 0 var(--space-4);
+  background-image: radial-gradient(circle at 88% 10%, rgba(47, 111, 223, 0.16), transparent 45%); }
+.report-hero .eyebrow { font-family: var(--font-head); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--bench-on-navy); margin: 0 0 var(--space-2); }
+.report-hero h1 { color: #fff; font-size: clamp(1.9rem, 1.4rem + 2vw, 2.9rem); max-width: 20ch; }
+.report-hero .dek { color: var(--on-navy); font-size: var(--step-0); max-width: 58ch; }
+.report-hero .byline { color: var(--on-navy-muted); font-family: var(--font-head); font-size: 0.85rem; margin: 0; }
+
+/* section navigation */
+.report .stage-nav { position: sticky; top: 3.9rem; z-index: 40; background: var(--card); border-bottom: var(--hairline); box-shadow: 0 1px 0 rgba(15,23,42,0.03); }
+.report .stage-nav a { font-family: var(--font-head); font-size: 0.9rem; font-weight: 500; color: var(--muted); padding: 0.8rem 0.9rem; }
+.report .stage-nav a .t { display: inline-grid; place-items: center; width: 1.4rem; height: 1.4rem; border-radius: 50%; background: var(--paper-deep); color: var(--ink); font-family: var(--font-mono); font-size: 0.75rem; margin-right: 0.45rem; }
+.report .stage-nav a[aria-current="step"] { color: var(--ink); border-bottom-color: var(--bench); }
+.report .stage-nav a[aria-current="step"] .t { background: var(--bench-text); color: #fff; }
+@media (max-width: 820px) { .report .stage-nav { top: 3.5rem; } }
+
+/* sections */
+.report .stage { padding: var(--space-6) 0; border-bottom: var(--hairline); }
+.report .stage:nth-of-type(even) { background: var(--card); }
+.report .stage-label { font-family: var(--font-head); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em; color: var(--bench-text); }
+.report .stage-label .t { font-family: var(--font-mono); font-size: 0.85rem; color: var(--bench-text); }
+.report .stage h2 { font-size: var(--step-2); max-width: 28ch; }
+.report .lead { font-size: var(--step-1); max-width: 52ch; }
+.report .callout { background: var(--card); border: var(--hairline); border-left: 4px solid var(--bench); border-radius: 0 var(--radius) var(--radius) 0; }
+.report .stage:nth-of-type(even) .callout { background: var(--paper); }
+
+/* figures as cards */
+.report figure.plate { background: var(--card); border: var(--hairline); border-radius: var(--radius); padding: var(--space-4); box-shadow: var(--shadow); }
+.report .stage:nth-of-type(even) figure.plate { background: var(--paper); box-shadow: none; }
+.report figure.plate .plate-title { font-stretch: normal; }
+.report figure.plate figcaption { font-family: var(--font-head); font-size: 0.85rem; }
+
+/* tools as dashboard panels */
+.report .tool { background: var(--card); border: 1px solid #CBD3DF; border-radius: 10px; padding: 0; overflow: hidden; box-shadow: var(--shadow); margin: var(--space-5) 0; }
+.report .tool-head { background: var(--navy); color: var(--on-navy); padding: var(--space-3) var(--space-4); margin: 0; border-bottom: 0; }
+.report .tool-head h3 { color: #fff; font-size: 1.25rem; font-stretch: normal; }
+.report .tool-head p { color: var(--on-navy-muted); font-family: var(--font-head); font-size: 0.92rem; max-width: 70ch; }
+.report .tool-kicker { color: var(--bench-on-navy); font-family: var(--font-head); font-weight: 700; }
+.report .tool > :not(.tool-head) { margin-left: var(--space-4); margin-right: var(--space-4); }
+.report .tool > :last-child { margin-bottom: var(--space-4); }
+.report .tool > .tool-head + * { margin-top: var(--space-4); }
+.report .lab-form fieldset { background: var(--paper); border: var(--hairline); border-radius: var(--radius); padding: var(--space-3); }
+.report .lab-form legend { font-family: var(--font-head); font-weight: 700; color: var(--ink); padding: 0 0.3rem; }
+.report .lab-opt input { accent-color: var(--bench-text); }
+.report button, .report .lab-reset { font-family: var(--font-head); font-weight: 600; font-size: 0.9rem; border-radius: 6px; padding: 0.5rem 0.9rem; border: 1px solid var(--bench-text); background: var(--card); color: var(--bench-text); cursor: pointer; min-height: 2.25rem; }
+.report button:hover, .report .lab-reset:hover { background: #EEF4FF; color: var(--bench-text); }
+.report .lab-status.main { border-left-color: var(--bench); background: #EEF4FF; color: var(--ink); }
+.report .lab-status.explore { border-left-color: #D98A00; background: #FFF4E0; color: #7A4300; }
+.report .lab-num { font-family: var(--font-mono); font-weight: 500; font-stretch: normal; letter-spacing: -0.03em; }
+.report .anomaly { background: var(--card); border: var(--hairline); border-radius: var(--radius); }
+.report table { background: transparent; }
+.report .site-foot { display: none; }

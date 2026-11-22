@@ -78,7 +78,7 @@ function stripSvg(rows, window, res) {
   rows.forEach((r, i) => {
     const c = r.windows[window].car;
     const jitter = ((i * 37) % 11) - 5;                         // fixed offset so dots do not hide each other
-    s += `<circle cx="${x(c).toFixed(2)}" cy="${(H - m.b) / 2 + m.t / 2 + jitter * 3}" r="4" fill="${c < 0 ? "#D9452B" : "#1F4E8C"}" fill-opacity="0.75"><title>${
+    s += `<circle cx="${x(c).toFixed(2)}" cy="${(H - m.b) / 2 + m.t / 2 + jitter * 3}" r="4" fill="${c < 0 ? "#E8604C" : "#14A38B"}" fill-opacity="0.75"><title>${
       escapeHtml(`${r.firm}, after ${r.vehicle} (${r.day0}): ${pct(c)}`)}</title></circle>`;
   });
   if (Number.isFinite(res.mean)) s += line(x(res.mean), m.t - 8, x(res.mean), H - m.b + 2, "lab-mean")
@@ -127,7 +127,7 @@ function render(out, state, base, ctx) {
     <p class="lab-read">${res.p !== null ? `In plain words: this average ${escapeHtml(verdict(res.p))}.` : ""}${
       few ? ` <strong>Caution:</strong> fewer than ${ctx.minClusters} independent events, which is below the minimum set in advance, so the test is not reliable here.` : ""}</p>
     <figure class="lab-strip">${stripSvg(rows, state.window, res)}
-      <figcaption>Each dot is one company's reaction to one failure (red below zero, blue above). Hover a dot for details. The shaded band is the 95% interval of the average.</figcaption></figure>`;
+      <figcaption>Each dot is one company's reaction to one failure (coral below zero, teal above). Hover a dot for details. The shaded band is the 95% interval of the average.</figcaption></figure>`;
 }
 
 /** Attach behaviour after the report HTML is in the page. */

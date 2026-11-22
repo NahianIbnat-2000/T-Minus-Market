@@ -13,9 +13,7 @@ from pathlib import Path
 
 MINUS = "−"
 MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
-         '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,600..800&family=DM+Mono:wght@400;500'
-         '&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400&display=swap">')
+from sitechrome import FONTS  # noqa: E402  (shared with the report and the paper)
 
 e = html.escape
 
@@ -116,83 +114,41 @@ def _shell(title, desc, url, body, css, canonical=None, image=None, body_class="
 
 
 def article(data: dict, meta: dict, root: Path, css: str) -> str:
+    """Homepage (site root). Order: header, title, findings, interpretation, contagion vs competition, sample,
+    tool previews, limitations, resources, footer. Every number is read from the exported results."""
+    import casestudy as _cs
+    import sitechrome as SC
     f = facts(data)
     p, pl, e1 = f["prim"], f["placebo"], f["e1"]
     m = data["manifest"]
     updated = month(m.get("results_run_utc") or datetime.now(timezone.utc).isoformat())
     span = f"{f['first_year']} to {f['last_year']}" if f["first_year"] else ""
-    detect = "is not statistically detectable" if p["p"] >= 0.05 else "is statistically detectable"
+    detectable = p["p"] < 0.05
     all_fell = f["case_hi"] is not None and f["case_hi"] < 0
-    maker = (f"its shares fell by between {pct(abs(f['case_hi']), 1, False)} and {pct(abs(f['case_lo']), 1, False)}" if all_fell
-             else f"its two-day abnormal return ranged from {pct(f['case_lo'])} to {pct(f['case_hi'])}")
-    pw, w = f["pw"], f["w"]
-    n_firms = f["n_rival_firms"]
-    sign_flips = bool(w) and (min(w["observation_weighted"], w["event_weighted"], w["precision_weighted"], w["firm_balanced"]) < 0
-                              < max(w["observation_weighted"], w["event_weighted"], w["precision_weighted"], w["firm_balanced"]))
+    pw, w, we1 = f["pw"], f["w"], f.get("w_e1")
     mde = pw["mde80"] if pw else None
-    abstract = (
-        f"When an orbital rocket fails, does the stock market punish only the company that built it, or its listed competitors too? "
-        f"Using {f['n_failures']} orbital launch failures from {span}, this study measures abnormal stock returns over the two trading days "
-        f"after each failure became public, with a market model and a prespecified event-study test. In the {f['n_cases']} cases where the "
-        f"rocket's maker was listed, {maker} after allowing for the market. Across {f['n_rival_failures']} failures with listed competitors "
-        f"({f['prim']['n_firm_events']} stock reactions, {n_firms} firms, {f['n_clusters']} independent events), the average reaction was "
-        f"{pct(p['mean_car'], 2)} (95% interval {pct(p['ci_low'], 2)} to {pct(p['ci_high'], 2)}"
-        + (f", p = {pval(f['pA'])}" if f.get("pA") is not None else "")
-        + f"; the prespecified standardized test gives p = {pval(p['p'])}). "
-        + ("The data therefore do not establish either contagion or competitive gains among these firms. " if not p["p"] < 0.05 else "")
-        + (f"They also do not show that the effect is small: average reactions of about {pct(mde, 1, False)} in either direction could not "
-           f"have been reliably detected. " if mde and p["p"] >= 0.05 else "")
-        + f"The evidence comes from {n_firms} listed firms" + (f", with {e(f['top_firm'])} in every independent event" if f["top_firm_clusters"] == f["n_clusters"] else "")
-        + (", and the sign of the average changes with how events and firms are weighted." if sign_flips else "."))
+    n_firms = f["n_rival_firms"]
     pdf_ok = (root / "case-study.pdf").exists()
-    paper_card = ('<div class="read-card"><span class="rc-kicker">Working paper</span><h3>The full study</h3>'
-                  '<p><em>Rocket Launch Failures and Equity-Market Spillovers.</em> Methods, results, power, robustness, confounding news, '
-                  'limits and appendices.' + (' The same paper is available as a web page and as a PDF.' if pdf_ok else '') + '</p>'
-                  '<span class="rc-actions"><a class="rc-go" href="case-study.html">Read the paper</a>'
-                  + ('<a class="rc-dl" href="case-study.pdf" download>Download PDF</a>' if pdf_ok else '') + '</span></div>')
     repo = meta.get("repo_url")
-    code_card = (f'<a class="read-card" href="{e(repo)}"><span class="rc-kicker">GitHub</span><h3>Code and pipeline</h3>'
-                 f'<p>Python pipeline from raw launch records to the published statistics, with tests.</p><span class="rc-go">View the code</span></a>'
-                 if repo else
-                 '<div class="read-card muted-card"><span class="rc-kicker">On request</span><h3>Code and pipeline</h3>'
-                 '<p>A tested Python pipeline from raw launch records to every published number. Available on request.</p></div>')
-    we1 = f.get("w_e1")
-    e1_txt = (f" An exploratory check added after the results leaves out the {len(e1.get('dropped') or [])} days when competitors announced large contracts: "
-              f"the average moves to {pct(e1['mean_car'], 2)} (95% interval {pct(e1['ci_low'], 2)} to {pct(e1['ci_high'], 2)})"
-              + (f", while the median moves only from {pct(w['median'], 2)} to {pct(we1['median'], 2)}, so the average is sensitive to a few large moves" if w and we1 else "")
-              + ". It is exploratory and does not replace the main result." if e1 else "")
     cite_url = meta.get("live_url") or ""
-    import casestudy as _cs
+    year = str(datetime.fromisoformat(str(m.get("results_run_utc", "2026"))[:10]).year) if m.get("results_run_utc") else ""
+    cite = f"Ibnat, N. ({year}). {SC.PAPER_TITLE}. Space Shock working paper." + (f" {cite_url}" if cite_url else "")
+    fes_all = data.get("firmEvents") or []
+    makers = sorted([r for r in fes_all if r["group"] == "provider_failure" and r["windows"]["primary"]["car"] is not None], key=lambda r: r["day0"])
+    rivals = [r for r in fes_all if r["group"] == "rival" and r["windows"]["primary"]["car"] is not None]
     _nodes, _edges = _cs.sample_graph(m.get("sample") or {}, f, p)
-    sample_svg = ('<figure class="cs-fig">' + _cs.fig_sample(_nodes, _edges) + '<figcaption class="cs-cap">Each box gives a count and its unit. Source: GCAT and the project pipeline.</figcaption></figure>') if _nodes else ""
+    sample_svg = _cs.fig_sample(_nodes, _edges) if _nodes else ""
     blob = (repo.rstrip("/") + "/blob/master/") if repo else None
-    ev = [("Feasibility report (before results)", "reports/04_feasibility_report.md"), ("Results report", "reports/05_results.md"),
+    ev = [("Feasibility report (written before results)", "reports/04_feasibility_report.md"), ("Results report", "reports/05_results.md"),
           ("Confounding-news checks", "docs/CONFOUNDING_NEWS.md"), ("Exploratory confounding sensitivity", "reports/06_confounding_sensitivity.md"),
           ("Independent audit and verification", "audit/AUDIT_REPORT.md"), ("Reproduction guide", "README.md")]
-    evidence = ('<p class="evidence"><strong>Evidence:</strong> ' + " · ".join(f'<a href="{e(blob + path)}">{e(lab)}</a>' for lab, path in ev) + "</p>") if blob else ""
-    fes_all = data.get("firmEvents") or []
-    makers = sorted([r for r in fes_all if r["group"] == "provider_failure" and r["windows"]["primary"]["car"] is not None],
-                    key=lambda r: r["day0"])
-    rivals = [r for r in fes_all if r["group"] == "rival" and r["windows"]["primary"]["car"] is not None]
+    evidence = "".join(f'<li><a href="{e(blob + path)}">{e(lab)}</a></li>' for lab, path in ev) if blob else ""
 
-    # ---------------------------------------------------------------- ticker (real reactions, newest first)
-    tick = [(r["day0"], f'{r["vehicle"]} fails', r["ticker"], r["windows"]["primary"]["car"], "maker") for r in makers]
-    tick += [(r["day0"], f'{r["vehicle"]} fails', r["ticker"], r["windows"]["primary"]["car"], "rival")
-             for r in sorted(rivals, key=lambda r: -abs(r["windows"]["primary"]["car"]))[:10]]
-    tick.sort(key=lambda t: t[0], reverse=True)
-    def _tk(t):
-        cls = "dn" if t[3] < 0 else "up"
-        return (f'<span class="tk"><span class="tk-d">{e(t[0])}</span> {e(t[1])} <span class="tk-role">{"maker" if t[4] == "maker" else "rival"}</span> '
-                f'{e(t[2])} <span class="{cls}">{e(pct(t[3]))}</span></span>')
-    ticker_items = "".join(_tk(t) for t in tick)
-    ticker = (f'<div class="ticker" aria-hidden="true"><span class="ticker-label">Two-day abnormal returns</span>'
-              f'<div class="ticker-track"><div class="ticker-run">{ticker_items}{ticker_items}</div></div></div>') if tick else ""
-
-    # ---------------------------------------------------------------- maker chart: cumulative abnormal return paths
+    # ---------------------------------------------------------------- charts (inline SVG, data-driven)
     def maker_chart():
         if not makers:
             return ""
-        W, H, l, r_, t_, b_ = 560, 250, 44, 120, 16, 30
+        W, H, l, r_, t_, b_ = 560, 240, 46, 118, 14, 30
         T0, T1 = -1, 10
         paths = []
         for r in makers:
@@ -204,13 +160,12 @@ def article(data: dict, meta: dict, root: Path, css: str) -> str:
                 cum += ar[t]
                 pts.append((t, cum))
             paths.append((r, pts))
-        lo = min(min(v for _, v in pts) for _, pts in paths)
-        lo = min(lo, -0.05)
+        lo = min(-0.05, min(v for _, pts in paths for _, v in pts))
         lo = -0.05 * (int(-lo / 0.05) + 1)
         hi = 0.05
         X = lambda t: l + (t - T0) / (T1 - T0) * (W - l - r_)
         Y = lambda v: t_ + (hi - v) / (hi - lo) * (H - t_ - b_)
-        g = []
+        g = [f'<rect x="{X(0):.1f}" y="{t_}" width="{X(1) - X(0):.1f}" height="{H - t_ - b_}" class="win"/>']
         v = hi
         while v >= lo - 1e-9:
             g.append(f'<line x1="{l}" x2="{W - r_}" y1="{Y(v):.1f}" y2="{Y(v):.1f}" class="{"zero" if abs(v) < 1e-9 else "grid"}"/>'
@@ -218,155 +173,190 @@ def article(data: dict, meta: dict, root: Path, css: str) -> str:
             v -= 0.05
         for t in (0, 1, 5, 10):
             g.append(f'<text x="{X(t):.1f}" y="{H - 10}" text-anchor="middle" class="ax">{"Day 0" if t == 0 else "+" + str(t)}</text>')
-        g.append(f'<rect x="{X(0):.1f}" y="{t_}" width="{X(1) - X(0):.1f}" height="{H - t_ - b_}" class="win"/>')
         for r, pts in paths:
             d = " ".join(f'{"M" if i == 0 else "L"}{X(t):.1f},{Y(v):.1f}' for i, (t, v) in enumerate(pts))
             lt, lv = pts[-1]
-            g.append(f'<path d="{d}" class="mk"/><circle cx="{X(lt):.1f}" cy="{Y(lv):.1f}" r="3" class="mkd"/>'
+            g.append(f'<path d="{d}" class="loss-line"/><circle cx="{X(lt):.1f}" cy="{Y(lv):.1f}" r="3" class="loss-dot"/>'
                      f'<text x="{X(lt) + 8:.1f}" y="{Y(lv) + 4:.1f}" class="lab">{e(r["vehicle"])} {e(r["day0"][:4])}</text>')
-        desc = "; ".join(f'{r["vehicle"]} {r["day0"][:4]}: {pct(r["windows"]["primary"]["car"])} over days 0 to 1' for r, _ in paths)
+        desc = "; ".join(f'{r["vehicle"]} {r["day0"][:4]}: {pct(r["windows"]["primary"]["car"])} over days 0 to +1' for r, _ in paths)
         return (f'<svg viewBox="0 0 {W} {H}" class="chart" role="img" aria-label="Cumulative abnormal return of the rocket maker after each failure. {e(desc)}">'
                 + "".join(g) + "</svg>")
 
-    # ---------------------------------------------------------------- rival interval chart
     def rival_chart():
-        W, H, l, r_ = 560, 120, 20, 20
+        W, H, l, r_ = 560, 118, 24, 24
         lo_, hi_ = -0.05, 0.05
         X = lambda v: l + (v - lo_) / (hi_ - lo_) * (W - l - r_)
-        s = [f'<line x1="{X(0):.1f}" x2="{X(0):.1f}" y1="14" y2="{H - 30}" class="zero"/>']
-        for v in (-0.04, -0.02, 0.02, 0.04):
-            s.append(f'<text x="{X(v):.1f}" y="{H - 10}" text-anchor="middle" class="ax">{pct(v, 0)}</text>')
-        s.append(f'<text x="{X(0):.1f}" y="{H - 10}" text-anchor="middle" class="ax">0%</text>')
-        if mde and p["p"] >= 0.05:
-            s.append(f'<rect x="{X(-mde):.1f}" y="22" width="{X(mde) - X(-mde):.1f}" height="44" class="mde"/>'
-)
-        y = 44
+        s = []
+        if mde and not detectable:
+            s.append(f'<rect x="{X(-mde):.1f}" y="18" width="{X(mde) - X(-mde):.1f}" height="54" class="mde"/>')
+        s.append(f'<line x1="{X(0):.1f}" x2="{X(0):.1f}" y1="10" y2="{H - 28}" class="zero"/>')
+        for v in (-0.04, -0.02, 0, 0.02, 0.04):
+            s.append(f'<text x="{X(v):.1f}" y="{H - 8}" text-anchor="middle" class="ax">{pct(v, 0) if v else "0%"}</text>')
+        y = 45
         s.append(f'<line x1="{X(p["ci_low"]):.1f}" x2="{X(p["ci_high"]):.1f}" y1="{y}" y2="{y}" class="ci"/>'
-                 f'<line x1="{X(p["ci_low"]):.1f}" x2="{X(p["ci_low"]):.1f}" y1="{y - 7}" y2="{y + 7}" class="ci"/>'
-                 f'<line x1="{X(p["ci_high"]):.1f}" x2="{X(p["ci_high"]):.1f}" y1="{y - 7}" y2="{y + 7}" class="ci"/>'
-                 f'<circle cx="{X(p["mean_car"]):.1f}" cy="{y}" r="6" class="pt"/>')
+                 f'<line x1="{X(p["ci_low"]):.1f}" x2="{X(p["ci_low"]):.1f}" y1="{y - 8}" y2="{y + 8}" class="ci"/>'
+                 f'<line x1="{X(p["ci_high"]):.1f}" x2="{X(p["ci_high"]):.1f}" y1="{y - 8}" y2="{y + 8}" class="ci"/>'
+                 f'<circle cx="{X(p["mean_car"]):.1f}" cy="{y}" r="6.5" class="pt"/>')
         return (f'<svg viewBox="0 0 {W} {H}" class="chart" role="img" aria-label="Average two-day reaction of listed competitors '
                 f'{e(pct(p["mean_car"], 2))}, 95% interval {e(pct(p["ci_low"], 2))} to {e(pct(p["ci_high"], 2))}, which includes zero.">'
                 + "".join(s) + "</svg>")
 
-    year = str(datetime.fromisoformat(str(m.get("results_run_utc", "2026"))[:10]).year) if m.get("results_run_utc") else ""
-    status = [("Launch failures", f["n_failures"], f"orbital, {span}"), ("Listed-maker cases", f["n_cases"], f"{len(f['case_firms'])} firms"),
-              ("Rival reactions", p["n_firm_events"], f"{n_firms} listed rivals"), ("Independent events", f["n_clusters"], "clusters"),
-              ("Prespecified checks", f["n_robust"], "none significant" if f["n_robust_sig"] == 0 else f"{f['n_robust_sig']} significant")]
-    status_html = "".join(f'<li><span class="st-k">{e(k)}</span><span class="st-v">{e(str(v))}</span><span class="st-n">{e(n)}</span></li>'
-                          for k, v, n in status)
-    code_link = (f'<a class="card-go" href="{e(repo)}">View the code</a>' if repo else "")
-    maker_line = (f"In all {f['n_cases']} listed cases, the maker's shares fell {pct(abs(f['case_hi']), 1, False)} to {pct(abs(f['case_lo']), 1, False)} "
-                  f"more than the market in the two trading days after the failure." if all_fell else
-                  f"Across the {f['n_cases']} listed cases, the maker's two-day abnormal return ranged from {pct(f['case_lo'])} to {pct(f['case_hi'])}.")
-    rival_line = (f"Listed competitors moved {pct(p['mean_car'], 2)} on average (95% interval {pct(p['ci_low'], 2)} to {pct(p['ci_high'], 2)}"
-                  + (f", p = {pval(f['pA'])}" if f.get("pA") is not None else "") + f"). That {detect}.")
-    body = f"""<a class="skip-link" href="#main">Skip to the article</a>
-<div class="topbar"><div class="wrap tb">
-  <span><span class="dot" aria-hidden="true"></span>T-Minus Markets · research log</span>
-  <span>Results {e(updated)} · {f['n_failures']} failures · {p['n_firm_events']} rival reactions</span>
-</div></div>
-<header class="brand"><div class="wrap brand-row">
-  <a class="logo" href="index.html" aria-label="T-Minus Markets, home"><span class="logo-mark" aria-hidden="true">T&#8722;</span>
-    <span class="logo-text"><span class="logo-name">T-Minus Markets</span><span class="logo-tag">What a failed launch costs on the stock market</span></span></a>
-  <nav class="cd-nav" aria-label="Sections">
-    <a href="#question"><b>T&#8722;4</b> Question</a><a href="#findings"><b>T&#8722;3</b> Findings</a><a href="#method"><b>T&#8722;2</b> Method</a>
-    <a href="#meaning"><b>T&#8722;1</b> Meaning</a><a href="#explore"><b>T&#8722;0</b> Explore</a>
-  </nav>
-</div></header>
-{ticker}
+    def mini_years():
+        ys = {}
+        for x in data.get("failures") or []:
+            y_ = str(x.get("launch_utc", ""))[:4]
+            if y_.isdigit():
+                ys[int(y_)] = ys.get(int(y_), 0) + 1
+        if not ys:
+            return ""
+        a, b = min(ys), max(ys)
+        mx = max(ys.values())
+        bw = 240 / (b - a + 1)
+        bars = "".join(f'<rect x="{(y_ - a) * bw + 1:.1f}" y="{70 - ys.get(y_, 0) / mx * 64:.1f}" width="{bw - 2:.1f}" height="{ys.get(y_, 0) / mx * 64:.1f}" class="bar"/>'
+                       for y_ in range(a, b + 1))
+        return f'<svg viewBox="0 0 240 72" class="mini" aria-hidden="true">{bars}</svg>'
+
+    def mini_dots():
+        if not rivals:
+            return ""
+        X = lambda v: 120 + max(-0.1, min(0.1, v)) / 0.1 * 112
+        dots = "".join(f'<circle cx="{X(r["windows"]["primary"]["car"]):.1f}" cy="{20 + (i * 37) % 40}" r="3.4" class="{"neg" if r["windows"]["primary"]["car"] < 0 else "pos"}"/>'
+                       for i, r in enumerate(rivals))
+        return f'<svg viewBox="0 0 240 72" class="mini" aria-hidden="true"><line x1="120" x2="120" y1="4" y2="68" class="zero"/>{dots}</svg>'
+
+    def mini_placebo():
+        dist = pl.get("distribution") or []
+        if not dist:
+            return ""
+        lo_, hi_ = min(dist), max(dist)
+        nb = 24
+        cnt = [0] * nb
+        for v in dist:
+            cnt[min(nb - 1, int((v - lo_) / (hi_ - lo_ + 1e-12) * nb))] += 1
+        mx = max(cnt)
+        bw = 240 / nb
+        bars = "".join(f'<rect x="{i * bw + 1:.1f}" y="{70 - c / mx * 60:.1f}" width="{bw - 2:.1f}" height="{c / mx * 60:.1f}" class="bar soft"/>' for i, c in enumerate(cnt))
+        xa = (pl["actual_mean_car"] - lo_) / (hi_ - lo_ + 1e-12) * 240
+        return f'<svg viewBox="0 0 240 72" class="mini" aria-hidden="true">{bars}<line x1="{xa:.1f}" x2="{xa:.1f}" y1="2" y2="70" class="mark"/></svg>'
+
+    def mini_explainer():
+        return ('<svg viewBox="0 0 240 72" class="mini" aria-hidden="true"><polyline points="0,40 40,36 80,42 120,34 160,38 200,35 240,37" class="exp"/>'
+                '<polyline points="0,40 40,37 80,41 120,33 140,58 160,62 200,60 240,61" class="act"/></svg>')
+
+    # ---------------------------------------------------------------- text pieces
+    maker_big = f"{pct(f['case_hi'])} to {pct(f['case_lo'])}" if all_fell else f"{pct(f['case_lo'])} to {pct(f['case_hi'])}"
+    pA = f.get("pA")
+    weights = ([("Every reaction equal (prespecified)", w["observation_weighted"]), ("Every event equal", w["event_weighted"]),
+                ("Calmer stocks weigh more", w["precision_weighted"]), ("Every firm equal", w["firm_balanced"]), ("Median reaction", w["median"])]
+               if w else [])
+    weight_rows = "".join(f'<tr><th scope="row">{e(k)}</th><td class="num {"neg" if v < 0 else "pos"}">{e(pct(v, 2))}</td></tr>' for k, v in weights)
+    timing = ""
+    nm = [x["firm"] for x in (f.get("firms") or [])]
+
+    body = f"""<a class="skip-link" href="#main">Skip to content</a>
+{SC.header("home", "", pdf_ok, repo)}
 <main id="main">
-<section class="hero"><div class="wrap hero-grid">
-  <div>
-    <p class="eyebrow">Space · Finance · Event study</p>
-    <h1>When a rocket fails, who loses money?</h1>
-    <p class="dek">An event study of {f['n_failures']} orbital launch failures, {e(span)}: the stock of the company that built the rocket, and the stocks of its listed competitors.</p>
-    <p class="byline">{e(meta.get('author', 'Nahian Ibnat'))} · Independent research · Updated {e(updated)}</p>
-    <p class="cta"><a class="btn" href="site/index.html">Open the interactive report</a><a class="btn ghost" href="case-study.html">Read the working paper</a>{'<a class="dl-link" href="case-study.pdf" download>Download PDF</a>' if pdf_ok else ''}</p>
-  </div>
-  <aside class="status" aria-label="Sample at a glance"><div class="st-head"><span>Mission data</span><span>from the pipeline</span></div>
-    <ul>{status_html}</ul><p class="st-note">Every number on this page is read from the published results. Prices are never published.</p></aside>
+<section class="hero" aria-labelledby="title"><div class="wrap hero-in">
+  <p class="eyebrow">Space finance · Event study · Working paper</p>
+  <h1 id="title">When rockets fail, who pays the price?</h1>
+  <p class="dek">What happens to stock prices when an orbital rocket fails: for the company that built it, and for its listed competitors. {f['n_failures']} failures, {e(span)}.</p>
+  <p class="cta"><a class="btn" href="site/index.html">Explore the interactive report</a><a class="btn ghost" href="case-study.html">Read the working paper</a>{'<a class="dl-link" href="case-study.pdf" download>Download PDF</a>' if pdf_ok else ''}</p>
+  <p class="meta-line">{e(meta.get('author', 'Nahian Ibnat'))} · Independent working paper, not peer reviewed · Results {e(updated)}</p>
 </div></section>
 
-<section id="question" class="band"><div class="wrap two">
-  <div><p class="eyebrow">T&#8722;4 · The question</p><h2>Contagion or a gain for rivals?</h2></div>
-  <div class="lede-text">
-    <p>A failed launch destroys a rocket and often a customer's satellite, so the builder should lose value. The open question is its <strong>listed competitors</strong>. If investors read a failure as a sign that spaceflight is risky for everyone, rival stocks fall: <strong>contagion</strong>. If they expect customers to move to a rocket that works, rival stocks rise: <strong>competitive gain</strong>.</p>
-    <p class="muted">The same question comes up when a bank fails or a product is recalled. Launch failures are useful because they are sudden, public and easy to date.</p>
-  </div>
-</div></section>
-
-<section id="findings" class="findings"><div class="wrap">
-  <p class="eyebrow">T&#8722;3 · What the data show</p><h2>Two findings</h2>
+<section class="findings" aria-labelledby="h-find"><div class="wrap">
+  <h2 id="h-find" class="sec-h"><span class="sec-n">01</span>Headline findings</h2>
   <div class="find-grid">
-    <article class="panel loss-panel"><p class="panel-kicker">01 · The rocket's maker</p>
-      <p class="big">{e(f"{pct(f['case_hi'])} to {pct(f['case_lo'])}" if all_fell else f"{pct(f['case_lo'])} to {pct(f['case_hi'])}")}</p>
-      <p>{e(maker_line)}</p>
-      <figure>{maker_chart()}<figcaption>Cumulative abnormal return from the day before (0%) to day +10. Shaded: the two-day window. {f['n_cases']} cases from {len(f['case_firms'])} firms, so these are case studies.</figcaption></figure>
+    <article class="res-card is-loss" aria-labelledby="h-maker">
+      <p class="res-k">The rocket's maker</p>
+      <h3 id="h-maker" class="res-big">{e(maker_big)}</h3>
+      <p class="res-def">Two-day abnormal return (cumulative, day 0 to +1) in each of the <strong>{f['n_cases']} listed-maker cases</strong>, from {len(f['case_firms'])} firms.</p>
+      <figure>{maker_chart()}<figcaption>Each line is one failure: cumulative abnormal return from the close before the failure (0%) to day +10. Shaded: the two-day window. With {f['n_cases']} cases these are case studies, not a general estimate.</figcaption></figure>
     </article>
-    <article class="panel"><p class="panel-kicker">02 · Its listed competitors</p>
-      <p class="big neutral">{e(pct(p['mean_car'], 2))}</p>
-      <p>{e(rival_line)} {f['n_clusters']} independent events, {n_firms} firms.</p>
-      <figure>{rival_chart()}<figcaption>Dot: average two-day reaction. Bar: 95% interval. {f"Shaded: average effects up to about {pct(mde, 1, False)} either way could not be reliably detected." if mde and p["p"] >= 0.05 else ""}</figcaption></figure>
-      <p class="small">The prespecified standardized test gives p = {e(pval(p['p']))}.{f" On random ordinary days the real average sits at the {ordinal(pl['actual_percentile'])} percentile." if pl.get('actual_percentile') is not None else ""}</p>
+    <article class="res-card" aria-labelledby="h-rival">
+      <p class="res-k">Its listed competitors</p>
+      <h3 id="h-rival" class="res-big neutral">{e(pct(p['mean_car'], 2))}</h3>
+      <p class="res-def">Average two-day abnormal return, <strong>95% interval {e(pct(p['ci_low'], 2))} to {e(pct(p['ci_high'], 2))}</strong>. {p['n_firm_events']} reactions of {n_firms} listed competitor firms to {f['n_rival_failures']} failures, grouped into {f['n_clusters']} independent events.</p>
+      <figure>{rival_chart()}<figcaption>Dot: average. Bar: 95% interval (cluster-robust). {f"Shaded: average effects up to about {pct(mde, 1, False)} in either direction that this sample could not reliably detect." if mde and not detectable else ""}</figcaption></figure>
+      <div class="tests">
+        <div><span class="badge confirm">Prespecified test</span><p>Standardized (BMP) test with a correction for events on nearby days: <strong>p = {e(pval(p['p']))}</strong>. It gives volatile stocks less weight.</p></div>
+        {f'<div><span class="badge robust">Mean test</span><p>Cluster-robust test of the plain average shown above: <strong>p = {e(pval(pA))}</strong>. Same data, a different question, so the two p-values are not interchangeable.</p></div>' if pA is not None else ''}
+      </div>
     </article>
   </div>
 </div></section>
 
-<section id="method" class="band"><div class="wrap">
-  <p class="eyebrow">T&#8722;2 · How it works</p><h2>Three steps</h2>
-  <ol class="steps">
-    <li><span class="step-n">1</span><h3>Find every failure</h3><p>{f['n_failures']} orbital launch failures from GCAT, each dated to the first trading day after the news became public.</p></li>
-    <li><span class="step-n">2</span><h3>Predict a normal day</h3><p>A market model, fitted on about a year of earlier returns, predicts each stock's return from its home index.</p></li>
-    <li><span class="step-n">3</span><h3>Measure the gap</h3><p>The abnormal return is actual minus predicted, added up over the two trading days after the failure.</p></li>
-  </ol>
-  <details class="more"><summary>The sample in detail</summary>{sample_svg}
-    <ul class="method">
-      <li><strong>Listed-maker cases ({f['n_cases']}):</strong> failures whose rocket was built by a listed company.</li>
-      <li><strong>Rival-eligible failures ({f['n_rival_failures']}):</strong> failures with at least one listed direct competitor.</li>
-      <li><strong>Rival reactions ({p['n_firm_events']}):</strong> one per listed rival per failure.</li>
-      <li><strong>Independent events ({f['n_clusters']}):</strong> failures that share a firm within a few trading days count as one event.</li>
-      <li><strong>Rival firms ({n_firms}):</strong> {e(", ".join(f["rival_names"]))}.</li>
-    </ul>
-    <p>The rules were committed to the public repository before the results (record in the working paper, Appendix G); they were not filed with an independent registry. Only derived statistics are published.</p></details>
+<section class="interpret" aria-labelledby="h-int"><div class="wrap narrow">
+  <h2 id="h-int" class="sec-h"><span class="sec-n">02</span>In plain language</h2>
+  <p class="lede">{"A failed launch is expensive for the company that built the rocket: in every listed case its shares fell sharply, more than the market, over the next two trading days." if all_fell else "The maker's shares did not move the same way in every listed case."} For its competitors the picture is unclear. Their average reaction is close to zero, {"but" if not detectable else "and"} the interval runs from {e(pct(p['ci_low'], 2))} to {e(pct(p['ci_high'], 2))}{f", so losses or gains of up to about {pct(mde, 1, False)} cannot be ruled out" if mde and not detectable else ""}. <strong>Not finding an effect is not the same as finding no effect.</strong></p>
 </div></section>
 
-<section id="meaning" class="meaning"><div class="wrap">
-  <p class="eyebrow">T&#8722;1 · What it means</p><h2>What the evidence can and cannot say</h2>
-  <div class="mean-grid">
-    <div class="mean-card ok"><h3>Shown</h3><p>{"Large two-day losses for the maker in every listed case." if all_fell else "The maker's reaction in each listed case."} No detectable average reaction among the {n_firms} listed competitors.</p></div>
-    <div class="mean-card no"><h3>Not shown</h3><p>That rivals lose or gain on average; that the effect is zero; that customers switch rockets; that the pattern holds for private or state-owned firms.</p></div>
-    <div class="mean-card why"><h3>Why so uncertain</h3><p>{f"Only {n_firms} listed rivals, and {e(f['top_firm'])} is in all {f['n_clusters']} events." if w and f['top_firm'] else f"Only {n_firms} listed rivals."}{f" Effects below about {pct(mde, 1, False)} either way would usually be missed." if mde and p['p'] >= 0.05 else ""}</p></div>
+<section class="versus band" aria-labelledby="h-vs"><div class="wrap">
+  <h2 id="h-vs" class="sec-h"><span class="sec-n">03</span>Contagion or competition?</h2>
+  <p class="sec-intro">When one company's rocket fails, investors can read the news about its competitors in two opposite ways.</p>
+  <div class="vs-grid">
+    <div class="vs-card is-loss"><p class="vs-arrow" aria-hidden="true">&#8600;</p><h3>Contagion</h3><p>The failure is a reminder that spaceflight is risky for everyone: insurance, delays, customer doubts. <strong>Rival stocks fall.</strong></p></div>
+    <div class="vs-mid" aria-hidden="true">or</div>
+    <div class="vs-card is-gain"><p class="vs-arrow" aria-hidden="true">&#8599;</p><h3>Competitive gain</h3><p>Customers may move their satellites to a rocket that works. <strong>Rival stocks rise.</strong></p></div>
   </div>
-  <details class="more"><summary>Reliability and robustness</summary>
-    {f'<p>With this sample, an average effect smaller than about {e(pct(pw["mde80"], 1, False))} either way would usually go undetected (80% power at the 5% level); the chance of detecting a true 1% effect is about {pw["power"][0.01] * 100:.0f}%. "Not detectable" here does not mean "no effect".</p>' if pw and p["p"] >= 0.05 else ''}
-    <p><strong>Prespecified checks.</strong> {"None of the" if f["n_robust_sig"] == 0 else str(f["n_robust_sig"]) + " of the"} {f['n_robust']} checks fixed in advance {"detects" if f["n_robust_sig"] == 0 else "detect"} a significant average at the 5% level{f"; the estimates range from {e(pct(f['rob_min'], 2))} to {e(pct(f['rob_max'], 2))}, so the lack of an effect is stable but its direction and size are not" if f['rob_min'] is not None and f['rob_min'] < 0 < f['rob_max'] else ""}.</p>
-    {f'<p><strong>Weighting (added after the results).</strong> {e(pct(w["observation_weighted"], 2))} with every reaction equal (prespecified), {e(pct(w["event_weighted"], 2))} with every event equal, {e(pct(w["precision_weighted"], 2))} weighting calm stocks more, {e(pct(w["firm_balanced"], 2))} with every firm equal.</p>' if w else ''}
-    <p><strong>Exploratory.</strong>{e(e1_txt) if e1_txt else " No exploratory checks have been run."}</p>
-    <p>Possible explanations the data cannot separate: contagion and competitive gain cancelling out, customers unable to switch quickly, or investors treating a failure as news about the failed firm only.</p></details>
+  <p class="sec-note">Both can happen at once and partly cancel out, so an average near zero is consistent with either story, with both, or with neither.</p>
 </div></section>
 
-<section id="explore" class="band"><div class="wrap">
-  <p class="eyebrow">T&#8722;0 · Explore</p><h2>Go deeper</h2>
-  <div class="explore-grid">
-    <a class="card feature" href="site/index.html"><span class="card-k">Interactive report</span><h3>Run the study yourself</h3>
-      <p>Failure Timeline, Expected vs Actual, Event Study Lab and Placebo Simulator, in five countdown stages.</p><span class="card-go">Open the report</span></a>
-    <div class="card"><span class="card-k">Working paper</span><h3>The full study</h3>
-      <p><em>Rocket Launch Failures and Equity-Market Spillovers.</em> Methods, results, robustness and appendices.{' The same paper as a web page and as a PDF.' if pdf_ok else ''}</p>
-      <span class="card-actions"><a class="card-go" href="case-study.html">Read the paper</a>{'<a class="dl-link" href="case-study.pdf" download>Download PDF</a>' if pdf_ok else ''}</span></div>
-    <div class="card"><span class="card-k">Code</span><h3>Pipeline and tests</h3>
-      <p>Python pipeline from raw launch records to every published number, with an independent verification.</p>{code_link}</div>
+<section class="sample" aria-labelledby="h-sample"><div class="wrap">
+  <h2 id="h-sample" class="sec-h"><span class="sec-n">04</span>Sample and coverage</h2>
+  <p class="sec-intro">The counts below measure different things (failures, firm reactions, independent events), so they are not one shrinking funnel.</p>
+  <div class="sample-grid">
+    <figure class="card-fig">{sample_svg}<figcaption>Sample construction. Each box gives a count and its unit. Source: GCAT and the project pipeline.</figcaption></figure>
+    <dl class="units">
+      <div><dt>{f['n_failures']}</dt><dd><strong>Orbital launch failures</strong> identified, {e(span)} (GCAT success score below 0.75).</dd></div>
+      <div><dt>{f['n_cases']}</dt><dd><strong>Listed-maker cases</strong>: the rocket was built by a listed company.</dd></div>
+      <div><dt>{f['n_rival_failures']}</dt><dd><strong>Failures with listed competitors</strong>, the rival sample.</dd></div>
+      <div><dt>{p['n_firm_events']}</dt><dd><strong>Firm-event reactions</strong>: one per competitor per failure.</dd></div>
+      <div><dt>{f['n_clusters']}</dt><dd><strong>Independent events</strong>: failures that share a firm within a few trading days count once.</dd></div>
+      <div><dt>{n_firms}</dt><dd><strong>Listed competitor firms</strong>: {e(", ".join(f["rival_names"]))}.</dd></div>
+    </dl>
   </div>
-  {evidence}
+</div></section>
+
+<section class="tools band dark" aria-labelledby="h-tools"><div class="wrap">
+  <h2 id="h-tools" class="sec-h"><span class="sec-n">05</span>Interactive tools</h2>
+  <p class="sec-intro">Four tools in the interactive report let you check the study yourself. Changing a setting gives an exploratory result; the prespecified test stays fixed.</p>
+  <div class="tool-grid">
+    <a class="tool-card" href="site/index.html#timeline">{mini_years()}<h3>Failure Timeline</h3><p>Every failure since {f['first_year']}, filtered by year, rocket and whether it enters the study.</p><span class="go">Open</span></a>
+    <a class="tool-card" href="site/index.html#explainer">{mini_explainer()}<h3>Expected vs Actual</h3><p>How an abnormal return is measured: the predicted path against what happened.</p><span class="go">Open</span></a>
+    <a class="tool-card" href="site/index.html#lab">{mini_dots()}<h3>Event Study Lab</h3><p>Change the window, firms or events and see how the average moves. Labelled exploratory.</p><span class="go">Open</span></a>
+    <a class="tool-card" href="site/index.html#placebo-sim">{mini_placebo()}<h3>Placebo Simulator</h3><p>Draw random ordinary days and compare them with the real failures.</p><span class="go">Open</span></a>
+  </div>
+</div></section>
+
+<section class="limits" aria-labelledby="h-lim"><div class="wrap">
+  <h2 id="h-lim" class="sec-h"><span class="sec-n">06</span>Limitations and uncertainty</h2>
+  <div class="lim-grid">
+    {f'<div class="lim"><h3>Low statistical power</h3><p>Average effects smaller than about <strong>{e(pct(pw["mde80"], 1, False))}</strong> in either direction would usually be missed (80% power, 5% level). The chance of detecting a true 1% effect is about {pw["power"][0.01] * 100:.0f}%.</p></div>' if pw else ''}
+    <div class="lim"><h3>Few firms</h3><p>Only {n_firms} listed competitors{f", and <strong>{e(f['top_firm'])}</strong> appears in all {f['n_clusters']} independent events" if f.get('top_firm') and f.get('top_firm_clusters') == f['n_clusters'] else ""}. Results may not hold for private or state-owned launch firms.</p></div>
+    {f'<div class="lim"><h3>Weighting changes the sign</h3><table class="wtab"><caption class="visually-hidden">Average two-day reaction under different weightings</caption><tbody>{weight_rows}</tbody></table><p class="note-s">Sensitivity added after the results. No weighting is statistically preferred.</p></div>' if weights else ''}
+    {f'<div class="lim"><h3>Confounding news <span class="badge explore">Exploratory</span></h3><p>Dropping the {len(e1.get("dropped") or [])} reactions on days when competitors announced large contracts moves the average to <strong>{e(pct(e1["mean_car"], 2))}</strong> (95% interval {e(pct(e1["ci_low"], 2))} to {e(pct(e1["ci_high"], 2))})' + (f"; the median moves only from {e(pct(w['median'], 2))} to {e(pct(we1['median'], 2))}" if w and we1 else "") + '. Chosen after the results, so it does not replace the main test.</p></div>' if e1 else ''}
+    <div class="lim"><h3>Robustness</h3><p>{"None of the" if f["n_robust_sig"] == 0 else str(f["n_robust_sig"]) + " of the"} {f['n_robust']} prespecified checks {"finds" if f["n_robust_sig"] == 0 else "find"} a significant average at the 5% level{f"; their estimates range from {e(pct(f['rob_min'], 2))} to {e(pct(f['rob_max'], 2))}" if f['rob_min'] is not None else ""}.{f" On random ordinary days the real average sits at the {ordinal(pl['actual_percentile'])} percentile." if pl.get('actual_percentile') is not None else ""}</p></div>
+    <div class="lim"><h3>What an abnormal return is not</h3><p>It is the return beyond what the market model predicts, not an exact money loss caused by the failure. The rules were committed to the public repository before the results, not filed with an independent registry.</p></div>
+  </div>
+</div></section>
+
+<section class="resources band" aria-labelledby="h-res"><div class="wrap">
+  <h2 id="h-res" class="sec-h"><span class="sec-n">07</span>Paper, data and reproducibility</h2>
+  <div class="res-grid">
+    <div class="r-card"><p class="res-k">Working paper</p><h3>{e(SC.PAPER_TITLE)}</h3><p>Methods, results, power, robustness, confounding news and appendices. The same paper as a web page and as a PDF.</p>
+      <p class="r-actions"><a class="btn small" href="case-study.html">Read online</a>{'<a class="dl-link" href="case-study.pdf" download>Download PDF</a>' if pdf_ok else ''}</p></div>
+    <div class="r-card"><p class="res-k">Data and methods</p><h3>How the numbers are made</h3><p>Sources, event dating, the market model, the tests and the rules fixed before the results.</p>
+      <p class="r-actions"><a class="btn small ghost" href="site/index.html#methods">Data &amp; methods</a></p></div>
+    <div class="r-card"><p class="res-k">Reproducibility</p><h3>Code, tests, verification</h3><p>A Python pipeline from raw launch records to every published number, with tests and an independent check of the published statistics.</p>
+      <p class="r-actions">{f'<a class="btn small ghost" href="{e(repo)}">View the code</a>' if repo else ''}</p></div>
+  </div>
+  {f'<details class="more"><summary>Evidence documents</summary><ul class="ev">{evidence}</ul></details>' if evidence else ''}
 </div></section>
 </main>
-<footer class="site-foot"><div class="wrap foot-grid">
-  <div><h3>Author</h3><p>{e(meta.get('author', 'Nahian Ibnat'))}</p></div>
-  <div><h3>Sources</h3><p>Launch data: GCAT, J. McDowell, CC-BY. Prices: Yahoo Finance, used only to compute statistics.</p></div>
-  <div><h3>Cite</h3><p class="mono">Ibnat, N. ({e(year)}). When a rocket blows up, who loses money, and does anyone win? An event study of orbital launch failures. T-Minus Markets.{(' ' + e(cite_url)) if cite_url else ''}</p></div>
-  <div><h3>Note</h3><p>Research, not investment advice.</p></div>
-</div></footer>"""
+{SC.footer("", meta, pdf_ok, cite)}"""
     desc = (f"Event study of {f['n_failures']} orbital launch failures: the rocket's maker loses {pct(f['case_hi'])} to {pct(f['case_lo'])} in two days; "
             f"listed competitors show no detectable reaction ({pct(p['mean_car'], 2)}, 95% interval {pct(p['ci_low'], 2)} to {pct(p['ci_high'], 2)}).")
     image = (meta["live_url"].rstrip("/") + "/og.png") if meta.get("live_url") else None
-    return _shell("T-Minus Markets: when a rocket blows up, who loses money?", desc, meta.get("live_url"), body, css, meta.get("live_url"), image, body_class="theme-sky")
+    return _shell("Space Shock: when rockets fail, who pays the price?", desc, meta.get("live_url"), body, css, meta.get("live_url"), image, body_class="home")
+

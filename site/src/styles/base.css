@@ -10,22 +10,22 @@ body {
 }
 
 h1, h2, h3, .head {
-  font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800;
-  line-height: 1.08; letter-spacing: -0.01em; margin: 0 0 var(--space-3);
+  font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 700;
+  line-height: 1.12; letter-spacing: -0.02em; margin: 0 0 var(--space-3);
 }
 h1 { font-size: var(--step-3); }
 h2 { font-size: var(--step-2); }
 h3 { font-size: var(--step-1); font-weight: 700; }
 p { margin: 0 0 var(--space-3); max-width: var(--measure); }
-a { color: var(--gain); text-underline-offset: 0.15em; }
+a { color: var(--bench-text); text-underline-offset: 0.15em; }
 strong { font-weight: 700; }
 
 .mono, code, .num { font-family: var(--font-mono); font-size: 0.92em; font-variant-numeric: tabular-nums; }
 .muted { color: var(--muted); }
-.loss { color: var(--signal-text); }
-.gain { color: var(--gain); }
+.loss { color: var(--loss-text); }
+.gain { color: var(--gain-text); }
 
-:focus-visible { outline: 3px solid var(--gain); outline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--bench); outline-offset: 3px; }
 
 .skip-link {
   position: absolute; left: -999px; top: 0; padding: var(--space-2) var(--space-3);
@@ -52,6 +52,6 @@ strong { font-weight: 700; }
 
 table { border-collapse: collapse; width: 100%; font-size: var(--step--1); }
 th, td { text-align: left; padding: var(--space-2) var(--space-3); border-bottom: var(--hairline); vertical-align: top; }
-th { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 700; font-size: 0.78rem;
-     text-transform: uppercase; letter-spacing: 0.06em; border-bottom: var(--inkline); }
+th { font-family: var(--font-head); font-weight: 600; font-size: 0.78rem;
+     text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); border-bottom: 1px solid #B8C1CF; }
 td.num, th.num { text-align: right; }

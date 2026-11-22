@@ -22,7 +22,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SITE = ROOT / "site"
 SRC = SITE / "src"
-STYLES = ["tokens.css", "base.css", "components.css"]
+STYLES = ["tokens.css", "base.css", "components.css", "chrome.css", "report.css"]
 DATA_FILES = {"manifest": "manifest.json", "results": "results.json", "firmEvents": "firm_events.json",
               "failures": "failures.json", "rho": "rho.json"}
 
@@ -91,7 +91,7 @@ def build_pages(site_data: Path = SITE / "data", root_out: Path = ROOT) -> list[
     import landing
     data = {k: json.loads((site_data / f).read_text(encoding="utf-8")) for k, f in DATA_FILES.items()}
     meta = json.loads((SITE / "site_meta.json").read_text(encoding="utf-8"))
-    css = "\n".join((SRC / "styles" / f).read_text(encoding="utf-8") for f in STYLES + ["landing.css", "article-sky.css"])
+    css = "\n".join((SRC / "styles" / f).read_text(encoding="utf-8") for f in STYLES + ["home.css"])
     a = root_out / "index.html"
     (root_out / "plan.html").unlink(missing_ok=True)            # the plan page is no longer published
     (root_out / ".nojekyll").touch()
@@ -151,15 +151,14 @@ def build(site_data: Path = SITE / "data", out: Path = SITE / "index.html") -> P
     info = f"built {datetime.now(timezone.utc).isoformat(timespec='seconds')}"
     noscript = static_summary(data)
     meta = json.loads((SITE / "site_meta.json").read_text(encoding="utf-8"))
-    links = [("Article", "../index.html"), ("Working paper", "../case-study.html")]
-    if (ROOT / "case-study.pdf").exists() or shutil.which("xelatex") or shutil.which("pdflatex"):
-        links.append(("Download PDF", "../case-study.pdf"))
-    if meta.get("repo_url"):
-        links.append(("Code", meta["repo_url"]))
-    nav = " · ".join(f'<a href="{h}"{" download" if h.endswith(".pdf") else ""}>{l}</a>' for l, h in links)
+    import sitechrome as SC
+    pdf = (ROOT / "case-study.pdf").exists() or bool(shutil.which("xelatex") or shutil.which("pdflatex"))
+    header = SC.header("report", "../", pdf, meta.get("repo_url"))
+    year = str(data["manifest"].get("results_run_utc", ""))[:4]
+    footer = SC.footer("../", meta, pdf, f"Ibnat, N. ({year}). {SC.PAPER_TITLE}. Space Shock working paper.")
     html = (SITE / "template.html").read_text(encoding="utf-8")
     for key, val in (("{{STYLE}}", style), ("{{DATA}}", data_json), ("{{SCRIPT}}", script), ("{{BUILD_INFO}}", info),
-                     ("{{NOSCRIPT}}", noscript), ("{{NAV}}", nav)):
+                     ("{{NOSCRIPT}}", noscript), ("{{HEADER}}", header), ("{{FOOTER}}", footer), ("{{FONTS}}", SC.FONTS)):
         if key not in html:
             raise ValueError(f"template is missing {key}")
         html = html.replace(key, val)

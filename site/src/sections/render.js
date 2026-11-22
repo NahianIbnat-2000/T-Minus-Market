@@ -29,12 +29,12 @@ export function renderReport(data) {
   const conc = { firms: Object.keys(byFirm).length, top: topF ? topF[0] : "", topAll: !!topF && topF[1].size === new Set(rivRec.map((r) => r.cluster)).size };
 
   const t3 = `<section class="stage" id="t-3" aria-labelledby="h-t-3"><div class="wrap">
-    ${T.stageLabel("T−3", "The Question")}
+    ${T.stageLabel("1", "Question")}
     <h2 id="h-t-3">Why would investors care about a rocket?</h2>
     ${T.questionText(c)}</div></section>`;
 
   const t2 = `<section class="stage" id="t-2" aria-labelledby="h-t-2"><div class="wrap">
-    ${T.stageLabel("T−2", "The Failures")}
+    ${T.stageLabel("2", "Failures")}
     <h2 id="h-t-2">Every rocket that failed</h2>
     ${T.failuresText(c)}
     ${T.sampleDiagram(data.manifest && data.manifest.sample, c)}
@@ -43,7 +43,7 @@ export function renderReport(data) {
     ${timelineHtml(data)}</div></section>`;
 
   const t1 = `<section class="stage" id="t-1" aria-labelledby="h-t-1"><div class="wrap">
-    ${T.stageLabel("T−1", "The Method")}
+    ${T.stageLabel("3", "Method")}
     <h2 id="h-t-1">How do you measure a surprise?</h2>
     ${T.methodText()}
     ${explainerHtml()}</div></section>`;
@@ -53,7 +53,7 @@ export function renderReport(data) {
   const providerNotes = providers.filter((r) => r.ticker === "RKLB" && r.vehicle === "Electron")
     .map((r) => ({ series: `${r.vehicle} (${r.ticker})`, t: -5, mark: "a" }));
   const t0 = `<section class="stage" id="t0" aria-labelledby="h-t0"><div class="wrap">
-    ${T.stageLabel("T0", "The Reaction")}
+    ${T.stageLabel("4", "Results")}
     <h2 id="h-t0">What the market did</h2>
     ${T.providerText(cases)}
     <ul class="anomaly-grid">${providers.map((r, i) => anomalyCard(r, caseFor(r), i + 1)).join("")}</ul>
@@ -67,12 +67,12 @@ export function renderReport(data) {
         ...robust.filter((r) => r.ci_low !== null && r.ci_low !== undefined).map((r) => ({ label: r.name, mean: r.mean_car, lo: r.ci_low, hi: r.ci_high, note: "robustness" })),
         ...(e1 ? [{ label: "Without two contract-news days", mean: e1.mean_car, lo: e1.ci_low, hi: e1.ci_high, note: "exploratory, chosen after results" }] : []),
       ],
-      caption: `Mean cumulative abnormal return of listed competitors over T0 to T+1, with 95% intervals (cluster-robust). Rival sample: ${results.primary.n_failures} failures, ${results.primary.n_firm_events} firm-events, ${results.primary.n_clusters} independent events. Dots are blue above zero and red below; the sign is also given in the table.` })}
+      caption: `Mean cumulative abnormal return of listed competitors over T0 to T+1, with 95% intervals (cluster-robust). Rival sample: ${results.primary.n_failures} failures, ${results.primary.n_firm_events} firm-events, ${results.primary.n_clusters} independent events. Dots are teal above zero and coral below; the sign is also given in the table.` })}
     ${labHtml(data)}</div></section>`;
 
   const pl = results.placebo;
   const t1p = `<section class="stage" id="t+1" aria-labelledby="h-t1p"><div class="wrap">
-    ${T.stageLabel("T+1", "Is It Real?")}
+    ${T.stageLabel("5", "Checks")}
     <h2 id="h-t1p">Could it just be luck?</h2>
     ${T.placeboText(pl, results.exploratory_audit?.placebo_shared)}
     ${pl?.distribution ? placeboPlate({ title: "Real failures against ordinary days", distribution: pl.distribution, actual: pl.actual_mean_car,
