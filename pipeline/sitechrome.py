@@ -66,3 +66,29 @@ def footer(prefix: str = "", meta: dict | None = None, pdf: bool = True, cite: s
             f'<div><h2>Sources</h2><p>Launch data: GCAT, J. McDowell, CC-BY. Prices: Yahoo Finance, used only to compute statistics; no prices are republished.</p></div>'
             f'<div><h2>Cite</h2><p>{e(cite)}</p></div>'
             f'</div><p class="ss-legal">Independent research, not peer reviewed. Not investment advice.</p></footer>')
+
+
+# Highlights the current section in a page's table of contents (paper and methods pages). Progressive enhancement:
+# without JavaScript the contents still work as plain links.
+TOC_SCRIPT = """<script>
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll(".paper-toc a[href^='#'], .toc-mobile a[href^='#']"));
+  if (!links.length) return;
+  var ids = [], seen = {};
+  links.forEach(function (a) { var id = a.getAttribute("href").slice(1); if (!seen[id]) { seen[id] = 1; ids.push(id); } });
+  var secs = ids.map(function (id) { return document.getElementById(id); }).filter(Boolean);
+  var current = null, ticking = false;
+  function update() {
+    ticking = false;
+    var line = Math.max(180, window.innerHeight * 0.3), id = secs.length ? secs[0].id : null;
+    secs.forEach(function (el) { if (el.getBoundingClientRect().top <= line) id = el.id; });
+    if (id === current) return;
+    current = id;
+    links.forEach(function (a) { if (a.getAttribute("href") === "#" + id) a.setAttribute("aria-current", "location"); else a.removeAttribute("aria-current"); });
+  }
+  window.addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+  window.addEventListener("hashchange", update);
+  window.addEventListener("load", function () { setTimeout(update, 50); });
+  update();
+})();
+</script>"""

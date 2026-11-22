@@ -143,3 +143,40 @@ A/AA: 0 violations on all four pages at 375, 768, 1280 and 1440 px; no page-leve
 * Tools keep separate controls; there is no shared event selection across tools.
 * Some sample-diagram unit labels run slightly past their box at the smallest sizes.
 * The CRSP supplement (plan v1.2) is not shown on the site or in the paper.
+
+
+---
+
+# Third pass (v31, 22 Nov 2026): audit of the deployed v30
+
+Audited the published repository (commit `0264d63`) and the live pages, then the same files in a browser at 375, 768,
+1280 and 1440 px, with each tool exercised (Lab: change firm, window, reset; Timeline: filter, search, select by mouse and
+keyboard; Expected vs Actual: sliders; Placebo: draw 10, draw all, start over).
+
+## Findings
+
+| Type | Finding | Action |
+| --- | --- | --- |
+| Checked, no defect | Navigation on the live site already goes Overview / Explore Data / Research Paper / Data & Methods, and Data & Methods opens `methods.html` (live) | none |
+| Checked, no defect | No `/T-Minus-Market/` URL in any published page; canonical and citation use `/space-shock/` | Automated check strengthened (below) |
+| Checked, no defect | Report data load, loading line clears, nine charts render, direct link `#lab` works, back/forward works, no script errors; all four tools respond correctly and the Lab returns exactly to the prespecified result after reset | none |
+| Checked, no defect | Paper Contents/Sections: one visible per width, the other `display: none` | Both now labelled "Contents" with the same accessible name |
+| UX improvement | Paper and methods contents did not show the current section | Current section highlighted (`aria-current="location"`), small inline script, links still work without it |
+| Confirmed defect | `methods.html` had no contents list on phones and tablets (sidebar hidden below 980 px, no alternative) | Collapsible "On this page" added |
+| UX improvement | Expected vs Actual: no legend for the dots, line and markers; no y-axis title; event window not stated | Legend, axis titles and a note that the study sums T0 and T+1 |
+| Research concern | Placebo text could be read as a p-value | Placebo chart now names the null distribution and the observed statistic; text states the share is not the p-value of a formal test |
+| Research concern | Event timing was one paragraph and a list | `methods.html` section 5: table by class (independently verified disclosure / launch-time proxy / uncertain), for rival reactions, rival failures and maker cases, plus trading-day assignment rules; nothing invented |
+| UX improvement | Methods page in 9 parts mixed identification with timing and model with windows | 12 parts: sources, identification, sample, company selection, timing, model, abnormal returns, CARs, inference, robustness, limitations, reproducibility |
+| Research wording | Overview interpretation | Uses "does not establish a statistically reliable competitive or contagion effect; it does not show that there is no effect either" |
+
+## Checks added
+
+`audit/check_site.py` now also requires: the navigation to be exactly Overview | Explore Data | Research Paper | Data &
+Methods with the four expected destinations on every page, and every footer citation to name the Space Shock working
+paper with the live address. Result on the build: 50 of 50.
+
+## Results
+
+Python tests 67 passed; JavaScript tests 16 passed; consistency 56 of 56; site structure 50 of 50; axe-core WCAG 2.2 A/AA:
+0 violations on all four pages at all four widths; no script errors. `audit/verify_published.py` runs on the author's
+machine (it needs the private data). Deployment of this version is not confirmed until it is pushed.

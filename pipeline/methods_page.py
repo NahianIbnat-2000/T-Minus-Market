@@ -53,9 +53,10 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
         return (f'<div class="table-wrap" tabindex="0" role="region" aria-label="{e(caption)}"><table class="def">'
                 f'<caption>{e(caption)}</caption><tbody>{"".join(row(k, v) for k, v in rows)}</tbody></table></div>')
 
-    sections = [("sources", "Data sources"), ("sample", "Sample definitions"), ("events", "Event identification and timing"),
-                ("firms", "Firm classification"), ("model", "Market model and event windows"), ("inference", "Statistical inference"),
-                ("robust", "Robustness procedures"), ("quality", "Data quality and limitations"), ("replicate", "Replication")]
+    sections = [("sources", "Data sources"), ("identification", "Launch event identification"), ("sample", "Sample construction"),
+                ("firms", "Listed-company selection"), ("timing", "Event timing"), ("model", "Market-return model"),
+                ("ar", "Abnormal returns"), ("car", "Cumulative abnormal returns"), ("inference", "Statistical inference"),
+                ("robust", "Robustness checks"), ("quality", "Limitations and data quality"), ("replicate", "Reproducibility")]
     toc = "".join(f'<li><a href="#{k}">{i}. {e(v)}</a></li>' for i, (k, v) in enumerate(sections, 1))
 
     sample_rows = [
@@ -67,11 +68,21 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
         ("Independent events (clusters)", f"<strong>{f['n_clusters']}</strong>: failures that share a firm within {st.get('cluster_gap', 5)} trading days form one cluster. The unit of inference."),
         ("Distinct listed rivals", f"<strong>{f['n_rival_firms']}</strong>: {e(', '.join(f['rival_names']))}."),
     ]
+    rf, mc = tm["rival_failures"]["counts"], tm["maker_cases"]["counts"]
+    timing_classes = [("Independently verified public disclosure", "high", "Company statement with a documented time"),
+                      ("Launch-time proxy", "provisional", "GCAT launch time, used only where day 0 is insensitive to a small timing error"),
+                      ("Uncertain or incomplete timing", "low", "Company statement whose time or date is not certain")]
+    timing_tbl = ("<div class=\"table-wrap\" tabindex=\"0\" role=\"region\" aria-label=\"Event timing by source\"><table><caption>Event timing by source of the disclosure time</caption>"
+                  "<thead><tr><th scope=\"col\">Class</th><th scope=\"col\">What it means</th><th scope=\"col\" class=\"num\">Rival reactions</th>"
+                  "<th scope=\"col\" class=\"num\">Rival failures</th><th scope=\"col\" class=\"num\">Maker cases</th></tr></thead><tbody>"
+                  + "".join(f"<tr><th scope=\"row\">{e(a)}</th><td>{e(b)}</td><td class=\"num\">{tc.get(k, 0)}</td><td class=\"num\">{rf.get(k, 0)}</td><td class=\"num\">{mc.get(k, 0)}</td></tr>"
+                            for a, k, b in timing_classes)
+                  + f"<tr><th scope=\"row\">Total</th><td></td><td class=\"num\">{tm['rival_reactions']['n']}</td><td class=\"num\">{tm['rival_failures']['n']}</td><td class=\"num\">{tm['maker_cases']['n']}</td></tr></tbody></table></div>")
     timing_rows = [
-        ("Day 0", "The first trading session at or after the failure became public, on the stock's own exchange calendar (holidays and half days included)."),
-        ("Overnight and after-hours events", "A failure that becomes public after the close, at night or on a non-trading day moves day 0 to the next session of that exchange."),
-        ("Disclosure-time sources", f"Company statement, high confidence: {tc.get('high', 0)} rival reactions. Company statement, low confidence: {tc.get('low', 0)}. GCAT launch time, not separately verified: {tc.get('provisional', 0)} (of {tm['rival_reactions']['n']}). Maker cases using GCAT time: {tm['maker_cases']['counts'].get('provisional', 0)} of {tm['maker_cases']['n']}."),
-        ("When GCAT time is allowed", "Only where day 0 would not change if the true disclosure came 10 minutes earlier or up to 180 minutes later. Otherwise a sourced time is required; no time is invented."),
+        ("Assignment to a trading day", "Day 0 is the first trading session at or after the moment the failure became public, on each stock's own exchange calendar (holidays and half days included)."),
+        ("Overnight and after-hours events", "A failure that becomes public after the close, overnight or on a non-trading day is assigned to the next session of that exchange. The same failure can therefore fall on different calendar days for different rivals."),
+        ("When the launch-time proxy is allowed", "Only where day 0 would not change if the true disclosure came 10 minutes earlier or up to 180 minutes later. Otherwise a sourced time is required."),
+        ("Missing times", "No disclosure time is invented. A failure without a usable time does not enter the test."),
         ("Sensitivity", "Check R5 drops or shifts the uncertain disclosure times."),
     ]
     firm_rows = [
@@ -82,14 +93,21 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
         ("Point in time", "Each link uses listing dates, ownership and exposure as they were on the failure date (<code>data/manual/firm_map.csv</code>, <code>data/manual/vehicle_segments.csv</code>). Prices from before a firm's real listing (a pre-merger shell company) are dropped."),
     ]
     model_rows = [
-        ("Returns", "Simple daily returns from adjusted closes; CARs are sums of simple abnormal returns."),
         ("Benchmark", "Each firm's home market index."),
-        ("Expected return", f"Market model by OLS on trading days {e(str(est[0]))} to {e(str(est[1]))} before day 0; at least {e(str(st.get('min_obs', 100)))} returns. With 30 to 99 returns, a market-adjusted model (alpha 0, beta 1), flagged. Fewer: dropped."),
-        ("Abnormal return", "Actual return minus the market-model prediction."),
-        ("CAR variance", "Includes the prediction error of the estimated model (window length, estimation length and market moves in the window)."),
+        ("Model", f"Market model by OLS: stock return = alpha + beta × market return + error, on trading days {e(str(est[0]))} to {e(str(est[1]))} before day 0."),
+        ("Minimum history", f"At least {e(str(st.get('min_obs', 100)))} returns. With 30 to 99 returns, a market-adjusted model (alpha 0, beta 1) is used and flagged. With fewer, the firm-event is dropped."),
+        ("Returns", "Simple daily returns from adjusted closes."),
+    ]
+    ar_rows = [
+        ("Definition", "Abnormal return = actual return minus the market-model prediction for that day: the part of the move the market does not explain."),
+        ("Uncertainty", "The variance of each abnormal return includes the prediction error of the estimated model, not only the residual variance."),
+    ]
+    car_rows = [
+        ("Definition", "Cumulative abnormal return (CAR) = the sum of daily abnormal returns over the event window."),
         ("Main window", f"{t('primary')}: the confirmatory test (H2)."),
         ("Wider window", f"{t('robust')}: robustness check R4."),
-        ("One-month window", f"{t('descriptive')}: description only."),
+        ("One-month window", f"{t('descriptive')}: description only, no test."),
+        ("CAR variance", "Window length, estimation length and the market's moves in the window enter the prediction-error variance (paper, equation 3)."),
     ]
     inf_rows = [
         ("Prespecified test", f"Standardized test of Boehmer, Musumeci and Poulsen (1991), with the Kolari and Pynnönen (2010) correction for correlation between rivals reacting to the same failure, applied within clusters. Null: mean standardized CAR is zero. p from a t distribution with clusters minus one degrees of freedom. Result: <strong>p = {e(L.pval(p['p']))}</strong>."),
@@ -101,7 +119,7 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
     ]
     rob_items = "".join(f"<li>{e(r['name'])}{(' <span class=\"muted\">(' + e(r['note']) + ')</span>') if r.get('note') else ''}</li>" for r in robust)
     quality = [
-        ("Announcement timestamps", "Sourced company statements where available; otherwise GCAT launch times under the rule above."),
+        ("Announcement timestamps", "Sourced company statements where available; otherwise GCAT launch times under the rule in section 5."),
         ("GCAT launch-time proxies", f"{tc.get('provisional', 0)} of {tm['rival_reactions']['n']} rival reactions rely on them. Clock or time-zone errors beyond the allowed band would shift day 0."),
         ("Trading calendars", "Each exchange's own calendar (Milan, Nasdaq, NYSE). A failure can fall on different calendar days for different rivals."),
         ("Confounding company news", f"News around the largest reactions was checked against public sources ({', '.join(f'{v} {k.replace(chr(95), chr(32))}' for k, v in flags.items()) or 'none flagged'}). Flagged reactions stay in the confirmatory test; dropping them is exploratory (E1 to E3)."),
@@ -131,7 +149,8 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
   <p class="byline">Rules version v{e(str(res.get('plan_version', '')))} · results {e(updated)}</p>
 </div></header>
 <div class="wrap paper-grid">
-<aside class="paper-toc" aria-label="On this page"><p class="pt-h">On this page</p><ol>{toc}</ol></aside>
+<aside class="paper-toc" aria-label="On this page"><nav aria-label="Page contents"><p class="pt-h">On this page</p><ol>{toc}</ol></nav></aside>
+<details class="toc-mobile"><summary>On this page</summary><nav aria-label="Page contents"><ol>{toc}</ol></nav></details>
 <main id="main" class="article cs methods-page">
 <section id="sources"><h2>1. Data sources</h2>
 {tbl("Data sources", [("Launches", e(man.get("sources", {}).get("launches") or "GCAT, J. McDowell, CC-BY")),
@@ -139,24 +158,35 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
                       ("Firm map", "Hand-built, point in time, with a source for every row (<code>data/manual/</code>)."),
                       ("Disclosure times", "Company statements with sources and confidence (<code>data/manual/disclosure_times.csv</code>).")])}
 </section>
-<section id="sample"><h2>2. Sample definitions</h2>
+<section id="identification"><h2>2. Launch event identification</h2>
+{tbl("Launch event identification", [("Universe", f"Every orbital launch attempt in GCAT, {e(span)}."),
+     ("Failure", "GCAT success score below 0.75 (GCAT's own pass or fail line). Partial failures below that line count as failures."),
+     ("Pad explosions", "Explosions before launch are recorded separately and are not launch failures."),
+     ("Link to firms", "Each failure is linked by hand, point in time, to its maker if listed and to listed rivals (section 4).")])}
+</section>
+<section id="sample"><h2>3. Sample construction</h2>
 <p>The counts measure different units. Firm-event reactions are not independent events.</p>
 {f'<figure class="cs-fig">{CS.fig_sample(nodes, edges)}<figcaption class="cs-cap">Sample construction. Each box gives a count and its unit. Source: GCAT and the project pipeline.</figcaption></figure>' if nodes else ''}
 {tbl("Sample definitions", sample_rows)}
 {tbl("Failures not in the study, by reason (a failure can have several)", [(e(k), str(v)) for k, v in why.most_common()]) if why else ''}
 </section>
-<section id="events"><h2>3. Event identification and timing</h2>{tbl("Event timing rules", timing_rows)}</section>
-<section id="firms"><h2>4. Firm classification</h2>{tbl("Firm classification", firm_rows)}</section>
-<section id="model"><h2>5. Market model and event windows</h2>{tbl("Model and windows", model_rows)}
+<section id="firms"><h2>4. Listed-company selection</h2>{tbl("Firm classification", firm_rows)}</section>
+<section id="timing"><h2>5. Event timing</h2>
+<p>{e(L.pct(tm['rival_reactions']['shares'].get('provisional', 0), 0, False))} of rival reactions ({tc.get('provisional', 0)} of {tm['rival_reactions']['n']}) are dated by the launch-time proxy, not by a separately verified company statement.</p>
+{timing_tbl}
+{tbl("How events are assigned to trading days", timing_rows)}</section>
+<section id="model"><h2>6. Market-return model</h2>{tbl("Market-return model", model_rows)}</section>
+<section id="ar"><h2>7. Abnormal returns</h2>{tbl("Abnormal returns", ar_rows)}</section>
+<section id="car"><h2>8. Cumulative abnormal returns</h2>{tbl("Cumulative abnormal returns and windows", car_rows)}
 <p>Equations: <a href="case-study.html#s5">paper, section 5</a>.</p></section>
-<section id="inference"><h2>6. Statistical inference</h2>{tbl("Tests and estimands", inf_rows)}
+<section id="inference"><h2>9. Statistical inference</h2>{tbl("Tests and estimands", inf_rows)}
 <p>Estimands and the four weightings: <a href="case-study.html#s5">paper, section 5.1</a>; sample concentration: <a href="case-study.html#s6">section 6.3</a>.</p></section>
-<section id="robust"><h2>7. Robustness procedures</h2>
+<section id="robust"><h2>10. Robustness checks</h2>
 <p><span class="badge confirm">Prespecified</span> {len(robust)} checks fixed before the results:</p><ul class="method">{rob_items}</ul>
 <p><span class="badge robust">Benchmark</span> Placebo R9: {e(str(pl.get('draws', '')))} sets of random ordinary trading days (seed {e(str(pl.get('seed', '')))}), one per reaction. The real result's percentile is a description, not a p-value.</p>
 <p><span class="badge explore">Exploratory</span> Analyses designed after the results (confounding drops E1 to E3, weighting, a shared-date placebo R9b) are labelled wherever they appear and never replace the prespecified test. Results: <a href="case-study.html#s7">paper, sections 7 and 8</a>.</p></section>
-<section id="quality"><h2>8. Data quality and limitations</h2>{tbl("Data quality", quality)}</section>
-<section id="replicate"><h2>9. Replication</h2>
+<section id="quality"><h2>11. Limitations and data quality</h2>{tbl("Data quality", quality)}</section>
+<section id="replicate"><h2>12. Reproducibility</h2>
 <p>Python 3.11+, <code>pip install -r requirements.txt</code>, then run the steps in order. Prices are downloaded on your machine and never committed.</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Pipeline steps"><table><caption>Pipeline steps</caption><thead><tr><th scope="col">Command</th><th scope="col">What it does</th></tr></thead><tbody>{step_rows}
 <tr><td><code>python audit/verify_published.py</code></td><td>Recompute every published statistic independently</td></tr>
@@ -170,7 +200,8 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
 <li>McDowell, J. C. GCAT: General Catalog of Artificial Space Objects. planet4589.org/space/gcat.</li>
 </ul></section>
 </main></div>
-{SC.footer("", meta, bool(pdf_name), SC.cite(year, meta))}"""
+{SC.footer("", meta, bool(pdf_name), SC.cite(year, meta))}
+{SC.TOC_SCRIPT}"""
     desc = "Data and methods of Space Shock: sources, sample definitions, event timing, firm classification, the market model, tests, data quality and replication."
     url = (meta["live_url"].rstrip("/") + "/methods.html") if meta.get("live_url") else None
     return L._shell("Data & Methods · Space Shock", desc, url, body, css, url, None, body_class="paper methods")

@@ -159,7 +159,7 @@ def build(site_data: Path = SITE / "data", out: Path = SITE / "index.html") -> P
     pdf = (ROOT / "case-study.pdf").exists() or bool(shutil.which("xelatex") or shutil.which("pdflatex"))
     header = SC.header("report", "../", pdf, meta.get("repo_url"))
     year = str(data["manifest"].get("results_run_utc", ""))[:4]
-    footer = SC.footer("../", meta, pdf, f"Ibnat, N. ({year}). {SC.PAPER_TITLE}. Space Shock working paper.")
+    footer = SC.footer("../", meta, pdf, SC.cite(year, meta))
     html = (SITE / "template.html").read_text(encoding="utf-8")
     for key, val in (("{{STYLE}}", style), ("{{DATA}}", data_json), ("{{SCRIPT}}", script), ("{{BUILD_INFO}}", info),
                      ("{{NOSCRIPT}}", noscript), ("{{HEADER}}", header), ("{{FOOTER}}", footer), ("{{FONTS}}", SC.FONTS)):

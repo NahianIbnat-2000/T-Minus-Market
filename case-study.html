@@ -452,6 +452,14 @@ body.report { background: var(--paper); }
 .report .load-error { margin: var(--space-5) 0; padding: var(--space-4); border: 1px solid #F0B4A8; border-left: 4px solid var(--loss); background: #FFF4F1; border-radius: var(--radius); }
 .report .load-error h2 { font-size: var(--step-1); }
 .report .lab-form fieldset { width: 100%; min-width: 0; }
+.report .ex-legend { list-style: none; padding: 0; margin: var(--space-3) 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 0.4rem var(--space-3); font-family: var(--font-head); font-size: 0.85rem; color: var(--muted); }
+.report .ex-legend li { display: flex; align-items: center; gap: 0.5rem; }
+.report .sw { flex: none; display: inline-block; width: 14px; height: 14px; }
+.report .sw-dot { width: 7px; height: 7px; border-radius: 50%; background: #94A3B8; margin: 0 3.5px; }
+.report .sw-line { height: 2px; background: var(--ink); }
+.report .sw-exp { border-radius: 50%; border: 2px solid var(--ink); background: #fff; }
+.report .sw-act { border-radius: 50%; background: var(--loss); }
+.report .ex-window, .report .sim-cap { font-family: var(--font-head); font-size: 0.85rem; color: var(--muted); margin-top: var(--space-2); max-width: none; }
 
 /* Shared long-form article layout (used by the working paper). */
 .article { padding-top: var(--space-4); padding-bottom: var(--space-6); }
@@ -575,6 +583,8 @@ body.paper { background: var(--paper); }
   .methods-page table.def th, .methods-page table.def td { display: block; width: auto; border-bottom: 0; padding-left: 0; }
   .methods-page table.def tr { display: block; border-bottom: var(--hairline); padding: 0.3rem 0; }
 }
+.paper-toc a[aria-current="location"], .toc-mobile a[aria-current="location"] { border-left-color: var(--bench); color: var(--bench-text); font-weight: 600; }
+.methods-page th[scope="row"] { font-family: var(--font-head); text-transform: none; letter-spacing: 0; color: var(--ink); font-weight: 600; font-size: 0.9rem; }
 
 </style>
 </head>
@@ -595,8 +605,8 @@ body.paper { background: var(--paper); }
   </dl>
 </div></header>
 <div class="wrap paper-grid">
-<aside class="paper-toc screen-only" aria-label="Contents"><nav aria-label="Paper sections"><p class="pt-h">Contents</p><ol><li><a href="#s1">1. Introduction</a></li><li><a href="#s2">2. Institutional background</a></li><li><a href="#s3">3. Related literature</a></li><li><a href="#s4">4. Data and sample construction</a></li><li><a href="#s5">5. Empirical methodology</a></li><li><a href="#s6">6. Main results</a></li><li><a href="#s7">7. Robustness and sensitivity</a></li><li><a href="#s8">8. Confounding corporate announcements</a></li><li><a href="#s9">9. Discussion</a></li><li><a href="#s10">10. Limitations</a></li><li><a href="#s11">11. Conclusion</a></li><li><a href="#apx">Appendices</a></li></ol></nav></aside>
-<details class="toc-mobile screen-only"><summary>Sections</summary><nav aria-label="Paper sections (mobile)"><ol><li><a href="#s1">1. Introduction</a></li><li><a href="#s2">2. Institutional background</a></li><li><a href="#s3">3. Related literature</a></li><li><a href="#s4">4. Data and sample construction</a></li><li><a href="#s5">5. Empirical methodology</a></li><li><a href="#s6">6. Main results</a></li><li><a href="#s7">7. Robustness and sensitivity</a></li><li><a href="#s8">8. Confounding corporate announcements</a></li><li><a href="#s9">9. Discussion</a></li><li><a href="#s10">10. Limitations</a></li><li><a href="#s11">11. Conclusion</a></li><li><a href="#apx">Appendices</a></li></ol></nav></details>
+<aside class="paper-toc screen-only" aria-label="Contents"><nav aria-label="Paper contents"><p class="pt-h">Contents</p><ol><li><a href="#s1">1. Introduction</a></li><li><a href="#s2">2. Institutional background</a></li><li><a href="#s3">3. Related literature</a></li><li><a href="#s4">4. Data and sample construction</a></li><li><a href="#s5">5. Empirical methodology</a></li><li><a href="#s6">6. Main results</a></li><li><a href="#s7">7. Robustness and sensitivity</a></li><li><a href="#s8">8. Confounding corporate announcements</a></li><li><a href="#s9">9. Discussion</a></li><li><a href="#s10">10. Limitations</a></li><li><a href="#s11">11. Conclusion</a></li><li><a href="#apx">Appendices</a></li></ol></nav></aside>
+<details class="toc-mobile screen-only"><summary>Contents</summary><nav aria-label="Paper contents"><ol><li><a href="#s1">1. Introduction</a></li><li><a href="#s2">2. Institutional background</a></li><li><a href="#s3">3. Related literature</a></li><li><a href="#s4">4. Data and sample construction</a></li><li><a href="#s5">5. Empirical methodology</a></li><li><a href="#s6">6. Main results</a></li><li><a href="#s7">7. Robustness and sensitivity</a></li><li><a href="#s8">8. Confounding corporate announcements</a></li><li><a href="#s9">9. Discussion</a></li><li><a href="#s10">10. Limitations</a></li><li><a href="#s11">11. Conclusion</a></li><li><a href="#apx">Appendices</a></li></ol></nav></details>
 <main id="main" class="article cs">
 <section class="abstract-sec"><h2>Abstract</h2><p>This paper asks how equity markets react when an orbital launch fails, both for the company that built the rocket and for its publicly listed competitors. Using 138 orbital launch failures from 2000 to 2026 (GCAT) and a market-model event study with a prespecified test, it finds that in the 4 failures with a listed maker (2 firms) the maker&#x27;s two-day cumulative abnormal return was between −8.8% and −16.3%, each case with a 95% interval excluding zero. Across 24 failures with listed competitors (42 stock reactions, 3 firms, 22 independent events), the equal-weighted average two-day cumulative abnormal return is +0.28% (95% cluster-robust interval −1.62% to +2.18%; cluster-robust p = 0.76); the prespecified standardized test (Boehmer-Musumeci-Poulsen with a Kolari-Pynnönen adjustment) gives p = 0.40. The evidence therefore establishes neither systematic contagion nor systematic competitive gains among these firms, and it does not show the effect is negligible: average effects of about 2.7% in either direction would usually go undetected. The sign of the estimate changes with how events and firms are weighted, and every independent event involves Avio SpA. The study is a small-sample case study of listed firms, not an estimate for the launch industry as a whole.</p>
 <p class="keywords"><strong>Keywords:</strong> event study; industry spillovers; contagion; competitive effects; launch failures. <strong>JEL:</strong> G14, L13.</p></section>
@@ -771,6 +781,28 @@ body.paper { background: var(--paper); }
 <p class="signoff">Nahian Ibnat, Nov 2026. Cite as: Ibnat, N. (2026). <em>When Rockets Fail: Financial Contagion and Competitive Effects in the Space Industry.</em> Space Shock working paper. https://nahianibnat-2000.github.io/space-shock/case-study.html Research, not investment advice.</p>
 </main>
 </div>
-<footer class="ss-footer"><div class="ss-fgrid"><div><h2>Space Shock</h2><p>Financial contagion and competitive effects of rocket launch failures. An event study of orbital launch failures and the stocks of the companies involved.</p><p>By Nahian Ibnat</p></div><div><h2>Explore</h2><ul><li><a href="index.html">Overview</a></li><li><a href="site/index.html">Explore Data</a></li><li><a href="case-study.html">Research Paper</a></li><li><a href="methods.html">Data &amp; Methods</a></li><li><a href="case-study.pdf" download>Download PDF</a></li><li><a href="https://github.com/NahianIbnat-2000/space-shock">Source code</a></li></ul></div><div><h2>Sources</h2><p>Launch data: GCAT, J. McDowell, CC-BY. Prices: Yahoo Finance, used only to compute statistics; no prices are republished.</p></div><div><h2>Cite</h2><p>Ibnat, N. (2026). When Rockets Fail: Financial Contagion and Competitive Effects in the Space Industry. Space Shock working paper.</p></div></div><p class="ss-legal">Independent research, not peer reviewed. Not investment advice.</p></footer>
+<footer class="ss-footer"><div class="ss-fgrid"><div><h2>Space Shock</h2><p>Financial contagion and competitive effects of rocket launch failures. An event study of orbital launch failures and the stocks of the companies involved.</p><p>By Nahian Ibnat</p></div><div><h2>Explore</h2><ul><li><a href="index.html">Overview</a></li><li><a href="site/index.html">Explore Data</a></li><li><a href="case-study.html">Research Paper</a></li><li><a href="methods.html">Data &amp; Methods</a></li><li><a href="case-study.pdf" download>Download PDF</a></li><li><a href="https://github.com/NahianIbnat-2000/space-shock">Source code</a></li></ul></div><div><h2>Sources</h2><p>Launch data: GCAT, J. McDowell, CC-BY. Prices: Yahoo Finance, used only to compute statistics; no prices are republished.</p></div><div><h2>Cite</h2><p>Ibnat, N. (2026). When Rockets Fail: Financial Contagion and Competitive Effects in the Space Industry. Space Shock working paper. https://nahianibnat-2000.github.io/space-shock/</p></div></div><p class="ss-legal">Independent research, not peer reviewed. Not investment advice.</p></footer>
+<script>
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll(".paper-toc a[href^='#'], .toc-mobile a[href^='#']"));
+  if (!links.length) return;
+  var ids = [], seen = {};
+  links.forEach(function (a) { var id = a.getAttribute("href").slice(1); if (!seen[id]) { seen[id] = 1; ids.push(id); } });
+  var secs = ids.map(function (id) { return document.getElementById(id); }).filter(Boolean);
+  var current = null, ticking = false;
+  function update() {
+    ticking = false;
+    var line = Math.max(180, window.innerHeight * 0.3), id = secs.length ? secs[0].id : null;
+    secs.forEach(function (el) { if (el.getBoundingClientRect().top <= line) id = el.id; });
+    if (id === current) return;
+    current = id;
+    links.forEach(function (a) { if (a.getAttribute("href") === "#" + id) a.setAttribute("aria-current", "location"); else a.removeAttribute("aria-current"); });
+  }
+  window.addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+  window.addEventListener("hashchange", update);
+  window.addEventListener("load", function () { setTimeout(update, 50); });
+  update();
+})();
+</script>
 </body>
 </html>

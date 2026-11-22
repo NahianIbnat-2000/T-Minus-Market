@@ -110,3 +110,5 @@ body.paper { background: var(--paper); }
   .methods-page table.def th, .methods-page table.def td { display: block; width: auto; border-bottom: 0; padding-left: 0; }
   .methods-page table.def tr { display: block; border-bottom: var(--hairline); padding: 0.3rem 0; }
 }
+.paper-toc a[aria-current="location"], .toc-mobile a[aria-current="location"] { border-left-color: var(--bench); color: var(--bench-text); font-weight: 600; }
+.methods-page th[scope="row"] { font-family: var(--font-head); text-transform: none; letter-spacing: 0; color: var(--ink); font-weight: 600; font-size: 0.9rem; }

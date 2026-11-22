@@ -62,3 +62,11 @@ body.report { background: var(--paper); }
 .report .load-error { margin: var(--space-5) 0; padding: var(--space-4); border: 1px solid #F0B4A8; border-left: 4px solid var(--loss); background: #FFF4F1; border-radius: var(--radius); }
 .report .load-error h2 { font-size: var(--step-1); }
 .report .lab-form fieldset { width: 100%; min-width: 0; }
+.report .ex-legend { list-style: none; padding: 0; margin: var(--space-3) 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 0.4rem var(--space-3); font-family: var(--font-head); font-size: 0.85rem; color: var(--muted); }
+.report .ex-legend li { display: flex; align-items: center; gap: 0.5rem; }
+.report .sw { flex: none; display: inline-block; width: 14px; height: 14px; }
+.report .sw-dot { width: 7px; height: 7px; border-radius: 50%; background: #94A3B8; margin: 0 3.5px; }
+.report .sw-line { height: 2px; background: var(--ink); }
+.report .sw-exp { border-radius: 50%; border: 2px solid var(--ink); background: #fff; }
+.report .sw-act { border-radius: 50%; background: var(--loss); }
+.report .ex-window, .report .sim-cap { font-family: var(--font-head); font-size: 0.85rem; color: var(--muted); margin-top: var(--space-2); max-width: none; }

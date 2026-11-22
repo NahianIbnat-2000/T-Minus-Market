@@ -108,8 +108,8 @@ def test_case_study_page(built, tmp_path):
     import landing
     res = json.loads((root / "site_data" / "results.json").read_text())
     assert landing.pct(res["primary"]["mean_car"], 2) in cs                 # numbers come from results.json
-    assert cs.count("<svg") >= 3 and "<script" not in cs
-    text = re.sub(r"<[^>]+>", " ", re.sub(r"<(style|svg)[^>]*>.*?</\1>", "", cs, flags=re.S))
+    assert cs.count("<svg") >= 3 and cs.count("<script") == 1 and "<script src" not in cs   # only the contents highlighter
+    text = re.sub(r"<[^>]+>", " ", re.sub(r"<(style|svg|script)[^>]*>.*?</\1>", "", cs, flags=re.S))
     assert not re.search(r"\b(nan)\b|[{}]", text)
     assert "Preregistered" not in cs and "same conclusion" not in cs                   # audit wording fixes stay fixed
     art = (tmp_path / "index.html").read_text(encoding="utf-8")
@@ -196,9 +196,11 @@ def test_four_destinations_and_methods_page(built, tmp_path):
         nav = re.search(r'<nav class="ss-nav"[^>]*>(.*?)</nav>', txt, re.S).group(1)
         assert re.findall(r">([^<]+)</a>", nav) == ["Overview", "Explore Data", "Research Paper", "Data &amp; Methods"]
     m = (out / "methods.html").read_text(encoding="utf-8")
-    for h in ("Data sources", "Sample definitions", "Event identification and timing", "Firm classification",
-              "Market model and event windows", "Statistical inference", "Robustness procedures", "Data quality and limitations", "Replication"):
-        assert h in m
+    for h in ("Data sources", "Launch event identification", "Sample construction", "Listed-company selection", "Event timing",
+              "Market-return model", "Abnormal returns", "Cumulative abnormal returns", "Statistical inference", "Robustness checks",
+              "Limitations and data quality", "Reproducibility"):
+        assert f"{h}</h2>" in m
+    assert "Launch-time proxy" in m and "Independently verified public disclosure" in m
     home = (out / "index.html").read_text(encoding="utf-8")
     assert home.count('class="sec-h"') == 4 and "space-shock" in home and "T-Minus-Market" not in home
-    assert "does not provide conclusive evidence of either industry contagion or competitive substitution" in home
+    assert "does not establish a statistically reliable competitive or contagion effect" in home

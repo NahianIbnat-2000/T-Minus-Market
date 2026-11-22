@@ -53,6 +53,13 @@ export function explainerHtml() {
         <input type="range" name="${c.name}" min="${c.min}" max="${c.max}" step="${c.step}" value="${c.value}"></label>`).join("")}
     </form>
     <div class="ex-charts"><div class="ex-scatter"></div><div class="ex-bars"></div></div>
+    <ul class="ex-legend" aria-label="Legend">
+      <li><span class="sw sw-dot" aria-hidden="true"></span>Ordinary days in the estimation window (stock against market)</li>
+      <li><span class="sw sw-line" aria-hidden="true"></span>Fitted market model: the expected return for any market move</li>
+      <li><span class="sw sw-exp" aria-hidden="true"></span>Expected return on the event day</li>
+      <li><span class="sw sw-act" aria-hidden="true"></span>Actual return on the event day; the gap is the abnormal return</li>
+    </ul>
+    <p class="ex-window">Event window here: one day (T0). The study adds the abnormal returns of T0 and T+1 (the two-day CAR).</p>
     <div class="ex-out" aria-live="polite"></div>
     <p class="tool-source">Simulated data only. The study's real expected and actual returns are not shown because the price data may not be republished; the real abnormal returns for each maker case are in the Results section (cumulative paths) and in the <a href="../case-study.html#s6">paper</a>. <a href="../methods.html#model">Market model</a></p>
   </div>`;
@@ -72,7 +79,8 @@ function scatter(sim, ev, marketMove) {
   s += `<circle class="ex-act" cx="${x(marketMove).toFixed(1)}" cy="${y(ev.actual).toFixed(1)}" r="5"/>`;
   s += text(m.l + 4, m.t + 10, "each dot: one ordinary day", "label muted");
   return s + axisBottom(x, H - m.b, ticksX, (v) => pct(v, 0), m.l, W - m.r) + axisLeft(y, m.l, ticksY, (v) => pct(v, 0), m.t, H - m.b)
-    + text(W - m.r - 4, H - 4, "market return", "label muted", 'text-anchor="end"') + "</svg>";
+    + text(W - m.r - 4, H - 4, "market return (benchmark index)", "label muted", 'text-anchor="end"')
+    + `<text class="label muted" transform="translate(11 ${(m.t + H - m.b) / 2}) rotate(-90)" text-anchor="middle">stock return</text>` + "</svg>";
 }
 
 function bars(ev) {
@@ -81,6 +89,7 @@ function bars(ev) {
   const y = linear([-0.2, 0.1], [H - m.b, m.t]);
   const bw = (W - m.l - m.r) / items.length;
   let s = svgOpen(W, H, "Bars for the actual, expected and abnormal return on the event day.");
+  s += text(m.l + 4, m.t + 10, "return on the event day (T0)", "label muted");
   const ticks = niceTicks(-0.2, 0.1, 6);
   for (const t of ticks) s += line(m.l, y(t), W - m.r, y(t), "grid-line");
   s += line(m.l, y(0), W - m.r, y(0), "zero-line");

@@ -286,7 +286,7 @@ def article(data: dict, meta: dict, root: Path, css: str) -> str:
   <h2 id="h-lim" class="sec-h">What the evidence can and cannot show</h2>
   <ul class="cc">
     <li><strong>Makers lose.</strong> {"In every listed case the maker's shares fell well beyond the market over two days." if all_fell else "Maker reactions differ across the listed cases."} With {f['n_cases']} cases this describes those cases, not every launch company.</li>
-    <li><strong>Competitors: imprecise, not zero.</strong> The competitor analysis does not provide conclusive evidence of either industry contagion or competitive substitution. The interval runs from {e(pct(p['ci_low'], 2))} to {e(pct(p['ci_high'], 2))}.</li>
+    <li><strong>Competitors: imprecise, not zero.</strong> The evidence does not establish a statistically reliable competitive or contagion effect; it does not show that there is no effect either. The interval runs from {e(pct(p['ci_low'], 2))} to {e(pct(p['ci_high'], 2))}.</li>
     {f'<li><strong>Low power.</strong> Average effects below about {e(pct(mde, 1, False))} either way would usually be missed.</li>' if mde else ''}
     <li><strong>Small, concentrated sample.</strong> {n_firms} listed competitors{f"; {e(f['top_firm'])} is in all {f['n_clusters']} independent events" if f.get('top_firm') and f.get('top_firm_clusters') == f['n_clusters'] else ""}.</li>
     {f'<li><strong>Weighting matters.</strong> Weighting every reaction equally gives {e(pct(w["observation_weighted"], 2))}; weighting every firm equally gives {e(pct(w["firm_balanced"], 2))} (a sensitivity analysis, not the prespecified estimate).</li>' if w else ''}

@@ -604,8 +604,8 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
   </dl>
 </div></header>
 <div class="wrap paper-grid">
-<aside class="paper-toc screen-only" aria-label="Contents"><nav aria-label="Paper sections"><p class="pt-h">Contents</p><ol>{toc_items}</ol></nav></aside>
-<details class="toc-mobile screen-only"><summary>Sections</summary><nav aria-label="Paper sections (mobile)"><ol>{toc_items}</ol></nav></details>
+<aside class="paper-toc screen-only" aria-label="Contents"><nav aria-label="Paper contents"><p class="pt-h">Contents</p><ol>{toc_items}</ol></nav></aside>
+<details class="toc-mobile screen-only"><summary>Contents</summary><nav aria-label="Paper contents"><ol>{toc_items}</ol></nav></details>
 <main id="main" class="article cs">
 <section class="abstract-sec"><h2>Abstract</h2><p>{e(abstract)}</p>
 <p class="keywords"><strong>Keywords:</strong> event study; industry spillovers; contagion; competitive effects; launch failures. <strong>JEL:</strong> G14, L13.</p></section>
@@ -787,7 +787,8 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
 <p class="signoff">{e(meta.get("author", "Nahian Ibnat"))}, {e(updated)}. Cite as: Ibnat, N. ({e(year)}). <em>{e(SC.PAPER_TITLE)}.</em> Space Shock working paper.{(" " + e(meta["live_url"]) + "case-study.html") if meta.get("live_url") else ""} Research, not investment advice.</p>
 </main>
 </div>
-{SC.footer("", meta, bool(pdf_name), f"Ibnat, N. ({year}). {SC.PAPER_TITLE}. Space Shock working paper.")}"""
+{SC.footer("", meta, bool(pdf_name), SC.cite(year, meta))}
+{SC.TOC_SCRIPT}"""
     desc = (f"Working paper: {f['n_failures']} orbital launch failures, {span}. Listed makers lose {pct(f['case_hi'])} to {pct(f['case_lo'])} in two days; "
             f"listed rivals {pct(p['mean_car'], 2)} (95% interval {pct(p['ci_low'], 2)} to {pct(p['ci_high'], 2)}), not detectable with {f['n_clusters']} independent events.")
     url = (meta["live_url"].rstrip("/") + "/case-study.html") if meta.get("live_url") else None

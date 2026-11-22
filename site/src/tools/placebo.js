@@ -29,6 +29,7 @@ export function placeboToolHtml({ results }) {
       <button type="button" data-draw="reset" class="ghost">Start over</button>
     </div>
     <div class="sim-chart"></div>
+    <p class="sim-cap">Bars: the placebo (null) distribution, one average two-day abnormal return per random set of ordinary days. Line: the observed statistic, the same average for the real failures.</p>
     <div class="sim-out" aria-live="polite"></div>
     <ul class="sim-facts">
       <li><strong>Pseudo-event dates:</strong> random ordinary trading days of each stock's own exchange, at least ${PLACEBO_GAP} sessions away from any of that stock's failure days, with a full year of earlier prices for the market model.</li>
@@ -88,7 +89,7 @@ export function mountPlacebo(root, { results }) {
         ? (n === 1 ? `The first random set was not ${escapeHtml(dir)} the real failures.` : `None of the ${n} random sets has been ${escapeHtml(dir)} the real failures so far.`)
         : `${side} of ${n} random sets of ordinary days ${side === 1 ? "was" : "were"} ${escapeHtml(dir)} the real failures.`}
         The two-sided share counts surprises in either direction, so it is double the smaller of the two tails.
-        ${done ? ` With all draws in, it equals the share reported in the robustness checks${matches ? " (checked)" : ""}. A small share means ordinary days rarely produce a move this large; a large share means luck could easily explain it.` : ""}</p>`;
+        ${done ? ` With all draws in, it equals the share reported in the robustness checks${matches ? " (checked)" : ""}. A small share means ordinary days rarely produce a move this large; a large share means luck could easily explain it. The share describes how ordinary the real result looks; it is not the p-value of a formal test.` : ""}</p>`;
   };
   const stop = () => { if (timer) { clearInterval(timer); timer = null; } };
   el.querySelector(".sim-controls").addEventListener("click", (ev) => {
