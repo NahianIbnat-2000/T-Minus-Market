@@ -24,14 +24,14 @@ LOGO = ('<svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true" focu
 def nav_items(prefix: str, pdf: bool, repo: str | None):
     """Primary navigation: four destinations, each with one purpose."""
     return [("home", "Overview", f"{prefix}index.html"), ("report", "Explore Data", f"{prefix}site/index.html"),
-            ("paper", "Research Paper", f"{prefix}case-study.html"), ("methods", "Data & Methods", f"{prefix}methods.html")]
+            ("paper", "Paper", f"{prefix}paper.html"), ("methods", "Data & Methods", f"{prefix}methods.html")]
 
 
 def extra_items(prefix: str, pdf: bool, repo: str | None):
     """Secondary links (footer only)."""
     items = []
     if pdf:
-        items.append(("pdf", "Download PDF", f"{prefix}case-study.pdf"))
+        items.append(("pdf", "Download PDF", f"{prefix}paper.pdf"))
     if repo:
         items.append(("code", "Source code", repo))
     return items
@@ -39,7 +39,7 @@ def extra_items(prefix: str, pdf: bool, repo: str | None):
 
 def cite(year: str, meta: dict) -> str:
     url = meta.get("live_url") or ""
-    return f"Ibnat, N. ({year}). {PAPER_TITLE}. Space Shock working paper." + (f" {url}" if url else "")
+    return f"Ibnat, N. ({year}). {PAPER_TITLE}. Space Shock paper." + (f" {url}" if url else "")
 
 
 def header(active: str, prefix: str = "", pdf: bool = True, repo: str | None = None) -> str:

@@ -64,8 +64,8 @@ def main(root: Path = ROOT) -> int:
     counts = {"independent events": f"{p['n_clusters']} independent", "reactions": str(p["n_firm_events"])}
     pages = {
         "article": text_of(root / "index.html"),
-        "paper (HTML)": text_of(root / "case-study.html"),
-        "paper (PDF)": text_of(root / "case-study.pdf"),
+        "paper (HTML)": text_of(root / "paper.html"),
+        "paper (PDF)": text_of(root / "paper.pdf"),
         "report summary": noscript_of(root / "site" / "index.html"),
     }
     fails, rows = [], []

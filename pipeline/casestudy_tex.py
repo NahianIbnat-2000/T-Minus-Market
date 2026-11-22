@@ -1,8 +1,8 @@
-"""LaTeX version of the case study: case-study.html (one source of text) -> casestudy/case-study.tex -> case-study.pdf.
+"""LaTeX version of the paper: paper.html (one source of text) -> paper/paper.tex -> paper.pdf.
 
 - Text: converted from the case-study HTML, so the web page and the PDF never disagree.
   Elements with class "screen-only" (for example the PDF links) are left out.
-- Figures: redrawn with matplotlib as vector PDFs (casestudy/fig-1.pdf ...), Times-style font.
+- Figures: redrawn with matplotlib as vector PDFs (paper/fig-1.pdf ...), Times-style font.
 - Typeset: XeLaTeX with Times New Roman 12 pt (TeX Gyre Termes if Times New Roman is not installed);
   pdfLaTeX with the Times package as a fallback. If no LaTeX is installed, the .tex folder is still
   written, ready to upload to Overleaf.
@@ -475,7 +475,7 @@ def build_tex(html: str, data: dict, meta: dict, outdir: Path) -> Path:
            + "{\\normalsize " + esc(meta.get("author", "Nahian Ibnat")) + (" \\textperiodcentered{} " + esc(date) if date else "")
            + "\\par}" + ("{\\small Interactive version: \\url{" + url + "}\\par}" if url else "") + "}\n\\vspace{6pt}\n"
            + body + "\\end{document}\n")
-    tex = outdir / "case-study.tex"
+    tex = outdir / "paper.tex"
     tex.write_text(doc, encoding="utf-8")
     return tex
 
@@ -490,20 +490,20 @@ def find_engine() -> list[str] | None:
 def compile_pdf(tex: Path, pdf_out: Path) -> bool:
     eng = find_engine()
     if not eng:
-        print("Skipped case-study.pdf: no LaTeX found. Install MiKTeX (miktex.org) and run step 08 again, "
-              "or upload the casestudy/ folder to Overleaf (compiler: XeLaTeX).")
+        print("Skipped paper.pdf: no LaTeX found. Install MiKTeX (miktex.org) and run step 08 again, "
+              "or upload the paper/ folder to Overleaf (compiler: XeLaTeX).")
         return False
     cmd = [*eng, "-interaction=nonstopmode", "-halt-on-error", tex.name]
     try:
         for _ in range(2):                                            # twice, so page layout settles
             r = subprocess.run(cmd, cwd=tex.parent, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=300)
         if r.returncode != 0:
-            log = (tex.parent / "case-study.log")
+            log = (tex.parent / "paper.log")
             tail = log.read_text(errors="ignore")[-1500:] if log.exists() else r.stdout[-1500:]
-            print("Skipped case-study.pdf: LaTeX stopped with an error. End of the log:\n" + tail)
+            print("Skipped paper.pdf: LaTeX stopped with an error. End of the log:\n" + tail)
             return False
     except (subprocess.SubprocessError, OSError) as err:
-        print(f"Skipped case-study.pdf: could not run LaTeX ({err}).")
+        print(f"Skipped paper.pdf: could not run LaTeX ({err}).")
         return False
     shutil.copyfile(tex.with_suffix(".pdf"), pdf_out)
     for ext in (".aux", ".log", ".out"):

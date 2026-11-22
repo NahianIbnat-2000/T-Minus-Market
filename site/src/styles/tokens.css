@@ -1,4 +1,4 @@
-/* Space Shock design tokens. One system for the homepage, the interactive report and the working paper.
+/* Space Shock design tokens. One system for the homepage, the interactive report and the paper.
    Colour semantics: coral = negative abnormal return, teal = positive, blue = benchmark / neutral information,
    navy = hero and analytics surfaces. Contrast (WCAG 2.2) on --paper #F7F8FA: ink 16.9, muted 7.4,
    loss-text 5.9, gain-text 5.3, bench-text 6.3 (all text-safe). Marks (--loss, --gain, --bench) are for

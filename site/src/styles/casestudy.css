@@ -1,4 +1,4 @@
-/* Case study page: screen and A4 print */
+/* Paper page: screen and A4 print */
 .cs { max-width: 48rem; }
 .cs h3 { font-size: var(--step-1); margin: var(--space-5) 0 var(--space-2); }
 .cs-head .byline a { color: inherit; }

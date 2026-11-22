@@ -22,7 +22,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-PAGES = ["index.html", "site/index.html", "case-study.html", "methods.html"]
+PAGES = ["index.html", "site/index.html", "paper.html", "methods.html"]
 OUTDATED = [r"github\.io/T-Minus-Market", r"github\.com/NahianIbnat-2000/T-Minus-Market\b"]
 
 
@@ -80,15 +80,15 @@ def check(root: Path = ROOT) -> list[tuple[str, str, bool]]:
                 rows.append((page, f"{tag} uses the live address", mm.group(1).startswith(live)))
         cite = re.search(r"<h2>Cite</h2><p>(.*?)</p>", txt, flags=re.S)
         if cite:
-            rows.append((page, "citation names the paper and the live address", "Space Shock working paper" in cite.group(1) and live in cite.group(1)))
-        expected_nav = ["Overview", "Explore Data", "Research Paper", "Data &amp; Methods"]
+            rows.append((page, "citation names the paper and the live address", "Space Shock paper" in cite.group(1) and live in cite.group(1)))
+        expected_nav = ["Overview", "Explore Data", "Paper", "Data &amp; Methods"]
         nav = re.search(r'<nav class="ss-nav"[^>]*>(.*?)</nav>', txt, flags=re.S)
         if nav:
             got = re.findall(r">([^<]+)</a>", nav.group(1))
-            rows.append((page, "navigation is Overview | Explore Data | Research Paper | Data & Methods", got == expected_nav))
+            rows.append((page, "navigation is Overview | Explore Data | Paper | Data & Methods", got == expected_nav))
             dest = dict(zip(got, re.findall(r'href="([^"]+)"', nav.group(1))))
             pre = "../" if page.startswith("site/") else ""
-            want = {"Overview": pre + "index.html", "Explore Data": pre + "site/index.html", "Research Paper": pre + "case-study.html",
+            want = {"Overview": pre + "index.html", "Explore Data": pre + "site/index.html", "Paper": pre + "paper.html",
                     "Data &amp; Methods": pre + "methods.html"}
             rows.append((page, "navigation destinations are the four pages", dest == want))
         if nav:

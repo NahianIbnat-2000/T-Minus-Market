@@ -87,7 +87,7 @@ def bundle(entry: Path) -> str:
 
 
 def build_pages(site_data: Path = SITE / "data", root_out: Path = ROOT) -> list[Path]:
-    """Overview (index.html), research paper (case-study.html/.pdf), Data & Methods (methods.html) and preview image."""
+    """Overview (index.html), research paper (paper.html/.pdf), Data & Methods (methods.html) and preview image."""
     import landing
     data = {k: json.loads((site_data / f).read_text(encoding="utf-8")) for k, f in DATA_FILES.items()}
     meta = json.loads((SITE / "site_meta.json").read_text(encoding="utf-8"))
@@ -95,22 +95,27 @@ def build_pages(site_data: Path = SITE / "data", root_out: Path = ROOT) -> list[
     a = root_out / "index.html"
     (root_out / "plan.html").unlink(missing_ok=True)            # the plan page is no longer published
     (root_out / ".nojekyll").touch()
+    # the paper used to be published as case-study.html/.pdf with its LaTeX files in casestudy/: forward old links
+    import make_redirects
+    (root_out / "case-study.html").write_text(make_redirects.page("paper.html"), encoding="utf-8")
+    (root_out / "case-study.pdf").unlink(missing_ok=True)
+    shutil.rmtree(root_out / "casestudy", ignore_errors=True)
     out = [a]
     cs_css = "\n".join((SRC / "styles" / f).read_text(encoding="utf-8") for f in STYLES + ["landing.css", "casestudy.css"])
     import casestudy
     import casestudy_tex
-    pdf, cs = root_out / "case-study.pdf", root_out / "case-study.html"
+    pdf, cs = root_out / "paper.pdf", root_out / "paper.html"
     has_tex = casestudy_tex.find_engine() is not None
     html_cs = casestudy.build(data, meta, ROOT, cs_css, pdf.name if (has_tex or pdf.exists()) else None)
     cs.write_text(html_cs, encoding="utf-8")
     out.append(cs)
     try:
-        tex = casestudy_tex.build_tex(html_cs, data, meta, root_out / "casestudy")
+        tex = casestudy_tex.build_tex(html_cs, data, meta, root_out / "paper")
         out.append(tex)
         if casestudy_tex.compile_pdf(tex, pdf):
             out.append(pdf)
     except ImportError:
-        print("Skipped the LaTeX case study: run  pip install matplotlib  first (it draws the figures).")
+        print("Skipped the LaTeX paper: run  pip install matplotlib  first (it draws the figures).")
     # the homepage and the methods page are written after the PDF, so their "Download PDF" links reflect this build
     a.write_text(landing.article(data, meta, root_out, css), encoding="utf-8")
     import methods_page
@@ -135,7 +140,7 @@ def static_summary(data: dict) -> str:
     rows = "".join(f"<tr><td>{e(c['vehicle'])}, {e(L.day(c['day0']))}</td><td>{e(c['firm'])}</td><td>{e(L.pct(c['car_primary']))}</td></tr>"
                    for c in data["results"].get("provider_case_series") or [])
     return (f"<h2>Key results (static summary)</h2><p>This interactive report needs JavaScript for its charts and tools. "
-            f"The full text is in the <a href=\"../case-study.html\">working paper</a> and the <a href=\"../index.html\">article</a>.</p>"
+            f"The full text is in the <a href=\"../paper.html\">paper</a> and the <a href=\"../index.html\">article</a>.</p>"
             f"<p>Listed competitors: average two-day abnormal return {e(L.pct(p['mean_car'], 2))} (95% interval {e(L.pct(p['ci_low'], 2))} to "
             f"{e(L.pct(p['ci_high'], 2))}" + (f", p = {e(L.pval(f['pA']))}" if f.get("pA") is not None else "")
             + f"; prespecified standardized test p = {e(L.pval(p['p']))}), from {p['n_failures']} failures, {p['n_firms']} firms and "
@@ -156,7 +161,7 @@ def build(site_data: Path = SITE / "data", out: Path = SITE / "index.html") -> P
     noscript = static_summary(data)
     meta = json.loads((SITE / "site_meta.json").read_text(encoding="utf-8"))
     import sitechrome as SC
-    pdf = (ROOT / "case-study.pdf").exists() or bool(shutil.which("xelatex") or shutil.which("pdflatex"))
+    pdf = (ROOT / "paper.pdf").exists() or bool(shutil.which("xelatex") or shutil.which("pdflatex"))
     header = SC.header("report", "../", pdf, meta.get("repo_url"))
     year = str(data["manifest"].get("results_run_utc", ""))[:4]
     footer = SC.footer("../", meta, pdf, SC.cite(year, meta))

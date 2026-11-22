@@ -99,8 +99,8 @@ def test_preview_image(built, tmp_path):
 def test_case_study_page(built, tmp_path):
     root, _ = built
     outs = _load("s8d", "08_build_html.py").build_pages(site_data=root / "site_data", root_out=tmp_path)
-    cs = (tmp_path / "case-study.html").read_text(encoding="utf-8")
-    assert tmp_path / "case-study.html" in outs
+    cs = (tmp_path / "paper.html").read_text(encoding="utf-8")
+    assert tmp_path / "paper.html" in outs
     for heading in ["Abstract", "1. Introduction", "2. Institutional background", "3. Related literature", "4. Data and sample construction",
                     "5. Empirical methodology", "6. Main results", "7. Robustness and sensitivity", "8. Confounding corporate announcements",
                     "9. Discussion", "10. Limitations", "11. Conclusion", "References", "Appendix A", "Appendix F"]:
@@ -114,22 +114,22 @@ def test_case_study_page(built, tmp_path):
     assert "Preregistered" not in cs and "same conclusion" not in cs                   # audit wording fixes stay fixed
     art = (tmp_path / "index.html").read_text(encoding="utf-8")
     assert "Preregistered" not in art and "on request" not in art and "same conclusion" not in art
-    assert 'href="case-study.html"' in art
+    assert 'href="paper.html"' in art
 
 
 def test_case_study_latex(built, tmp_path):
     pytest.importorskip("matplotlib")
     root, _ = built
     _load("s8e", "08_build_html.py").build_pages(site_data=root / "site_data", root_out=tmp_path)
-    tex = (tmp_path / "casestudy" / "case-study.tex").read_text(encoding="utf-8")
+    tex = (tmp_path / "paper" / "paper.tex").read_text(encoding="utf-8")
     assert r"\documentclass[12pt,a4paper]{article}" in tex and "Times New Roman" in tex
     assert "Economics and Data Science" not in tex and "claude.ai" not in tex
-    assert "case-study.pdf" not in tex                     # the PDF does not link to itself
-    figs = sorted(p.name for p in (tmp_path / "casestudy").glob("fig-*.pdf"))
+    assert "paper.pdf" not in tex                     # the PDF does not link to itself
+    figs = sorted(p.name for p in (tmp_path / "paper").glob("fig-*.pdf"))
     assert "fig-years.pdf" in figs and "fig-forest.pdf" in figs     # always drawn; others depend on the data
     assert all(f"{{{f}}}" in tex for f in figs)                     # every drawn figure is used
     if shutil.which("xelatex") or shutil.which("pdflatex"):
-        assert (tmp_path / "case-study.pdf").read_bytes()[:5] == b"%PDF-"
+        assert (tmp_path / "paper.pdf").read_bytes()[:5] == b"%PDF-"
 
 
 def test_publication_consistency(built, tmp_path):
@@ -191,10 +191,10 @@ def test_site_check_catches_problems(built, tmp_path):
 
 def test_four_destinations_and_methods_page(built, tmp_path):
     out = _build(built, tmp_path)
-    for page in ("index.html", "site/index.html", "case-study.html", "methods.html"):
+    for page in ("index.html", "site/index.html", "paper.html", "methods.html"):
         txt = (out / page).read_text(encoding="utf-8")
         nav = re.search(r'<nav class="ss-nav"[^>]*>(.*?)</nav>', txt, re.S).group(1)
-        assert re.findall(r">([^<]+)</a>", nav) == ["Overview", "Explore Data", "Research Paper", "Data &amp; Methods"]
+        assert re.findall(r">([^<]+)</a>", nav) == ["Overview", "Explore Data", "Paper", "Data &amp; Methods"]
     m = (out / "methods.html").read_text(encoding="utf-8")
     for h in ("Data sources", "Launch event identification", "Sample construction", "Listed-company selection", "Event timing",
               "Market-return model", "Abnormal returns", "Cumulative abnormal returns", "Statistical inference", "Robustness checks",

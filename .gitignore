@@ -3,9 +3,9 @@ __pycache__/
 .pytest_cache/
 data/raw/*.tsv
 data/interim/*.parquet
-casestudy/*.aux
-casestudy/*.log
-casestudy/*.out
+paper/*.aux
+paper/*.log
+paper/*.out
 data/processed/firm_event_cars.csv
 # CRSP-derived files from the WRDS run: kept out of the public repo (licence); only aggregates are published
 data/crsp/

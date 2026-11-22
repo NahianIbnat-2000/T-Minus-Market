@@ -24,7 +24,7 @@ def make(facts: dict, out: Path, pct, pval) -> Path:
 
     ax.add_patch(Rectangle((0, 0), W, 10, color=SIGNAL))                       # countdown bar
     ax.text(L, 62, "SPACE SHOCK", family=sans, size=17, color=INK, weight="bold", va="center")
-    ax.text(R, 62, "WORKING PAPER · EVENT STUDY", family=mono, size=13, color=MUTED, va="center", ha="right")
+    ax.text(R, 62, "PAPER · EVENT STUDY", family=mono, size=13, color=MUTED, va="center", ha="right")
     ax.plot([L, R], [86, 86], color=RULE, lw=1.2)
     ax.text(L, 118, "When rockets fail,\nwho pays the price?", family=sans, weight="bold",
             size=46, color=INK, va="top", linespacing=1.12)
@@ -49,7 +49,7 @@ def make(facts: dict, out: Path, pct, pval) -> Path:
     span = f"{facts['first_year']} to {facts['last_year']}" if facts["first_year"] else ""
     ax.plot([L, R], [H - 62, H - 62], color=RULE, lw=1.2)
     ax.text(L, H - 36, f"Nahian Ibnat · {facts['n_failures']} orbital launch failures, {span}", family=mono, size=13, color=INK, va="center")
-    ax.text(R, H - 36, "Interactive report and working paper", family=mono, size=13, color=MUTED, va="center", ha="right")
+    ax.text(R, H - 36, "Interactive report and paper", family=mono, size=13, color=MUTED, va="center", ha="right")
     fig.savefig(out, dpi=DPI, facecolor=PAPER)
     plt.close(fig)
     return out

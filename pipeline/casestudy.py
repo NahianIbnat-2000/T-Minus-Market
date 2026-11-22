@@ -1,4 +1,4 @@
-"""Long-form case study (case-study.html): the full write-up of the project, built from site/data/*.json.
+"""Long-form paper (paper.html): the full write-up of the project, built from site/data/*.json.
 
 Static HTML with inline SVG figures (no JavaScript), styled for screen and for A4 printing, so the same
 file becomes the companion PDF (step 08 prints it with a headless browser when one is available).
@@ -457,7 +457,7 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
            f"would usually go undetected. " if not detect and pw else "")
         + (f"The sign of the estimate changes with how events and firms are weighted, and every independent event involves "
            f"{f['top_firm']}. " if sign_flips and top_all else "")
-        + "The study is a small-sample case study of listed firms, not an estimate for the launch industry as a whole.")
+        + "The study is a small-sample study of listed firms, not an estimate for the launch industry as a whole.")
 
     inshort = [
         f"<strong>The rocket's maker:</strong> " + (f"large losses in each of {f['n_cases']} cases ({pct(f['case_hi'])} to {pct(f['case_lo'])} over two days)."
@@ -467,7 +467,7 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
         + ("no detectable reaction." if not detect else "a detectable reaction."),
         (f"<strong>Uncertainty:</strong> effects of about {pct(pw['mde80'], 1, False)} either way could go undetected; " if pw else "<strong>Uncertainty:</strong> ")
         + ("the sign depends on weighting." if sign_flips else "see section 7."),
-        "<strong>Status:</strong> working paper for feedback; rules fixed in git before results, not independently registered.",
+        "<strong>Status:</strong> paper for feedback; rules fixed in git before results, not independently registered.",
     ]
 
     # ---------------- tables
@@ -591,13 +591,13 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
     body = f"""<a class="skip-link" href="#main">Skip to the paper</a>
 {SC.header("paper", "", bool(pdf_name), meta.get("repo_url"))}
 <header class="paper-head"><div class="wrap ph-in">
-  <nav class="crumbs screen-only" aria-label="Breadcrumb"><ol><li><a href="index.html">Overview</a></li><li aria-current="page">Research Paper</li></ol></nav>
-  <p class="ph-eyebrow">Working paper · Space Shock</p>
+  <nav class="crumbs screen-only" aria-label="Breadcrumb"><ol><li><a href="index.html">Overview</a></li><li aria-current="page">Paper</li></ol></nav>
+  <p class="ph-eyebrow">Paper · Space Shock</p>
   <h1>{e(SC.PAPER_TITLE)}</h1>
   <p class="dek">Evidence from publicly listed launch providers: stock market reactions to orbital launch failures, {e(span)}.</p>
   <p class="byline">{e(meta.get("author", "Nahian Ibnat"))} · {e(updated)} · Draft for feedback, not peer reviewed</p>
   <dl class="ph-meta screen-only">
-    <div><dt>Status</dt><dd>Working paper, not peer reviewed</dd></div>
+    <div><dt>Status</dt><dd>Paper, not peer reviewed</dd></div>
     <div><dt>Version</dt><dd>Analysis rules v{e(str(plan_v))} · results {e(updated)}</dd></div>
     <div><dt>Sample</dt><dd>{f['n_failures']} failures · {p['n_firm_events']} rival reactions · {f['n_clusters']} independent events</dd></div>
     <div><dt>Formats</dt><dd>{f'<a class="btn small" href="{e(pdf_name)}" download>Download PDF</a> ' if pdf_name else ''}<a href="methods.html#replicate">Replication</a></dd></div>
@@ -784,13 +784,13 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
 {_table(["Resource", "What it is"], [[f'<a href="{e(h)}">{e(l)}</a>', e(wh)] for l, h, wh in links]
         + ([[f'<a class="screen-only" href="{e(pdf_row[1])}">{e(pdf_row[0])}</a>', f'<span class="screen-only">{e(pdf_row[2])}</span>']] if pdf_row else []))}</section>
 
-<p class="signoff">{e(meta.get("author", "Nahian Ibnat"))}, {e(updated)}. Cite as: Ibnat, N. ({e(year)}). <em>{e(SC.PAPER_TITLE)}.</em> Space Shock working paper.{(" " + e(meta["live_url"]) + "case-study.html") if meta.get("live_url") else ""} Research, not investment advice.</p>
+<p class="signoff">{e(meta.get("author", "Nahian Ibnat"))}, {e(updated)}. Cite as: Ibnat, N. ({e(year)}). <em>{e(SC.PAPER_TITLE)}.</em> Space Shock paper.{(" " + e(meta["live_url"]) + "paper.html") if meta.get("live_url") else ""} Research, not investment advice.</p>
 </main>
 </div>
 {SC.footer("", meta, bool(pdf_name), SC.cite(year, meta))}
 {SC.TOC_SCRIPT}"""
-    desc = (f"Working paper: {f['n_failures']} orbital launch failures, {span}. Listed makers lose {pct(f['case_hi'])} to {pct(f['case_lo'])} in two days; "
+    desc = (f"Paper: {f['n_failures']} orbital launch failures, {span}. Listed makers lose {pct(f['case_hi'])} to {pct(f['case_lo'])} in two days; "
             f"listed rivals {pct(p['mean_car'], 2)} (95% interval {pct(p['ci_low'], 2)} to {pct(p['ci_high'], 2)}), not detectable with {f['n_clusters']} independent events.")
-    url = (meta["live_url"].rstrip("/") + "/case-study.html") if meta.get("live_url") else None
+    url = (meta["live_url"].rstrip("/") + "/paper.html") if meta.get("live_url") else None
     img = (meta["live_url"].rstrip("/") + "/og.png") if meta.get("live_url") else None
-    return landing._shell(f"{SC.PAPER_TITLE} (Space Shock working paper)", desc, url, body, css, url, img, body_class="paper")
+    return landing._shell(f"{SC.PAPER_TITLE} (Space Shock paper)", desc, url, body, css, url, img, body_class="paper")

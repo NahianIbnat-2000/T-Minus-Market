@@ -11,6 +11,6 @@ export function methodsSection({ manifest: m, results: r }) {
   <h2 id="h-methods">How this study was done</h2>
   <p>Main window ${win(s.windows?.primary || [0, 1])}; market model estimated over trading days ${win(s.estimation_window || [-250, -30])}; independent events are failures that share a firm within ${escapeHtml(s.cluster_gap)} trading days. The rules were fixed and committed before any stock reaction was measured; checks added later are labelled exploratory.</p>
   <p>Sources, sample definitions, event timing, firm classification, the tests, data quality and replication are documented on one page:</p>
-  <p class="r-actions"><a class="btn" href="../methods.html">Data &amp; Methods</a> <a class="btn ghost" href="../case-study.html">Research paper</a></p>
+  <p class="r-actions"><a class="btn" href="../methods.html">Data &amp; Methods</a> <a class="btn ghost" href="../paper.html">Paper</a></p>
   </div></section>`;
 }

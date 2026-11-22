@@ -3,7 +3,7 @@
 **When rockets fail, who pays the price?** Financial contagion and competition in the space industry.
 
 An event study of stock market reactions to orbital launch failures since 2000, with a homepage, an interactive
-report and a working paper (*When Rockets Fail: Financial Contagion and Competitive Effects in the Space Industry*).
+report and a paper (*When Rockets Fail: Financial Contagion and Competitive Effects in the Space Industry*).
 Author: Nahian Ibnat. The project was called T-Minus Markets until November 2026 (repository `T-Minus-Market`, renamed to `space-shock`). Live site: https://nahianibnat-2000.github.io/space-shock/
 
 Launch data: GCAT (J. McDowell, planet4589.org/space/gcat), CC-BY.
@@ -18,14 +18,14 @@ Static pages, all built by one command, ready for GitHub Pages (branch master, f
 | --- | --- |
 | `index.html` | The homepage: question, headline findings, interpretation, sample, tool previews, limitations, resources |
 | `site/index.html` | The interactive report: six sections and four tools (Failure Timeline, Expected vs Actual, Event Study Lab, Placebo Simulator) |
-| `case-study.html` | The working paper: metadata, abstract, sticky contents, equations, figures, tables, references |
-| `case-study.pdf` | The case study typeset with LaTeX (Times New Roman 12 pt), from the same text as the web page. Needs a LaTeX install (MiKTeX on Windows); without one, step 08 still writes `casestudy/` for Overleaf |
-| `casestudy/` | `case-study.tex` and its four figures (vector PDFs) |
+| `paper.html` | The paper: metadata, abstract, sticky contents, equations, figures, tables, references |
+| `paper.pdf` | The paper typeset with LaTeX (Times New Roman 12 pt), from the same text as the web page. Needs a LaTeX install (MiKTeX on Windows); without one, step 08 still writes `paper/` for Overleaf |
+| `paper/` | `paper.tex` and its four figures (vector PDFs) |
 | `og.png` | Link-preview image for LinkedIn (needs matplotlib; skipped if missing) |
 
 ```
 python pipeline/07_export_site_data.py   # results -> site/data/*.json
-python pipeline/08_build_html.py         # -> index.html, site/index.html, case-study.html/.pdf, og.png, .nojekyll
+python pipeline/08_build_html.py         # -> index.html, site/index.html, paper.html/.pdf, og.png, .nojekyll
 ```
 
 Every number on every page comes from `site/data/` (derived statistics only). Edit text and code in
@@ -194,4 +194,4 @@ the published derived data with `audit/verify_published.py`; re-estimating the C
 `data/processed/firm_event_cars.csv` holds alphas and betas and is never committed.
 
 `docs/ANALYSIS_PLAN.md` is the internal record of the rules fixed before results and of every later change. It is not published
-on the website; the working paper reproduces its commit record (Appendix G).
+on the website; the paper reproduces its commit record (Appendix G).

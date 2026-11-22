@@ -2,7 +2,7 @@
 
 A reference page: how the data were built, how events and firms are defined, how the model and tests work, what can
 go wrong with the data, and how to reproduce everything. It is written as structured definitions, not prose, and it
-links to the working paper for derivations, so the two pages do not repeat each other. Every count is read from the
+links to the paper for derivations, so the two pages do not repeat each other. Every count is read from the
 exported data; nothing is typed in by hand.
 """
 from __future__ import annotations
@@ -145,7 +145,7 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
 <header class="paper-head"><div class="wrap ph-in">
   <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Overview</a></li><li aria-current="page">Data &amp; Methods</li></ol></nav>
   <h1>Data &amp; Methods</h1>
-  <p class="dek">How the sample was built, how events and firms are defined, how abnormal returns are tested, what can go wrong with the data, and how to reproduce every number. The full derivations are in the <a href="case-study.html">research paper</a>.</p>
+  <p class="dek">How the sample was built, how events and firms are defined, how abnormal returns are tested, what can go wrong with the data, and how to reproduce every number. The full derivations are in the <a href="paper.html">paper</a>.</p>
   <p class="byline">Rules version v{e(str(res.get('plan_version', '')))} · results {e(updated)}</p>
 </div></header>
 <div class="wrap paper-grid">
@@ -178,13 +178,13 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
 <section id="model"><h2>6. Market-return model</h2>{tbl("Market-return model", model_rows)}</section>
 <section id="ar"><h2>7. Abnormal returns</h2>{tbl("Abnormal returns", ar_rows)}</section>
 <section id="car"><h2>8. Cumulative abnormal returns</h2>{tbl("Cumulative abnormal returns and windows", car_rows)}
-<p>Equations: <a href="case-study.html#s5">paper, section 5</a>.</p></section>
+<p>Equations: <a href="paper.html#s5">paper, section 5</a>.</p></section>
 <section id="inference"><h2>9. Statistical inference</h2>{tbl("Tests and estimands", inf_rows)}
-<p>Estimands and the four weightings: <a href="case-study.html#s5">paper, section 5.1</a>; sample concentration: <a href="case-study.html#s6">section 6.3</a>.</p></section>
+<p>Estimands and the four weightings: <a href="paper.html#s5">paper, section 5.1</a>; sample concentration: <a href="paper.html#s6">section 6.3</a>.</p></section>
 <section id="robust"><h2>10. Robustness checks</h2>
 <p><span class="badge confirm">Prespecified</span> {len(robust)} checks fixed before the results:</p><ul class="method">{rob_items}</ul>
 <p><span class="badge robust">Benchmark</span> Placebo R9: {e(str(pl.get('draws', '')))} sets of random ordinary trading days (seed {e(str(pl.get('seed', '')))}), one per reaction. The real result's percentile is a description, not a p-value.</p>
-<p><span class="badge explore">Exploratory</span> Analyses designed after the results (confounding drops E1 to E3, weighting, a shared-date placebo R9b) are labelled wherever they appear and never replace the prespecified test. Results: <a href="case-study.html#s7">paper, sections 7 and 8</a>.</p></section>
+<p><span class="badge explore">Exploratory</span> Analyses designed after the results (confounding drops E1 to E3, weighting, a shared-date placebo R9b) are labelled wherever they appear and never replace the prespecified test. Results: <a href="paper.html#s7">paper, sections 7 and 8</a>.</p></section>
 <section id="quality"><h2>11. Limitations and data quality</h2>{tbl("Data quality", quality)}</section>
 <section id="replicate"><h2>12. Reproducibility</h2>
 <p>Python 3.11+, <code>pip install -r requirements.txt</code>, then run the steps in order. Prices are downloaded on your machine and never committed.</p>

@@ -127,7 +127,7 @@ def article(data: dict, meta: dict, root: Path, css: str) -> str:
     pw, w, we1 = f["pw"], f["w"], f.get("w_e1")
     mde = pw["mde80"] if pw else None
     n_firms = f["n_rival_firms"]
-    pdf_ok = (root / "case-study.pdf").exists()
+    pdf_ok = (root / "paper.pdf").exists()
     repo = meta.get("repo_url")
     cite_url = meta.get("live_url") or ""
     year = str(datetime.fromisoformat(str(m.get("results_run_utc", "2026"))[:10]).year) if m.get("results_run_utc") else ""
@@ -254,8 +254,8 @@ def article(data: dict, meta: dict, root: Path, css: str) -> str:
   <h1 id="title">When Rockets Fail, Who Pays the Price?</h1>
   <p class="dek">An empirical investigation of financial contagion and competitive effects following rocket launch failures.</p>
   <p class="q">When an orbital rocket fails, what happens to the stock of the company that built it, and to the stocks of its listed competitors? Investors could treat the failure as bad news for the whole industry (<strong class="c-loss">contagion</strong>) or as a chance for rivals to win customers (<strong class="c-gain">competitive gain</strong>). This study measures which, using {f['n_failures']} orbital launch failures from {e(span)}.</p>
-  <p class="cta"><a class="btn" href="site/index.html">Explore the Evidence</a><a class="btn ghost" href="case-study.html">Read the Research Paper</a></p>
-  <p class="meta-line">{e(meta.get('author', 'Nahian Ibnat'))} · Working paper, not peer reviewed · Results {e(updated)}</p>
+  <p class="cta"><a class="btn" href="site/index.html">Explore the Evidence</a><a class="btn ghost" href="paper.html">Read the Paper</a></p>
+  <p class="meta-line">{e(meta.get('author', 'Nahian Ibnat'))} · Paper, not peer reviewed · Results {e(updated)}</p>
 </div></section>
 
 <section class="findings" aria-labelledby="h-find"><div class="wrap">
@@ -292,15 +292,15 @@ def article(data: dict, meta: dict, root: Path, css: str) -> str:
     {f'<li><strong>Weighting matters.</strong> Weighting every reaction equally gives {e(pct(w["observation_weighted"], 2))}; weighting every firm equally gives {e(pct(w["firm_balanced"], 2))} (a sensitivity analysis, not the prespecified estimate).</li>' if w else ''}
     {f'<li><strong>Event timing.</strong> {prov * 100:.0f}% of competitor reactions are dated from GCAT launch times not separately checked against a company statement, used only where the trading day would not change under a small timing error.</li>' if prov is not None else ''}
   </ul>
-  <p class="more-links">Details: <a href="methods.html#quality">data quality and limitations</a> · <a href="case-study.html#s7">robustness in the paper</a></p>
+  <p class="more-links">Details: <a href="methods.html#quality">data quality and limitations</a> · <a href="paper.html#s7">robustness in the paper</a></p>
 </div></section>
 
 <section class="resources band" aria-labelledby="h-res"><div class="wrap">
   <h2 id="h-res" class="sec-h">Research and reproducibility</h2>
   <div class="res-grid">
     <div class="r-card"><h3>Read</h3><ul class="rlist">
-      <li><a href="case-study.html">Research paper (web)</a><span>{e(SC.PAPER_TITLE)}</span></li>
-      {'<li><a href="case-study.pdf" download>Download PDF</a><span>Same paper, typeset</span></li>' if pdf_ok else ''}</ul></div>
+      <li><a href="paper.html">Paper (web)</a><span>{e(SC.PAPER_TITLE)}</span></li>
+      {'<li><a href="paper.pdf" download>Download PDF</a><span>Same paper, typeset</span></li>' if pdf_ok else ''}</ul></div>
     <div class="r-card"><h3>Understand</h3><ul class="rlist">
       <li><a href="methods.html">Data &amp; Methods</a><span>Sources, definitions, tests, data quality</span></li>
       <li><a href="site/index.html">Explore Data</a><span>Interactive report and four tools</span></li></ul></div>

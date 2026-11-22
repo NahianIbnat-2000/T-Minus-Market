@@ -1,4 +1,4 @@
-/* Shared long-form article layout (used by the working paper). */
+/* Shared long-form article layout (used by the paper). */
 .article { padding-top: var(--space-4); padding-bottom: var(--space-6); }
 .article section { margin: var(--space-6) 0 0; }
 .article h2 { font-size: var(--step-2); margin-bottom: var(--space-3); }
