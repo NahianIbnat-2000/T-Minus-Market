@@ -37,3 +37,8 @@ a.read-card:hover, a.read-card:focus-visible { background: var(--paper-deep); ou
   .tile { border-right: 0; border-bottom: var(--hairline); padding: var(--space-3) 0 !important; }
   .tile:last-child { border-bottom: 0; }
 }
+.rc-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: baseline; border-top: var(--hairline); padding-top: var(--space-2); }
+.rc-actions .rc-go { border-top: 0; padding-top: 0; color: inherit; }
+.rc-dl, .dl-link { font-family: var(--font-mono); font-size: var(--step--1); color: var(--gain); }
+.rc-dl::before, .dl-link::before { content: "\2193  "; }
+.dl-link { align-self: center; margin-left: var(--space-2); }

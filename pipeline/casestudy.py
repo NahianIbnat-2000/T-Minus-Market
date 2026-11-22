@@ -562,11 +562,11 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
                   ("Confounding-news checks", blob + "docs/CONFOUNDING_NEWS.md", "News around the largest reactions, with sources"),
                   ("Independent audit", blob + "audit/AUDIT_REPORT.md", "Verification of every published statistic"),
                   ("Code and pipeline", meta["repo_url"], "Python pipeline, tests and reproduction guide")]
-    pdf_row = ("This paper as PDF", pdf_name, "Typeset version (LaTeX)") if pdf_name else None
+    pdf_row = ("Download PDF", pdf_name, "This paper as a typeset PDF (same text)") if pdf_name else None
     nav = " · ".join(f'<a href="{e(h)}">{e(l)}</a>' for l, h in
                      [("Article", "index.html"), ("Interactive report", "site/index.html")]
                      + ([("Code", meta["repo_url"])] if meta.get("repo_url") else []))
-    nav += (f' <span class="screen-only">· <a href="{e(pdf_name)}">PDF</a></span>' if pdf_name else "")
+    nav += (f' <span class="screen-only">· <a href="{e(pdf_name)}" download>Download PDF</a></span>' if pdf_name else "")
     contents = ["Introduction", "Institutional background", "Related literature", "Data and sample construction", "Empirical methodology",
                 "Main results", "Robustness and sensitivity", "Confounding corporate announcements", "Discussion", "Limitations", "Conclusion"]
 

@@ -145,9 +145,11 @@ def article(data: dict, meta: dict, root: Path, css: str) -> str:
         + f"The evidence comes from {n_firms} listed firms" + (f", with {e(f['top_firm'])} in every independent event" if f["top_firm_clusters"] == f["n_clusters"] else "")
         + (", and the sign of the average changes with how events and firms are weighted." if sign_flips else "."))
     pdf_ok = (root / "case-study.pdf").exists()
-    paper_card = ('<a class="read-card" href="case-study.html"><span class="rc-kicker">Working paper</span><h3>The full study</h3>'
+    paper_card = ('<div class="read-card"><span class="rc-kicker">Working paper</span><h3>The full study</h3>'
                   '<p><em>Rocket Launch Failures and Equity-Market Spillovers.</em> Methods, results, power, robustness, confounding news, '
-                  'limits and appendices' + (', with a typeset PDF' if pdf_ok else '') + '.</p><span class="rc-go">Read the paper</span></a>')
+                  'limits and appendices.' + (' The same paper is available as a web page and as a PDF.' if pdf_ok else '') + '</p>'
+                  '<span class="rc-actions"><a class="rc-go" href="case-study.html">Read the paper</a>'
+                  + ('<a class="rc-dl" href="case-study.pdf" download>Download PDF</a>' if pdf_ok else '') + '</span></div>')
     repo = meta.get("repo_url")
     code_card = (f'<a class="read-card" href="{e(repo)}"><span class="rc-kicker">GitHub</span><h3>Code and pipeline</h3>'
                  f'<p>Python pipeline from raw launch records to the published statistics, with tests.</p><span class="rc-go">View the code</span></a>'
@@ -188,7 +190,7 @@ def article(data: dict, meta: dict, root: Path, css: str) -> str:
   <section class="tiles" aria-label="Key findings">{tiles_html}</section>
 
   <section class="abstract"><h2>In short</h2><p>{e(abstract)}</p>
-    <p class="cta"><a class="btn" href="site/index.html">Open the interactive report</a> <a class="btn ghost" href="case-study.html">Read the working paper</a>{' <a class="btn ghost" href="case-study.pdf">PDF</a>' if pdf_ok else ''}</p></section>
+    <p class="cta"><a class="btn" href="site/index.html">Open the interactive report</a> <a class="btn ghost" href="case-study.html">Read the working paper</a>{' <a class="dl-link" href="case-study.pdf" download>Download PDF</a>' if pdf_ok else ''}</p></section>
 
   <section id="a1"><h2>1. The research question</h2>
   <p>Orbital launch is a small industry with a handful of listed firms, and every launch is a public, all-or-nothing test. A failure destroys hardware and often a customer's satellite, so the rocket's maker should lose value. The open question is the competitors. If investors read a failure as a reminder that spaceflight is risky for everyone, rival launch stocks fall too: <strong>contagion</strong>. If they expect customers to move to a rocket that works, rivals rise: <strong>competitive gain</strong>. The two stories point in opposite directions, and both could operate at once.</p>
@@ -237,7 +239,6 @@ def article(data: dict, meta: dict, root: Path, css: str) -> str:
     {code_card}
   </div>
   <p class="evidence"><strong>Also:</strong> {" · ".join(x for x in [
-      '<a href="case-study.pdf">Working paper (PDF)</a>' if pdf_ok else "",
       '<a href="site/index.html#methods">Data and methods</a>',
       (f'<a href="{e(repo.rstrip("/") + "#reproduction-and-verification")}">Replication instructions</a>' if repo else "")] if x)}</p>
   {evidence}</section>

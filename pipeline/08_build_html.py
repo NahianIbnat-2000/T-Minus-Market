@@ -93,7 +93,6 @@ def build_pages(site_data: Path = SITE / "data", root_out: Path = ROOT) -> list[
     meta = json.loads((SITE / "site_meta.json").read_text(encoding="utf-8"))
     css = "\n".join((SRC / "styles" / f).read_text(encoding="utf-8") for f in STYLES + ["landing.css", "article-sky.css"])
     a = root_out / "index.html"
-    a.write_text(landing.article(data, meta, ROOT, css), encoding="utf-8")
     (root_out / "plan.html").unlink(missing_ok=True)            # the plan page is no longer published
     (root_out / ".nojekyll").touch()
     out = [a]
@@ -112,6 +111,8 @@ def build_pages(site_data: Path = SITE / "data", root_out: Path = ROOT) -> list[
             out.append(pdf)
     except ImportError:
         print("Skipped the LaTeX case study: run  pip install matplotlib  first (it draws the figures).")
+    # the article is written after the PDF, so its "Download PDF" link reflects this build
+    a.write_text(landing.article(data, meta, root_out, css), encoding="utf-8")
     try:                                            # link-preview image; optional
         import og_image
         out.append(og_image.make(landing.facts(data), root_out / "og.png", landing.pct, landing.pval))
@@ -152,10 +153,10 @@ def build(site_data: Path = SITE / "data", out: Path = SITE / "index.html") -> P
     meta = json.loads((SITE / "site_meta.json").read_text(encoding="utf-8"))
     links = [("Article", "../index.html"), ("Working paper", "../case-study.html")]
     if (ROOT / "case-study.pdf").exists() or shutil.which("xelatex") or shutil.which("pdflatex"):
-        links.append(("PDF", "../case-study.pdf"))
+        links.append(("Download PDF", "../case-study.pdf"))
     if meta.get("repo_url"):
         links.append(("Code", meta["repo_url"]))
-    nav = " · ".join(f'<a href="{h}">{l}</a>' for l, h in links)
+    nav = " · ".join(f'<a href="{h}"{" download" if h.endswith(".pdf") else ""}>{l}</a>' for l, h in links)
     html = (SITE / "template.html").read_text(encoding="utf-8")
     for key, val in (("{{STYLE}}", style), ("{{DATA}}", data_json), ("{{SCRIPT}}", script), ("{{BUILD_INFO}}", info),
                      ("{{NOSCRIPT}}", noscript), ("{{NAV}}", nav)):

@@ -354,6 +354,11 @@ a.read-card:hover, a.read-card:focus-visible { background: var(--paper-deep); ou
   .tile { border-right: 0; border-bottom: var(--hairline); padding: var(--space-3) 0 !important; }
   .tile:last-child { border-bottom: 0; }
 }
+.rc-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: baseline; border-top: var(--hairline); padding-top: var(--space-2); }
+.rc-actions .rc-go { border-top: 0; padding-top: 0; color: inherit; }
+.rc-dl, .dl-link { font-family: var(--font-mono); font-size: var(--step--1); color: var(--gain); }
+.rc-dl::before, .dl-link::before { content: "\2193  "; }
+.dl-link { align-self: center; margin-left: var(--space-2); }
 
 /* Root article only: light "clear sky" theme, so the article reads differently from the cream archive report.
    Contrast on --paper #F7F9FC (WCAG 2.2): ink 15.9, muted 7.3, signal-text 5.6, gain 6.4 (all text-safe). */
@@ -414,7 +419,7 @@ body.theme-sky {
   <section class="tiles" aria-label="Key findings"><div class="tile loss"><div class="tile-num">−8.8% to −16.3%</div><p>two-day abnormal return of the rocket&#x27;s maker: a loss in each of the 4 listed cases</p></div><div class="tile neutral"><div class="tile-num">+0.28%</div><p>average two-day reaction of listed competitors; 95% interval −1.62% to +2.18%; not statistically detectable</p></div><div class="tile neutral"><div class="tile-num">61st</div><p>percentile of the real competitor result among 1000 random sets of ordinary trading days</p></div></section>
 
   <section class="abstract"><h2>In short</h2><p>When an orbital rocket fails, does the stock market punish only the company that built it, or its listed competitors too? Using 138 orbital launch failures from 2000 to 2026, this study measures abnormal stock returns over the two trading days after each failure became public, with a market model and a prespecified event-study test. In the 4 cases where the rocket&#x27;s maker was listed, its shares fell by between 8.8% and 16.3% after allowing for the market. Across 24 failures with listed competitors (42 stock reactions, 3 firms, 22 independent events), the average reaction was +0.28% (95% interval −1.62% to +2.18%, p = 0.76; the prespecified standardized test gives p = 0.40). The data therefore do not establish either contagion or competitive gains among these firms. They also do not show that the effect is small: average reactions of about 2.7% in either direction could not have been reliably detected. The evidence comes from 3 listed firms, with Avio SpA in every independent event, and the sign of the average changes with how events and firms are weighted.</p>
-    <p class="cta"><a class="btn" href="site/index.html">Open the interactive report</a> <a class="btn ghost" href="case-study.html">Read the working paper</a> <a class="btn ghost" href="case-study.pdf">PDF</a></p></section>
+    <p class="cta"><a class="btn" href="site/index.html">Open the interactive report</a> <a class="btn ghost" href="case-study.html">Read the working paper</a> <a class="dl-link" href="case-study.pdf" download>Download PDF</a></p></section>
 
   <section id="a1"><h2>1. The research question</h2>
   <p>Orbital launch is a small industry with a handful of listed firms, and every launch is a public, all-or-nothing test. A failure destroys hardware and often a customer's satellite, so the rocket's maker should lose value. The open question is the competitors. If investors read a failure as a reminder that spaceflight is risky for everyone, rival launch stocks fall too: <strong>contagion</strong>. If they expect customers to move to a rocket that works, rivals rise: <strong>competitive gain</strong>. The two stories point in opposite directions, and both could operate at once.</p>
@@ -457,12 +462,12 @@ body.theme-sky {
 
   <section id="a8" aria-label="Read the research"><h2>8. Read the research</h2>
   <div class="read-grid">
-    <a class="read-card" href="case-study.html"><span class="rc-kicker">Working paper</span><h3>The full study</h3><p><em>Rocket Launch Failures and Equity-Market Spillovers.</em> Methods, results, power, robustness, confounding news, limits and appendices, with a typeset PDF.</p><span class="rc-go">Read the paper</span></a>
+    <div class="read-card"><span class="rc-kicker">Working paper</span><h3>The full study</h3><p><em>Rocket Launch Failures and Equity-Market Spillovers.</em> Methods, results, power, robustness, confounding news, limits and appendices. The same paper is available as a web page and as a PDF.</p><span class="rc-actions"><a class="rc-go" href="case-study.html">Read the paper</a><a class="rc-dl" href="case-study.pdf" download>Download PDF</a></span></div>
     <a class="read-card" href="site/index.html"><span class="rc-kicker">Interactive</span><h3>The report</h3>
       <p>Five countdown stages from the question to the checks, with four tools: Failure Timeline, Expected vs Actual, Event Study Lab and Placebo Simulator.</p><span class="rc-go">Open the report</span></a>
     <a class="read-card" href="https://github.com/NahianIbnat-2000/T-Minus-Market"><span class="rc-kicker">GitHub</span><h3>Code and pipeline</h3><p>Python pipeline from raw launch records to the published statistics, with tests.</p><span class="rc-go">View the code</span></a>
   </div>
-  <p class="evidence"><strong>Also:</strong> <a href="case-study.pdf">Working paper (PDF)</a> · <a href="site/index.html#methods">Data and methods</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market#reproduction-and-verification">Replication instructions</a></p>
+  <p class="evidence"><strong>Also:</strong> <a href="site/index.html#methods">Data and methods</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market#reproduction-and-verification">Replication instructions</a></p>
   <p class="evidence"><strong>Evidence:</strong> <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/reports/04_feasibility_report.md">Feasibility report (before results)</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/reports/05_results.md">Results report</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/docs/CONFOUNDING_NEWS.md">Confounding-news checks</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/reports/06_confounding_sensitivity.md">Exploratory confounding sensitivity</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/audit/AUDIT_REPORT.md">Independent audit and verification</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/README.md">Reproduction guide</a></p></section>
 
   <section class="cite"><h2>Cite</h2>
