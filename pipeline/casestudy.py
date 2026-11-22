@@ -1068,7 +1068,9 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
 </div>
 {SC.footer("", meta, bool(pdf_name), SC.cite(year, meta))}
 {SC.TOC_SCRIPT}"""
-    desc = (f"Paper: {f['n_failures']} orbital launch failures, {span}. Listed makers lose {pct(f['case_hi'])} to {pct(f['case_lo'])} in two days; "
+    maker_d = (f"In {f['n_cases']} listed-maker cases the maker's shares fell {pct(abs(f['case_hi']), 1, False)} to {pct(abs(f['case_lo']), 1, False)} "
+               "relative to the market in two days; " if all_fell else "")
+    desc = (f"Paper: {f['n_failures']} orbital launch failures, {span}. " + maker_d + f""
             f"listed rivals {pct(p['mean_car'], 2)} (95% interval {pct(p['ci_low'], 2)} to {pct(p['ci_high'], 2)}), not detectable with {f['n_clusters']} independent events.")
     url = (meta["live_url"].rstrip("/") + "/paper.html") if meta.get("live_url") else None
     img = (meta["live_url"].rstrip("/") + "/og.png") if meta.get("live_url") else None

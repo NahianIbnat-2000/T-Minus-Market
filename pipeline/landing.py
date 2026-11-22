@@ -264,7 +264,7 @@ def article(data: dict, meta: dict, root: Path, css: str) -> str:
     <div class="kf is-loss"><p class="kf-k">Rocket makers</p><p class="kf-v loss-v">{e(maker_big)}</p><p class="kf-l">Two-day abnormal return in each of the {f['n_cases']} listed-maker cases ({len(f['case_firms'])} firms). Case studies, not an average.</p></div>
     <div class="kf"><p class="kf-k">Listed competitors</p><p class="kf-v">{e(pct(p['mean_car'], 2))}</p><p class="kf-l">Average two-day abnormal return. 95% interval {e(pct(p['ci_low'], 2))} to {e(pct(p['ci_high'], 2))}.</p></div>
     <div class="kf"><p class="kf-k">Statistical test</p><p class="kf-v">p = {e(pval(p['p']))}</p><p class="kf-l">Prespecified standardized test. {"No conclusive evidence of either contagion or competitive gains." if not detectable else "Detectable at the 5% level."}</p></div>
-    <div class="kf"><p class="kf-k">Sample</p><p class="kf-v">{f['n_clusters']} <span class="kf-u">independent events</span></p><p class="kf-l">{p['n_firm_events']} reactions of {n_firms} listed competitor firms to {f['n_rival_failures']} failures.</p></div>
+    <div class="kf"><p class="kf-k">Sample</p><p class="kf-v">{f['n_clusters']} <span class="kf-u">independent events</span></p><p class="kf-l">{p['n_firm_events']} reactions of {n_firms} listed competitor firms to {f['n_rival_failures']} failures{"; failures a few days apart that hit the same firm count as one event" if f['n_rival_failures'] != f['n_clusters'] else ""}.</p></div>
   </div>
   <div class="fig-row">
     <figure class="fig-card">{maker_chart()}<figcaption><strong>Rocket makers.</strong> Cumulative abnormal return from the close before the failure (0%) to day +10, one line per case. Shaded: the two-day window.</figcaption></figure>
@@ -313,7 +313,9 @@ def article(data: dict, meta: dict, root: Path, css: str) -> str:
 </div></section>
 </main>
 {SC.footer("", meta, pdf_ok, SC.cite(year, meta))}"""
-    desc = (f"Event study of {f['n_failures']} orbital launch failures: the rocket's maker loses {pct(f['case_hi'])} to {pct(f['case_lo'])} in two days; "
-            f"listed competitors show no detectable reaction ({pct(p['mean_car'], 2)}, 95% interval {pct(p['ci_low'], 2)} to {pct(p['ci_high'], 2)}).")
+    maker_d = (f"In the {f['n_cases']} cases with a listed maker, its shares fell {pct(abs(f['case_hi']), 1, False)} to {pct(abs(f['case_lo']), 1, False)} "
+               "relative to the market over two days; " if f.get("case_hi") is not None and f["case_hi"] < 0 else "")
+    desc = (f"Event study of {f['n_failures']} orbital launch failures, {f['first_year']} to {f['last_year']}. " + maker_d
+            + f"listed competitors show no detectable reaction ({pct(p['mean_car'], 2)}, 95% interval {pct(p['ci_low'], 2)} to {pct(p['ci_high'], 2)}).")
     image = (meta["live_url"].rstrip("/") + "/og.png") if meta.get("live_url") else None
     return _shell("Space Shock: When Rockets Fail, Who Pays the Price?", desc, meta.get("live_url"), body, css, meta.get("live_url"), image, body_class="home")
