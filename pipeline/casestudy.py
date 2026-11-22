@@ -350,27 +350,182 @@ def fig_timing(tm):
 # ----------------------------------------------------------------------------- page helpers
 class _Num:
     def __init__(self):
-        self.fig = 0; self.tab = 0; self.eq = 0
+        self.fig = 0; self.tab = 0; self.eq = 0; self.map = {}
 
 
 def _figure(num, fid, title, svg, cap):
     if not svg:
         return ""
     num.fig += 1
-    return (f'<figure class="cs-fig" data-fig="{fid}"><figcaption class="cs-figtitle"><span>Figure {num.fig}.</span> {e(title)}</figcaption>'
+    num.map[("fig", fid)] = num.fig
+    return (f'<figure class="cs-fig" id="fig-{fid}" data-fig="{fid}"><figcaption class="cs-figtitle"><span>Figure {num.fig}.</span> {e(title)}</figcaption>'
             f'{svg}<figcaption class="cs-cap">{cap}</figcaption></figure>')
 
 
-def _ttable(num, title, head, rows, note="", cls=""):
+def _ttable(num, title, head, rows, note="", cls="", key=None):
     num.tab += 1
-    return (f'<div class="cs-table"><p class="tcap"><strong>Table {num.tab}.</strong> {e(title)}</p>' + _table(head, rows, cls)
+    key = key or f"t{num.tab}"
+    num.map[("tab", key)] = num.tab
+    return (f'<div class="cs-table" id="tab-{key}"><p class="tcap"><strong>Table {num.tab}.</strong> {e(title)}</p>' + _table(head, rows, cls)
             + (f'<p class="cs-cap">{note}</p>' if note else "") + "</div>")
 
 
 def _eq(num, html_body, tex):
     num.eq += 1
-    return (f'<div class="eq" data-tex="{e(tex)}" tabindex="0" role="group" aria-label="Equation {num.eq}">'
+    return (f'<div class="eq" id="eq-{num.eq}" data-tex="{e(tex)}" tabindex="0" role="group" aria-label="Equation {num.eq}">'
             f'<span class="eq-body">{html_body}</span><span class="eq-no">({num.eq})</span></div>')
+
+
+def X(kind, key):
+    """Placeholder for a link to a table or figure; replaced by "Table N" / "Figure N" once all are numbered."""
+    return f"@@{kind}:{key}@@"
+
+
+def resolve_xrefs(body: str, num) -> str:
+    import re as _re
+
+    def sub(m):
+        kind, key = m.group(1), m.group(2)
+        n = num.map.get((kind, key))
+        if n is None:                              # the item was not drawn for this data; keep the sentence readable
+            return "the table below" if kind == "tab" else "the figure below"
+        word = "Table" if kind == "tab" else "Figure"
+        return f'<a class="xref" href="#{kind if kind == "tab" else "fig"}-{key}">{word} {n}</a>'
+    return _re.sub(r"@@(tab|fig):([\w-]+)@@", sub, body)
+
+
+def sec(n, cap=True):
+    return f'<a class="xref" href="#s{n}">{"Section" if cap else "section"} {n}</a>'
+
+
+def apx(letter):
+    return f'<a class="xref" href="#apx-{letter.lower()}">Appendix {letter}</a>'
+
+
+def eqref(n):
+    return f'<a class="xref" href="#eq-{n}">Equation {n}</a>'
+
+
+# ----------------------------------------------------------------------------- references (APA 7)
+# key: (names in a narrative citation, names in a parenthetical citation, year, full APA 7 entry as HTML).
+# Every entry was checked against Crossref or the publisher page. Only entries cited in the text are listed.
+REFS = {
+    "abramov2015": ("Abramov and Kiang", "Abramov &amp; Kiang", "2015",
+                    "Abramov, D., &amp; Kiang, C. (2015). <em>Effect of space launch delays and failures on stock market returns of commercial "
+                    "payload operators</em> (Paper IAC-15,E6,1,1,x29453) [Conference paper]. 66th International Astronautical Congress, "
+                    "Jerusalem, Israel. <a href=\"https://iafastro.directory/iac/archive/browse/IAC-15/E6/1/29453/\">https://iafastro.directory/iac/archive/browse/IAC-15/E6/1/29453/</a>"),
+    "aharony1983": ("Aharony and Swary", "Aharony &amp; Swary", "1983",
+                    "Aharony, J., &amp; Swary, I. (1983). Contagion effects of bank failures: Evidence from capital markets. "
+                    "<em>Journal of Business, 56</em>(3), 305–322. DOI"),
+    "blose1996": ("Blose et al.", "Blose et al.", "1996",
+                  "Blose, L. E., Bornkamp, R., Brier, M., Brown, K., &amp; Frederick, J. (1996). Catastrophic events, contagion, and stock "
+                  "market efficiency: The case of the space shuttle Challenger. <em>Review of Financial Economics, 5</em>(2), 117–129. DOI"),
+    "boehmer1991": ("Boehmer et al.", "Boehmer et al.", "1991",
+                    "Boehmer, E., Musumeci, J., &amp; Poulsen, A. B. (1991). Event-study methodology under conditions of event-induced "
+                    "variance. <em>Journal of Financial Economics, 30</em>(2), 253–272. DOI"),
+    "bosch1998": ("Bosch et al.", "Bosch et al.", "1998",
+                  "Bosch, J.-C., Eckard, E. W., &amp; Singal, V. (1998). The competitive impact of air crashes: Stock market evidence. "
+                  "<em>Journal of Law and Economics, 41</em>(2), 503–519. DOI"),
+    "brown1985": ("Brown and Warner", "Brown &amp; Warner", "1985",
+                  "Brown, S. J., &amp; Warner, J. B. (1985). Using daily stock returns: The case of event studies. "
+                  "<em>Journal of Financial Economics, 14</em>(1), 3–31. DOI"),
+    "cameron2008": ("Cameron et al.", "Cameron et al.", "2008",
+                    "Cameron, A. C., Gelbach, J. B., &amp; Miller, D. L. (2008). Bootstrap-based improvements for inference with clustered "
+                    "errors. <em>Review of Economics and Statistics, 90</em>(3), 414–427. DOI"),
+    "campbell1997": ("Campbell et al.", "Campbell et al.", "1997",
+                     "Campbell, J. Y., Lo, A. W., &amp; MacKinlay, A. C. (1997). <em>The econometrics of financial markets</em>. "
+                     "Princeton University Press."),
+    "chance1987": ("Chance and Ferris", "Chance &amp; Ferris", "1987",
+                   "Chance, D. M., &amp; Ferris, S. P. (1987). The effect of aviation disasters on the air transport industry: A financial "
+                   "market perspective. <em>Journal of Transport Economics and Policy, 21</em>(2), 151–165. DOI"),
+    "corrado1989": ("Corrado", "Corrado", "1989",
+                    "Corrado, C. J. (1989). A nonparametric test for abnormal security-price performance in event studies. "
+                    "<em>Journal of Financial Economics, 23</em>(2), 385–395. DOI"),
+    "cross2018": ("Cross and Vesely", "Cross &amp; Vesely", "2018",
+                  "Cross, B., &amp; Vesely, W. (2018, September 16–21). <em>Synthesizing a new launch vehicle failure probability based on "
+                  "historical flight data</em> [Conference presentation]. Probabilistic Safety Assessment and Management Conference "
+                  "(PSAM 14), Los Angeles, CA, United States. <a href=\"https://ntrs.nasa.gov/citations/20180006947\">https://ntrs.nasa.gov/citations/20180006947</a>"),
+    "dillow2015": ("Dillow", "Dillow", "2015",
+                   "Dillow, C. (2015, July 23). What SpaceX’s launch failure means for the private space industry. <em>Fortune</em>. "
+                   "<a href=\"https://fortune.com/2015/07/23/spacex-rocket-failure-industry/\">https://fortune.com/2015/07/23/spacex-rocket-failure-industry/</a>"),
+    "do2023": ("Do et al.", "Do et al.", "2023",
+               "Do, H. X., Nguyen, N. H., Nguyen, Q. M. P., &amp; Truong, C. (2023). Aerospace competition, investor attention, and stock "
+               "return comovement. <em>Journal of Economic Behavior &amp; Organization, 215</em>, 40–59. DOI"),
+    "euronews2026": ("“SpaceX Makes Its Nasdaq Debut”", "“SpaceX Makes Its Nasdaq Debut,”", "2026",
+                     "SpaceX makes its Nasdaq debut after the largest public offering in history. (2026, June 12). <em>Euronews</em>. "
+                     "<a href=\"https://www.euronews.com/business/2026/06/12/spacex-makes-its-nasdaq-debut-after-the-largest-public-offering-in-history\">"
+                     "https://www.euronews.com/business/2026/06/12/spacex-makes-its-nasdaq-debut-after-the-largest-public-offering-in-history</a>"),
+    "faa2021": ("Federal Aviation Administration", "Federal Aviation Administration", "2021",
+                "Federal Aviation Administration. (2021). <em>Part 450 mishap plan: Reporting, response, and investigation requirements</em> "
+                "(Advisory Circular 450.173-1). U.S. Department of Transportation. "
+                "<a href=\"https://www.faa.gov/documentLibrary/media/Advisory_Circular/AC_450.173-1.pdf\">https://www.faa.gov/documentLibrary/media/Advisory_Circular/AC_450.173-1.pdf</a>"),
+    "fama1969": ("Fama et al.", "Fama et al.", "1969",
+                 "Fama, E. F., Fisher, L., Jensen, M. C., &amp; Roll, R. (1969). The adjustment of stock prices to new information. "
+                 "<em>International Economic Review, 10</em>(1), 1–21. DOI"),
+    "jarrell1985": ("Jarrell and Peltzman", "Jarrell &amp; Peltzman", "1985",
+                    "Jarrell, G., &amp; Peltzman, S. (1985). The impact of product recalls on the wealth of sellers. "
+                    "<em>Journal of Political Economy, 93</em>(3), 512–536. DOI"),
+    "kaplanski2010": ("Kaplanski and Levy", "Kaplanski &amp; Levy", "2010",
+                      "Kaplanski, G., &amp; Levy, H. (2010). Sentiment and stock prices: The case of aviation disasters. "
+                      "<em>Journal of Financial Economics, 95</em>(2), 174–201. DOI"),
+    "kolari2010": ("Kolari and Pynnönen", "Kolari &amp; Pynnönen", "2010",
+                   "Kolari, J. W., &amp; Pynnönen, S. (2010). Event study testing with cross-sectional correlation of abnormal returns. "
+                   "<em>Review of Financial Studies, 23</em>(11), 3996–4025. DOI"),
+    "lang1992": ("Lang and Stulz", "Lang &amp; Stulz", "1992",
+                 "Lang, L. H. P., &amp; Stulz, R. M. (1992). Contagion and competitive intra-industry effects of bankruptcy announcements. "
+                 "<em>Journal of Financial Economics, 32</em>(1), 45–60. DOI"),
+    "mackinlay1997": ("MacKinlay", "MacKinlay", "1997",
+                      "MacKinlay, A. C. (1997). Event studies in economics and finance. <em>Journal of Economic Literature, 35</em>(1), 13–39."),
+    "maloney2003": ("Maloney and Mulherin", "Maloney &amp; Mulherin", "2003",
+                    "Maloney, M. T., &amp; Mulherin, J. H. (2003). The complexity of price discovery in an efficient market: The stock market "
+                    "reaction to the Challenger crash. <em>Journal of Corporate Finance, 9</em>(4), 453–479. DOI"),
+    "mcdowell": ("McDowell", "McDowell", "n.d.",
+                 "McDowell, J. C. (n.d.). <em>GCAT: General catalog of artificial space objects</em> [Data set]. "
+                 "<a href=\"https://planet4589.org/space/gcat/\">https://planet4589.org/space/gcat/</a>"),
+    "webb2023": ("Webb", "Webb", "2023",
+                 "Webb, M. D. (2023). Reworking wild bootstrap-based inference for clustered errors. "
+                 "<em>Canadian Journal of Economics, 56</em>(3), 839–858. DOI"),
+    "yahoo": ("Yahoo Finance", "Yahoo Finance", "n.d.",
+              "Yahoo Finance. (n.d.). <em>Historical prices</em> [Data set]. <a href=\"https://finance.yahoo.com/\">https://finance.yahoo.com/</a>"),
+}
+DOIS = {"aharony1983": "10.1086/296203", "blose1996": "10.1016/S1058-3300(96)90010-5", "boehmer1991": "10.1016/0304-405X(91)90032-F",
+        "bosch1998": "10.1086/467399", "brown1985": "10.1016/0304-405X(85)90042-X", "cameron2008": "10.1162/rest.90.3.414",
+        "chance1987": "10.3828/jtep.1987.21.2.151", "corrado1989": "10.1016/0304-405X(89)90064-0", "do2023": "10.1016/j.jebo.2023.09.005",
+        "fama1969": "10.2307/2525569", "jarrell1985": "10.1086/261313", "kaplanski2010": "10.1016/j.jfineco.2009.10.002",
+        "kolari2010": "10.1093/rfs/hhq072", "lang1992": "10.1016/0304-405X(92)90024-R", "maloney2003": "10.1016/S0929-1199(02)00055-X",
+        "webb2023": "10.1111/caje.12661"}
+
+
+def _apa(key):
+    entry = REFS[key][3]
+    if key in DOIS:
+        u = "https://doi.org/" + DOIS[key]
+        entry = entry.replace("DOI", f'<a href="{u}">{u}</a>')
+    return entry
+
+
+class Cites:
+    """In-text citations that link to their entry in the reference list; remembers which works were cited."""
+
+    def __init__(self):
+        self.used = set()
+
+    def n(self, key):                               # narrative: Lang and Stulz (1992)
+        self.used.add(key)
+        names, _, year, _ = REFS[key]
+        return f'<a class="cite" href="#ref-{key}">{names} ({year})</a>'
+
+    def p(self, *keys, pre=""):                     # parenthetical: (Lang &amp; Stulz, 1992; MacKinlay, 1997)
+        self.used.update(keys)
+        parts = [f'<a class="cite" href="#ref-{k}">{REFS[k][1]} {REFS[k][2]}</a>' if REFS[k][1].rstrip("”").endswith(",") else
+                 f'<a class="cite" href="#ref-{k}">{REFS[k][1]}, {REFS[k][2]}</a>'
+                 for k in sorted(keys, key=lambda k: html.unescape(REFS[k][1]).strip("“”"))]
+        return "(" + (pre + " " if pre else "") + "; ".join(parts) + ")"
+
+    def reference_list(self):
+        import re as _re
+        keys = sorted(self.used, key=lambda k: _re.sub(r"<[^>]+>", "", html.unescape(REFS[k][3])).lower())
+        return "".join(f'<p class="ref" id="ref-{k}">{_apa(k)}</p>' for k in keys)
 
 
 WHY = {"no_firm_map_match": "maker not a listed company",
@@ -587,7 +742,275 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
 
     import sitechrome as SC
     plan_v = res.get("plan_version") or ""
-    toc_items = "".join(f'<li><a href="#s{i}">{i}. {e(c)}</a></li>' for i, c in enumerate(contents, 1)) + '<li><a href="#apx">Appendices</a></li>'
+    C = Cites()
+    gap = st.get("cluster_gap", 5)
+    min_obs = st.get("min_obs", 100)
+    top = e(f["top_firm"]) if f.get("top_firm") else ""
+    cases_sig = all_fell and all(c["car_primary_ci"][1] < 0 for c in cases)
+    n_prov_r = tm["rival_reactions"]["counts"].get("provisional", 0)
+    n_low_r = tm["rival_reactions"]["counts"].get("low", 0)
+    n_prov_m = tm["maker_cases"]["counts"].get("provisional", 0)
+    toc_items = ("".join(f'<li><a href="#s{i}">{i}. {e(c)}</a></li>' for i, c in enumerate(contents, 1))
+                 + '<li><a href="#refs">References</a></li><li><a href="#apx">Appendices</a></li>')
+
+    # ---------------- reusable sentences (kept outside the f-strings so the page builds on Python 3.11)
+    maker_sentence = (f"In every one of the {f['n_cases']} listed cases the maker's shares fell over the two trading days after the failure became "
+                      f"public, after allowing for the movement of the market, by between {pct(f['case_hi'])} and {pct(f['case_lo'])}"
+                      + (", and in each case the 95% interval excludes zero." if cases_sig else ".")
+                      if all_fell else f"The {f['n_cases']} listed cases do not move in the same direction, so they are reported one by one.")
+    h2_sentence = ("H2 is therefore not rejected at the 5% level by any of these tests." if not detect and (not et or et["A"]["p"] >= 0.05)
+                   else "The tests do not all agree; each is reported next to the quantity it measures.")
+    precision = (f"How large would an effect have to be for this sample to find it? With a cluster-robust standard error of {pct(pw['se'], 2, False)}, "
+                 f"an average effect would need to be about {pct(pw['mde80'], 1, False)} to be detected four times out of five (80% power), and "
+                 f"about {pct(pw['mde90'], 1, False)} to be detected nine times out of ten. The chance of detecting a true average effect of 1% is only "
+                 f"{pw['power'][0.01]:.2f}. This figure is called the minimum detectable effect: the smallest true effect that a test of this size would "
+                 f"usually find. A two-day move of {pct(pw['mde80'], 1, False)} in a firm's value is large in economic terms, so the test can only rule out "
+                 f"large effects. The 90% interval ({_ci(*pw['ci90'])}) could support a claim that the effect is negligible only if a two-day effect of "
+                 f"about ±{pct(max(abs(pw['ci90'][0]), abs(pw['ci90'][1])), 1, False)} were accepted as negligible, which it is not. The data therefore "
+                 "do not show that competitors are unaffected; they show that any average effect is too small, relative to the noise, to be measured "
+                 "with this sample." if pw else "")
+    offset = (f"The average is close to zero partly because firms with opposite reactions cancel each other out. {e(et['contrib'][-1]['firm'])}'s "
+              f"{et['contrib'][-1]['n']} reactions add {pct(et['contrib'][-1]['contribution'], 2)} to the mean, while {e(et['contrib'][0]['firm'])}'s "
+              f"{et['contrib'][0]['n']} reactions add {pct(et['contrib'][0]['contribution'], 2)} ({X('tab', 'contrib')}). "
+              if et and len(et["contrib"]) > 1 else "")
+    firm_view = (f"A firm-level view makes the same point. The mean of the {et['firm']['k']} firm means is {pct(et['firm']['mean'], 2)}, with a 95% "
+                 f"interval of {_ci(*et['firm']['ci'], 1)}, but this interval rests on only {et['firm']['k'] - 1} degrees of freedom and is therefore "
+                 f"very wide. " if et and et["firm"]["ci"][0] is not None else "")
+    weights_sentence = (f"Weighting each firm equally instead of each reaction gives a different answer, and no weighting is better than the others on "
+                        f"statistical grounds ({X('tab', 'wt')} and {X('fig', 'weights')}). The every-reaction average is the main estimate only "
+                        "because it was chosen before the results were seen." if wt_rows else "")
+    e1_sentence = (f"Dropping the {len(e1.get('dropped') or [])} reactions that coincide with contract news changes the average from "
+                   f"{pct(p['mean_car'], 2)} to {pct(e1['mean_car'], 2)}"
+                   + (f", but the median moves only from {pct(w['median'], 2)} to {pct(w_e1['median'], 2)}. The change therefore comes from "
+                      f"removing {nw(n_e1)} large {e1_sign + ' ' if e1_sign else ''}move{'s' if n_e1 != 1 else ''}, not from a shift in the typical "
+                      "reaction" if w and w_e1 else "")
+                   + f". The standardized test hardly moves (p = {pval(e1['p'])}), because it already gives less weight to the volatile stocks behind "
+                   "those moves." if e1 else "")
+    flag_intro = (f"{X('tab', 'flag')} lists every competitor reaction with other company news in the window, the verdict, and the source of the news. "
+                  if flag_rows else "No competitor reaction had other company news in the window. ")
+    placebo_b = (f" A version designed after the results, with one shared random date for all reactions in a cluster (R9b, {r9b['draws']} draws), "
+                 f"places the real result at the {ordinal(r9b['actual_percentile'])} percentile (two-sided share {r9b['two_sided_share']:.3f})."
+                 if r9b else "")
+    concentration = (f"{top} appears in every one of the {f['n_clusters']} independent events. " if top_all else "")
+    verify_txt = (f"An independent script (<code>audit/verify_published.py</code>) recomputes the published statistics from the published derived data, "
+                  f"without importing any of the project's own code. {verif[0]} of {verif[1]} quantities match within a tolerance of 1e-9 for "
+                  "estimates and intervals and 1e-8 for test statistics and p-values." if verif else
+                  "An independent script (<code>audit/verify_published.py</code>) recomputes every published statistic from the published derived "
+                  "data, without importing any of the project's own code.")
+    commit_txt = (f" The published statistics were exported from commit <code>{e(str(man['git']['commit'])[:7])}</code>"
+                  + (" (with uncommitted changes in the working tree)" if man["git"].get("uncommitted_changes") else "") + "."
+                  if (man.get("git") or {}).get("commit") else "")
+    inshort_p = (("The rocket's maker lost a large share of its value in each of the " + str(f["n_cases"]) + f" listed cases ({pct(f['case_hi'])} to "
+                  f"{pct(f['case_lo'])} over two days). " if all_fell else f"The rocket's maker reacted differently in the {f['n_cases']} listed cases. ")
+                 + f"Listed competitors moved by {pct(p['mean_car'], 2)} on average (95% interval {pct(p['ci_low'], 2)} to {pct(p['ci_high'], 2)}"
+                 + (f", p = {pval(et['A']['p'])}" if et else "") + f"; prespecified standardized test p = {pval(p['p'])}), "
+                 + ("which cannot be told apart from zero. " if not detect else "which is different from zero. ")
+                 + (f"Effects of about {pct(pw['mde80'], 1, False)} in either direction could go undetected" if pw else "")
+                 + (", and the sign of the estimate depends on how events and firms are weighted. " if sign_flips else ". ")
+                 + "The rules were fixed in the public repository before the results, but not filed with an independent registry.")
+
+    lim_paras = [
+        f"The first limitation is the small number of listed firms. Only {f['n_rival_firms']} listed firms qualify as competitors, and they "
+        f"produce {f['n_clusters']} independent events{f', every one of which involves {top}' if top_all else ''}. Because the same shares appear "
+        f"in many events, grouping reactions by event captures only part of the dependence between them, and with {f['n_rival_firms']} firms "
+        "grouping by firm is not reliable either. The maker evidence is thinner still: "
+        f"{f['n_cases']} cases from {n_case_firms} firm{'s' if n_case_firms != 1 else ''}, which are case studies rather than an average effect.",
+        (f"The second limitation is statistical power. Average effects of about {pct(pw.get('mde80', 0), 1, False)} could go undetected, so the "
+         "study cannot claim that the effect is zero or negligible. " if pw else "The second limitation is statistical power. ")
+        + ("The sign of the estimate depends on how events and firms are weighted" if sign_flips else "The estimate is sensitive to the weighting")
+        + (f", and on {nw(n_e1)} large reaction{'s' if n_e1 != 1 else ''} that coincide with contract news" if n_e1 else "")
+        + ". The interval (for the equal-weighted mean) and the prespecified test (for the standardized mean) answer slightly different "
+        "questions and can disagree.",
+        f"The third limitation is timing. {pct(prov_share, 0, False)} of competitor reactions and {n_prov_m} of {tm['maker_cases']['n']} maker "
+        "cases use GCAT launch times that were not checked separately against a company statement. These times are used only where day 0 "
+        "would not change if the true disclosure came up to 10 minutes earlier or 180 minutes later. "
+        + (f"{nw(n_low).capitalize()} failure{'s are' if n_low != 1 else ' is'} dated by a statement with low confidence, which checks R5a "
+           "and R5b address. " if n_low else "")
+        + "A clock or time-zone error larger than that band would move day 0.",
+        "The fourth limitation is the model. A one-factor market model with a home-market index does not remove moves that affect the whole "
+        "space sector on the event days"
+        + (f" ({nw(n_sector)} flagged case{'s' if n_sector != 1 else ''})" if n_sector else "")
+        + ". Firms that were listed but later delisted, such as Orbital Sciences (later Orbital ATK), Astra and Virgin Orbit, are missing from "
+        "the main sample because the free price source does not carry them. Yahoo Finance prices and GCAT records are good sources but are "
+        "not audited.",
+        f"Finally, the results describe historically eligible, publicly traded launch firms with comparable commercial business, not the launch "
+        f"industry as a whole, and they say nothing about private, state-owned or diversified aerospace companies. The rules were committed to "
+        f"git before the results ({apx('G')}) but were not filed with an independent registry, and git timestamps are set by the author.",
+    ]
+    limitations = "".join(f"<p>{x}</p>" for x in lim_paras)
+
+    est_eq = _eq(num, "<i>θ</i><sub>obs</sub> = (1/<i>N</i>) Σ<sub><i>i</i></sub> <i>CAR</i><sub><i>i</i></sub>, &nbsp; <i>θ</i><sub>event</sub> = (1/<i>G</i>) Σ<sub><i>g</i></sub> (1/<i>N</i><sub><i>g</i></sub>) Σ<sub><i>i</i>∈<i>g</i></sub> <i>CAR</i><sub><i>i</i></sub>, &nbsp; <i>θ</i><sub>prec</sub> = Σ<sub><i>i</i></sub> <i>CAR</i><sub><i>i</i></sub>/<i>s</i><sub><i>i</i></sub> / Σ<sub><i>i</i></sub> 1/<i>s</i><sub><i>i</i></sub>, &nbsp; <i>θ</i><sub>firm</sub> = (1/<i>K</i>) Σ<sub><i>k</i></sub> (1/<i>N</i><sub><i>k</i></sub>) Σ<sub><i>i</i>∈<i>k</i></sub> <i>CAR</i><sub><i>i</i></sub>",
+                 r"\begin{gathered}\theta_{obs} = \frac{1}{N}\sum_i CAR_i,\qquad \theta_{event} = \frac{1}{G}\sum_g \frac{1}{N_g}\sum_{i\in g} CAR_i,\\ \theta_{prec} = \frac{\sum_i CAR_i/s_i}{\sum_i 1/s_i},\qquad \theta_{firm} = \frac{1}{K}\sum_k \frac{1}{N_k}\sum_{i\in k} CAR_i\end{gathered}")
+    up = p["mean_car"] >= 0
+    rival_econ = (f"In economic terms, the point estimate says that the average competitor's market value {'rose' if up else 'fell'} by about "
+                  f"{pct(abs(p['mean_car']), 2, False)} more than the market predicted over the two days after a failure. For a "
+                  f"competitor worth one billion dollars, this would be a {'gain' if up else 'loss'} of about {abs(p['mean_car']) * 1000:.1f} million "
+                  f"dollars. The interval, however, runs from {pct(p['ci_low'], 2)} to {pct(p['ci_high'], 2)}"
+                  + (", so a small loss through contagion and a small gain through competition are both consistent with the data."
+                     if p["ci_low"] < 0 < p["ci_high"] else "."))
+    maker_econ = (f"In economic terms, investors cut their estimate of the maker's market value by {pct(abs(f['case_hi']), 1, False)} to "
+                  f"{pct(abs(f['case_lo']), 1, False)} within two days. Losses of this size are consistent with investors expecting costs well "
+                  "beyond the lost rocket, such as delayed launches, lost contracts and a weaker reputation for reliability. " if all_fell else "")
+    sections = f"""<section class="abstract-sec"><h2>Abstract</h2><p>{e(abstract)}</p></section>
+<div class="kw"><p class="keywords"><em>Keywords:</em> event study; industry spillovers; contagion; competitive effects; launch failures</p>
+<p class="keywords"><em>JEL:</em> G14, L13</p></div>
+
+<aside class="inshort screen-only"><h2>In short</h2><p>{inshort_p}</p></aside>
+
+<section id="s1"><h2>1. Introduction</h2>
+<p>When a rocket fails, the company that built it loses the rocket, often a customer's satellite, and usually several months of flights while engineers find the cause. In the United States, for example, a licensed launch operator must investigate the root cause of any mishap, report the results to the regulator, and put in place measures that stop it from happening again {C.p("faa2021")}. The effect of the failure on the maker's competitors is much less clear, and it is the main question of this paper.</p>
+<p>Economists describe two opposite ways in which bad news at one firm can move the share prices of other firms in the same industry {C.p("lang1992")}. The first is contagion: investors read the failure as news about the whole industry, for example that rockets are riskier than they thought or that rules will become stricter, and they lower their estimate of the value of every firm in it. The second is the competitive effect: investors expect customers to move their satellites to providers whose rockets still work, so the competitors gain. The two channels push share prices in opposite directions, so theory alone cannot say which one is larger. Only data can.</p>
+<p>The question matters more now than it did a decade ago, because launch companies have become a larger part of public stock markets. In June 2026 SpaceX began trading on the Nasdaq after raising about $75 billion, the largest initial public offering on record {C.p("euronews2026")}. When more launch firms are listed, more investors hold shares whose value depends on how the market prices launch risk, both the risk of a firm's own rockets and the risk of its competitors' rockets. Whether a failure at one provider moves the shares of the others matters for how investors diversify, for how they value new listings, and for how firms and regulators think about the industry's exposure to a single accident.</p>
+<p>Earlier work has answered the same question for other industries. Studies of bankruptcies {C.p("lang1992")}, bank failures {C.p("aharony1983")}, product recalls {C.p("jarrell1985")} and air crashes {C.p("chance1987", "bosch1998")} show that bad news at one firm often moves the share prices of its competitors, and that the direction depends on the industry. For spaceflight, the evidence comes mainly from a single event, the loss of the space shuttle Challenger in 1986 {C.p("blose1996", "maloney2003")}, and from studies of satellite operators, who are the launch firms' customers rather than their competitors {C.p("abramov2015")}. To the author's knowledge, no study has measured how listed launch providers react to the failures of their competitors across many events.</p>
+<p>This paper fills that gap with an event study of orbital launch failures from {e(span)}. An event study measures how much a share price moves on and just after a specific piece of news, beyond what the general movement of the market on those days would predict {C.p("mackinlay1997")}. Launch failures suit the method well. They happen at a known time, they are usually broadcast live, and they are not caused by the decisions of the competitors whose shares are studied. The paper makes three contributions. First, it builds a hand-checked list of which listed firms were real competitors of the failed rocket on the day of each failure, using the GCAT launch catalogue {C.p("mcdowell")}. Second, it reports the reaction of the failed rocket's maker as a set of case studies and tests one confirmatory hypothesis for competitors, called H2: the average two-day abnormal return of listed competitors is zero. All rules for this test were fixed in the project's public repository before any result was computed ({apx("G")}). Third, it reports the uncertainty in full: how small an effect the sample could detect, how the estimate changes when events and firms are weighted differently, and which reactions coincide with other company news.</p>
+<p>The answer is limited by the sample. Only {f['n_rival_firms']} listed launch firms qualify as direct competitors at the time of a failure, so the study observes {f['n_clusters']} independent competitor events{f", every one of which involves {top}" if top_all else ""}. {"The average reaction of competitors is not distinguishable from zero, but the interval around it is wide enough to contain losses and gains that would matter to investors." if not detect else "The average reaction of competitors is distinguishable from zero."} The contribution is therefore a carefully documented and reproducible estimate with its uncertainty stated in full, not a general claim about the launch industry.</p>
+<p>The paper is organized as follows. {sec(2)} describes the launch industry and {sec(3, False)} reviews earlier studies. {sec(4)} and {sec(5, False)} describe the data and the method. {sec(6)}, {sec(7, False)} and {sec(8, False)} report the main results, the robustness checks and the role of other company news. {sec(9)} discusses the findings, {sec(10, False)} sets out the limitations and {sec(11, False)} concludes.</p></section>
+
+<section id="s2"><h2>2. Institutional background</h2>
+<p>An orbital launch places a satellite or another payload into orbit around the Earth. A small number of providers sell these launches, and many of them are government agencies, state-owned companies or privately held firms. As a result, only a few launch providers have shares that trade on a stock exchange, and these are the only firms whose market value can be observed every day. Rockets and satellites need long preparation before a launch, so a provider cannot easily turn spare rockets into launches in the near term, and satellite operators must choose from a limited number of providers and rockets {C.p("dillow2015")}. This matters for the competitive effect: even if customers want to leave a provider after a failure, the competitors can take on only a limited amount of new business in the short run.</p>
+<p>Launching is risky, and new rockets are riskier than mature ones. A study of launch records from 1980 to 2017 by NASA engineers found that new launch vehicles have had much higher failure probabilities in their early flights than engineering risk models predicted {C.p("cross2018")}. After a failure, the rocket normally stops flying while the cause is found and fixed; in the United States this investigation is a legal requirement for licensed launches {C.p("faa2021")}. For the maker, a failure therefore means the loss of the rocket, possible penalties or free replacement flights for the customer, the delay of its next launches, and damage to its reputation for reliability.</p>
+<p>Few launch companies have been publicly traded with launch as a major part of their business. Large aerospace groups that build rockets also make aircraft, defence systems or satellites, so a launch failure is a small part of their value and their share price says little about their launch business. The study therefore counts a firm as a direct competitor only when launch is its only business (a pure-play firm) or a major one ({apx("B")}). The listed launch-focused firms in the sample became public mostly in the last decade, so most of the competitor evidence comes from recent years. SpaceX listed on the Nasdaq in June 2026 {C.p("euronews2026")} and had too little trading history to enter the sample, because the model in {sec(5, False)} needs at least {min_obs} days of returns before an event.</p>
+<p>Most orbital launches are shown live online, so a failure usually becomes public at the moment it happens. In some cases a launch first appears to succeed, and the company confirms only later that the satellite did not reach the right orbit. In those cases the event date is set by the first public statement from the company, and the paper records how confident it is about that time ({sec(4, False)}).</p></section>
+
+<section id="s3"><h2>3. Related literature</h2>
+<h3>3.1 Event studies</h3>
+<p>The event study is the standard tool for measuring how a piece of news changes the value of a firm. The method goes back to {C.n("fama1969")}, who studied how share prices adjust to stock splits. Its logic is simple. If investors use public information quickly, the effect of news on a firm's value shows up in its share price within a short time. The researcher predicts what the firm's return would have been without the news, using the firm's normal relation to the market, and calls the difference between the actual and the predicted return the abnormal return {C.p("mackinlay1997")}. {C.n("brown1985")} show that this approach works well with daily returns and simple models.</p>
+<p>Two statistical problems matter for this paper. First, a dramatic event can make returns more volatile than usual, and ordinary tests then find an effect too often even when there is none. {C.n("boehmer1991")} propose a standardized test that allows for this extra volatility. Second, when one event hits several firms on the same day, their abnormal returns are correlated, which also makes ordinary tests too confident. {C.n("kolari2010")} measure the size of this bias and propose the correction used here. {C.n("corrado1989")} offers a test based on ranks rather than averages, which is less sensitive to a few very large returns. Finally, when observations fall into a small number of groups, standard errors that allow for correlation within groups can still be unreliable, and {C.n("cameron2008")} and {C.n("webb2023")} propose bootstrap methods for this case.</p>
+<h3>3.2 Contagion and competitive effects</h3>
+<p>A large literature asks how news at one firm moves its competitors. {C.n("lang1992")} separate the two channels described in the introduction. They find that bankruptcy announcements lower the value of a portfolio of competitors by about 1% on average, so contagion dominates on average, but that competitors gain in highly concentrated industries with low debt, where the bankrupt firm's customers can move to its rivals. {C.n("aharony1983")} study the failures of large US banks and find that the effect on other banks depends on whether the cause of the failure is specific to the failed bank or could be shared by others. {C.n("jarrell1985")} show that product recalls in the drug and car industries cost the recalling firm more than the direct cost of the recall, and that part of the loss spreads to its competitors.</p>
+<h3>3.3 Disasters and investor sentiment</h3>
+<p>Accidents are a closer comparison to launch failures, because they are sudden, public and physical. {C.n("chance1987")} study the share prices of airlines after fatal crashes. {C.n("bosch1998")} ask whether rival airlines lose because travellers become afraid of flying in general, or gain because travellers switch to other carriers. {C.n("kaplanski2010")} show that aviation disasters are followed by losses across the whole stock market that are far larger than the economic damage of the crash and that reverse within a few days. This points to investor sentiment, meaning a change in mood rather than in information about firm values, as a possible driver of short-run reactions to disasters.</p>
+<h3>3.4 Spaceflight and launch markets</h3>
+<p>For spaceflight, most of the evidence comes from one event, the loss of the space shuttle Challenger in January 1986. {C.n("blose1996")} study how the shares of the shuttle's contractors reacted and how quickly the market absorbed the news. {C.n("maloney2003")} show that the contractors' shares fell together on the day of the disaster, and that within the same day the market singled out Morton Thiokol, the firm whose booster seal was later found to have failed, months before the official inquiry reached that conclusion. {C.n("abramov2015")} study launch delays and failures from the point of view of satellite operators, the launch firms' customers. {C.n("do2023")} find that US satellite launch days draw investors' attention away from firm-specific news, so that share prices move more closely with the market on those days.</p>
+<h3>3.5 What this paper adds</h3>
+<p>This paper differs from these studies in three ways. It studies the failed provider's listed competitors, not its contractors or its customers. It uses many failures rather than one, so that an average reaction can be estimated, even though the number of listed competitors is small. And it applies the corrections for extra volatility and same-day correlation discussed above, together with a full report of the study's statistical power, so that a result of "no detectable effect" can be read correctly: as a statement about what the sample can and cannot detect, not as proof that there is no effect.</p></section>
+
+<section id="s4"><h2>4. Data and sample construction</h2>
+<h3>4.1 Launch records</h3>
+<p>The list of launches comes from GCAT, the General Catalog of Artificial Space Objects maintained by the astronomer Jonathan McDowell {C.p("mcdowell")}. GCAT records orbital launch attempts with their date, time, rocket, launch site and outcome. Each launch has a success score between 0 and 1, where lower scores mean worse outcomes. This paper treats a launch as a failure when its score is below 0.75. Explosions on the launch pad before lift-off are recorded separately and are not part of the main sample. The sample covers {e(span)} and contains {f['n_failures']} failures.</p>
+<h3>4.2 Firms and competitors</h3>
+<p>Each failure is linked by hand to its maker, if the maker was a listed company on that date, and to any listed competitors. The link is made point in time, which means that it uses only what was true on the day of the failure: a firm that listed later, or that bought a launch business later, is not counted. A firm is a Tier 1 competitor when four conditions hold on the date of the failure. Its shares are listed on a stock exchange; launch is its only business or a major one; it sells a rocket of the same size class to the same customer market as the failed rocket; and it has flown that rocket in the previous 730 days, which is about two years. A small number of further competitors (Tier 2) are added case by case, each with a documented source. Every row of the firm map used in the test is checked against company filings or exchange notices ({apx("B")}).</p>
+<h3>4.3 Share prices</h3>
+<p>Daily share prices, adjusted for dividends and stock splits, come from Yahoo Finance {C.p("yahoo")}. A daily return is the percentage change in this adjusted price from one trading day to the next. Each firm's benchmark is the main stock index of its home market, so that the model compares a firm with the market in which it trades. Prices from before a firm's real listing, for example the price of a shell company that it merged with in order to list, are dropped. Raw prices are used only on the author's computer and are not redistributed; the paper and the website publish only derived statistics.</p>
+<h3>4.4 Event dates and independent events</h3>
+<p>Day 0, written T0, is the first trading session on the stock's own exchange that starts at or after the moment the failure became public. If a rocket fails after the exchange has closed, day 0 is the next trading day. Other days are counted in trading days around day 0: T−1 is the session before it and T+1 the session after it. When two failures less than {gap} trading days apart affect the same firm, their windows overlap and the reactions cannot be separated, so they are grouped into one cluster, which this paper calls an independent event. {X("fig", "sample")} shows how the sample narrows from all launch attempts to the competitor reactions used in the test.</p>
+{_figure(num, "sample", "Sample construction", fig_sample(nodes, edges), f"Each box gives a count and its unit, and the unit changes along the way. Failures: GCAT success score below 0.75. In the study: the failure has a listed maker or a listed Tier 1-2 competitor (one failure has both). Competitor reactions: one per listed competitor per failure. Independent events: failures that share a firm within {gap} trading days are grouped. Source: GCAT (McDowell, n.d.) and the project pipeline.")}
+<h3>4.5 Event timing verification</h3>
+<p>Day 0 depends on when a failure became public relative to the close of the exchange, so the disclosure time of each event was checked. For each event the time is either a sourced company statement, recorded with high or low confidence, or the launch time recorded in GCAT. GCAT times are used only where day 0 would not change if the true disclosure came 10 minutes earlier or up to 180 minutes later; events that fail this check need a sourced time. {pct(prov_share, 0, False)} of competitor reactions ({n_prov_r} of {tm['rival_reactions']['n']}) and {n_prov_m} of {tm['maker_cases']['n']} maker cases rely on GCAT launch times that were not checked separately against a company statement, and {n_low_r} competitor reaction{"s" if n_low_r != 1 else ""} rely on a sourced time with low confidence. Checks R5a and R5b ({sec(7, False)}) test whether these choices matter. {X("tab", "tsrc")} and {X("fig", "timing")} give the breakdown.</p>
+{_ttable(num, "Disclosure-time sources", ["Source of the disclosure time", "Competitor reactions", "Competitor failures", "Maker cases"],
+         [[lab, str(tm["rival_reactions"]["counts"].get(k, 0)), str(tm["rival_failures"]["counts"].get(k, 0)), str(tm["maker_cases"]["counts"].get(k, 0))]
+          for k, lab in (("high", "Company statement, high confidence"), ("low", "Company statement, low confidence"), ("provisional", "GCAT launch time (not separately verified)"))], key="tsrc")}
+{_figure(num, "timing", "Event timing verification", fig_timing(tm), f"Share of events by disclosure-time source. Competitor reactions: n = {tm['rival_reactions']['n']}; maker cases: n = {tm['maker_cases']['n']}. Source: data/manual/disclosure_times.csv and GCAT.")}
+<h3>4.6 Description of the sample</h3>
+<p>{X("fig", "years")} shows how many orbital launch failures happened each year and how many of them enter the study. Most failures do not enter, because neither the maker nor any competitor was a listed launch firm at the time ({apx("E")}). {X("tab", "desc")} describes the competitor reactions firm by firm, and {X("fig", "exposure")} shows which firm is present in each independent event. The cumulative abnormal return (CAR) in these tables is defined in {sec(5, False)}; in short, it is the part of a stock's move over the window that the market does not explain.</p>
+{_figure(num, "years", "Orbital launch failures per year", fig_years(fails), f"Outline: all orbital launch failures, {e(span)}. Filled: failures that enter the study.")}
+{_ttable(num, "Competitor reactions by firm, CAR " + t("primary"), ["Firm", "Ticker", "Reactions", "Clusters", "Mean", "Median", "Range"], desc_rows, f"Clusters: independent events in which the firm appears; {f['n_clusters']} in total.", key="desc")}
+{_figure(num, "exposure", "Which competitor is present in each independent event", fig_exposure(firm_names, exp_rows), "Columns: independent events in date order. Filled: the firm is a competitor in that event; a number means it appears more than once (two close failures).")}
+</section>
+
+<section id="s5"><h2>5. Empirical methodology</h2>
+<h3>5.1 Normal and abnormal returns</h3>
+<p>To measure the effect of a failure, the study first needs an estimate of how each stock would have moved without it. This "normal" return comes from the market model, which describes a stock's daily return as a constant plus a fixed share of the market's return {C.p("mackinlay1997")}. The share is called beta (β): a stock with a beta of 1.5 tends to rise 1.5% when the market rises 1%. The model is estimated by ordinary least squares, the standard method that picks the line that best fits past data, on trading days {-est[0]} to {-est[1]} before day 0. This period, called the estimation window, ends a month before the event so that the event itself cannot affect the estimate. At least {min_obs} daily returns are required. With 30 to 99 returns, the study uses a simpler market-adjusted model, in which the normal return is just the market return (α = 0 and β = 1), and flags the event:</p>
+{eqs[0]}
+<p>In {eqref(1)}, <i>R</i><sub><i>it</i></sub> is the return of stock <i>i</i> on day <i>t</i>, <i>R</i><sub><i>mt</i></sub> is the return of its market index, and <i>ε</i><sub><i>it</i></sub> is the part of the return that the market does not explain. The abnormal return (AR) on a day is the actual return minus the return the model predicts. The cumulative abnormal return (CAR) over an event window from day τ<sub>1</sub> to day τ<sub>2</sub> is the sum of the daily abnormal returns:</p>
+{eqs[1]}
+<p>A CAR of −10% over two days means that the stock did 10 percentage points worse than the market would have predicted, which can be read as the market cutting its estimate of the firm's value by about a tenth. Returns are simple percentage changes, and CARs are sums of simple abnormal returns.</p>
+<h3>5.2 How precise is each reaction?</h3>
+<p>Each CAR contains noise, because even on a quiet day a stock does not move exactly as the model predicts. The variance of each CAR, a measure of how much it would vary by chance, includes both this daily noise and the error from estimating the model itself {C.p("campbell1997")}. In {eqref(3)}, <i>σ̂</i><sub><i>i</i></sub><sup>2</sup> is the variance of the stock's unexplained returns in the estimation window, <i>L</i> is the length of the event window, <i>T</i> the number of estimation days, <i>W</i> the event window and <i>E</i> the estimation window:</p>
+{eqs[2]}
+<h3>5.3 Testing whether competitors react</h3>
+<p>A statistical test asks whether an average reaction is larger than chance alone would produce. Its result is summarized by a p-value: the probability of seeing an average at least this far from zero if the true average were zero. A p-value below 0.05 is the usual threshold for calling an effect statistically significant. The confirmatory test in this paper is the standardized test of {C.n("boehmer1991")}, called the BMP test. It first divides each CAR by its own standard deviation, so that every reaction is measured in units of its own noise, and then tests whether the average of these standardized CARs (SCARs) is zero. Because it uses the spread of the standardized CARs across firms, it remains valid when the failure makes returns more volatile than usual:</p>
+{eqs[3]}
+<p>One failure can hit several competitors on the same day, and their reactions are then not independent. The BMP statistic is therefore adjusted as proposed by {C.n("kolari2010")} (the BMP-KP test, {eqref(5)}). Correlation is allowed only within a cluster <i>c</i>. For a pair of reactions it is the correlation of their unexplained returns in the estimation window, scaled by the share ℓ<sub><i>ij</i></sub> of event-window days that the two windows have in common. The p-values use a t distribution with <i>G</i> − 1 degrees of freedom, where <i>G</i> is the number of independent events; using the number of events rather than the number of reactions makes the test more cautious:</p>
+{eqs[4]}
+<p>The equal-weighted average CAR is reported with a cluster-robust interval ({eqref(6)}). A cluster-robust standard error measures the uncertainty of the average while allowing reactions in the same independent event to be correlated. The 95% interval is the range of values that the data cannot rule out at the 5% level. As a further check, the study also reports a wild cluster bootstrap p-value, which re-creates the test many times from the data and is more reliable when there are few clusters {C.p("cameron2008", "webb2023")}:</p>
+{eqs[5]}
+<h3>5.4 What exactly is being averaged?</h3>
+<p>An average depends on how much weight each observation gets, and with few firms and events this choice matters. Let <i>i</i> = 1, …, <i>N</i> index competitor reactions (one per listed competitor per failure), <i>g</i> = 1, …, <i>G</i> independent events, and <i>k</i> = 1, …, <i>K</i> firms, with <i>N</i><sub><i>g</i></sub> and <i>N</i><sub><i>k</i></sub> reactions in event <i>g</i> and firm <i>k</i>, and <i>s</i><sub><i>i</i></sub> = √Var(<i>CAR</i><sub><i>i</i></sub>). Four averages answer four different questions. Statisticians call the quantity that an average is meant to measure the estimand:</p>
+{est_eq}
+<p><i>θ</i><sub>obs</sub> is the average reaction of a listed competitor to a failure; <i>θ</i><sub>event</sub> treats every independent event equally; <i>θ</i><sub>prec</sub> gives more weight to calm stocks, whose reactions are measured more precisely; and <i>θ</i><sub>firm</sub> treats every firm equally. The confirmatory hypothesis H2 is stated for <i>θ</i><sub>obs</sub>, reported with the cluster-robust interval of {eqref(6)}. The prespecified BMP-KP test asks a slightly different question, whether the average standardized CAR is zero; the two coincide only when all stocks are about equally volatile, and the test is closest in spirit to <i>θ</i><sub>prec</sub>. Both are reported, each next to the quantity it matches. None of the weightings is better on statistical grounds; <i>θ</i><sub>obs</sub> stays the main estimate because it was chosen before the results were seen.</p>
+<h3>5.5 Event windows and prespecified checks</h3>
+<p>The main window covers day 0 and the next trading day, which is long enough to capture a failure late in the trading day and short enough to keep out most other news. {X("tab", "win")} lists the windows. Nine robustness checks were fixed in advance. Check R1 averages the reactions within each independent event first and then tests the event averages, with both a t-test and a sign test, which counts how many averages are negative. Check R2 is a plain t-test that ignores standardization. Check R3 is a rank test in the spirit of {C.n("corrado1989")}, with a p-value obtained by simulation. Check R4 uses the wider window. Check R5 drops or shifts events whose disclosure time is uncertain. Check R6 drops reactions estimated with the market-adjusted fallback model. Check R7 drops clusters that contain more than one failure. Check R8 leaves out one firm at a time. Check R9 is a placebo test, which repeats the whole calculation on ordinary days with no failure, to see how often an average as large as the real one appears by chance. Analyses designed after the results were seen are called exploratory, are labelled wherever they appear, and never replace H2.</p>
+{_ttable(num, "Event windows", ["Window", "Days", "Role"], [["Main", t("primary"), "Confirmatory test (H2)"], ["Wider", t("robust"), "Robustness check"], ["One month", t("descriptive"), "Description only"]], key="win")}
+</section>
+
+<section id="s6"><h2>6. Main results</h2>
+<h3>6.1 The rocket's maker</h3>
+<p>{maker_sentence} {X("tab", "case")} gives the numbers and {X("fig", "paths")} shows how the losses built up over the days after each failure. {maker_econ}With {f['n_cases']} cases from {n_case_firms} firm{"s" if n_case_firms != 1 else ""}, however, these are case studies, not an estimate of an average effect.</p>
+{_ttable(num, "The rocket's maker: two-day abnormal returns", ["Rocket", "Failure", "Listed maker", f"CAR {t('primary')}", "95% interval", f"CAR {t('robust')}"], case_rows, "Intervals: CAR ± 1.96 × prediction-error standard deviation.", key="case")}
+{_figure(num, "paths", "The rocket's maker: cumulative abnormal return", fig_paths(cases), f"Cumulative abnormal return from T−5 to T+20, set to zero at the close before the failure (T−1), so the value at T+1 is the two-day result in the table. {f['n_cases']} cases, market model, simple returns, home-market index. Source: project pipeline (prices from Yahoo Finance, not published).")}
+<h3>6.2 Listed competitors</h3>
+<p>{X("tab", "inf")} reports the confirmatory test. The equal-weighted average two-day abnormal return of listed competitors is {pct(p['mean_car'], 2)}, with a 95% interval from {pct(p['ci_low'], 2)} to {pct(p['ci_high'], 2)}{f"; the cluster-robust p-value is {pval(et['A']['p'])} and the wild cluster bootstrap p-value is {pval(et['A']['p_wild'])}" if et else ""}. The prespecified standardized test gives t = {p['stat']:.2f} (p = {pval(p['p'])}). {h2_sentence}</p>
+<p>{rival_econ}</p>
+{_ttable(num, "Confirmatory test of H2: listed competitors, CAR " + t("primary"), ["Quantity", "Value"], inf_rows, "Minimum detectable effect: two-sided 5% test, from the cluster-robust standard error implied by the interval.", key="inf")}
+<p>{precision}</p>
+<h3>6.3 Sample concentration, repeated firm exposure, and external validity</h3>
+<p>The competitor sample is concentrated. {concentration}The same shares appear in many events, so the {f['n_clusters']} clusters are not {f['n_clusters']} independent draws from the launch industry. Grouping by event handles competitors that react on the same day, but a firm-specific shock that lasts for months, such as a change in how investors value one firm, links that firm's reactions across events. Grouping by firm would address this, but with {f['n_rival_firms']} firms such inference is not reliable.</p>
+{_ttable(num, "Contribution of each firm to the competitor average", ["Firm", "Reactions", "Share of reactions", "Contribution to the mean", "Firm mean"],
+         [[e(c["firm"]), str(c["n"]), f'{c["share"] * 100:.0f}%', f'<span class="num">{pct(c["contribution"], 2)}</span>',
+           f'<span class="num">{pct(next(x["mean"] for x in firms if x["firm"] == c["firm"]), 2)}</span>'] for c in et["contrib"]] if et else [],
+         f"Contribution: the firm's summed CARs divided by all {p['n_firm_events']} reactions; contributions add up to the equal-weighted mean ({pct(p['mean_car'], 2)}).", key="contrib") if et else ""}
+<p>{offset}{weights_sentence}</p>
+{_ttable(num, "The competitor average under alternative weightings", ["Weighting (estimand)", "Estimate", "Note"], wt_rows, "Sensitivity analysis added after the audit; the prespecified estimate is the first row.", key="wt") if wt_rows else ""}
+{_figure(num, "weights", "The competitor average under alternative weightings", fig_weights([("Every reaction equal (prespecified)", w.get("observation_weighted"), "primary"), ("Every independent event equal", w.get("event_weighted"), ""), ("Inverse prediction-error SD", w.get("precision_weighted"), ""), ("Every firm equal", w.get("firm_balanced"), ""), ("Median reaction", w.get("median"), "")]) if w else "", f"CAR {t('primary')}, market model, simple returns; {p['n_firm_events']} reactions, {f['n_clusters']} events, {f['n_rival_firms']} firms. Shaded: the prespecified estimand.")}
+<p>{firm_view}Leaving one firm out at a time (check R8, {sec(7, False)}) is the more informative check of how much the result depends on a single firm. The results describe these listed firms, not private, state-owned or diversified aerospace companies, and they cannot be extended to the launch industry as a whole.</p></section>
+
+<section id="s7"><h2>7. Robustness and sensitivity</h2>
+<p>A robustness check repeats the analysis with a different but reasonable choice, to see whether the conclusion depends on that choice. {"None of the" if f["n_robust_sig"] == 0 else str(f["n_robust_sig"]) + " of the"} {len(robust)} prespecified checks {"finds" if f["n_robust_sig"] == 0 else "find"} a significant average at the 5% level ({X("fig", "forest")} and {X("tab", "rob")}). The conclusion that no effect is detectable is therefore stable. The size of the estimate is not: across the checks the average ranges from {pct(rob_lo, 2)} ({e(_plain_name(f['rob_min_name']))}) to {pct(rob_hi, 2)} ({e(_plain_name(f['rob_max_name']))}).{" Leaving out one firm changes the sign of the average." if r8_flip else ""}</p>
+{_figure(num, "forest", "Listed competitors: main test and prespecified checks", fig_forest(forest), f"Dots: average CAR {t('primary')} (except the wider-window check); lines: 95% cluster-robust intervals; tests without an interval are omitted. Full sample: {p['n_firm_events']} reactions, {f['n_clusters']} events. Shaded: the confirmatory estimate.")}
+{_ttable(num, "Prespecified robustness checks", ["Check", "Average", "95% interval", "p", "Reactions", "Clusters"], rob_rows, key="rob")}
+<p>The placebo test (R9) repeats the calculation on {pl.get("draws")} sets of randomly chosen ordinary trading days. If the real result were unusual, it would sit far in the tails of these placebo averages. It sits at the {ordinal(pl["actual_percentile"])} percentile, with a two-sided share of {pl["two_sided_share"]:.3f}, meaning that about {pl["two_sided_share"] * 100:.0f}% of random sets give an average at least as far from zero ({X("fig", "placebo")}). Because R9 draws a separate date for each reaction, it ignores that competitors hit by one failure move on the same day, so its spread is too narrow. It is a benchmark, not an exact test, and the percentile is not the probability that the effect is real.{placebo_b}</p>
+{_figure(num, "placebo", "Real result against random ordinary days (R9)", fig_placebo(pl), f"Average CAR {t('primary')} over {p['n_firm_events']} reactions on random non-event days, {pl.get('draws')} draws (fixed seed), one random day per reaction. Red: averages at least as far out as the real result. Black line: the real failures. A benchmark, not an exact permutation test.")}
+</section>
+
+<section id="s8"><h2>8. Confounding corporate announcements and sensitivity of the competitor estimate</h2>
+<p>An event study gives the event credit for every unusual return in the window. If a firm announces something else on the same days, such as a new contract or quarterly results, its reaction mixes the two pieces of news. This problem is called confounding, and the event-study model cannot fix it by itself {C.p("mackinlay1997")}. The news around the largest competitor reactions was therefore checked against public sources. {flag_intro}Flagged reactions stay in the confirmatory test, because the rules fixed in advance do not allow events to be removed after the results are seen.</p>
+{_ttable(num, "Competitor reactions with other news in the window", ["Firm", "Failure", "CAR", "Verdict", "News"], flag_rows, key="flag") if flag_rows else ""}
+<p>The exploratory specifications in {X("tab", "conf")} and {X("fig", "conf")} drop the flagged reactions. {e1_sentence} These exploratory estimates are not more correct than the prespecified one, because the choice of what to drop was made after seeing the data.</p>
+{_ttable(num, "Confounding-news sensitivity (exploratory)", ["Specification", "Average", "95% interval", "p", "Median", "Reactions", "Clusters"], conf_rows, key="conf")}
+{_figure(num, "conf", "Confounding-news sensitivity", fig_forest(conf_forest), f"Average CAR {t('primary')} with 95% cluster-robust intervals. Shaded: the prespecified estimate ({p['n_firm_events']} reactions). Hollow: exploratory specifications, chosen after results, that drop reactions with other news.")}
+</section>
+
+<section id="s9"><h2>9. Discussion</h2>
+<p>The evidence supports two statements. First, {"listed makers lose a large share of their value when their rocket fails" if all_fell else "the reactions of listed makers vary"}, in a small set of cases. Second, the average reaction of listed competitors cannot be told apart from zero in this sample. The first finding fits the Challenger evidence, where the market quickly singled out the firm responsible for the failure {C.p("maloney2003")}. The second differs from the clear average contagion that {C.n("lang1992")} find for bankruptcies, although their finding that competitors can gain in concentrated industries shows that the net effect depends on the industry.</p>
+<p>Several explanations are consistent with a small net reaction of competitors, and the data cannot separate them. Contagion and competitive gains may both be present and cancel each other out, as the two channels in {sec(1, False)} suggest. Customers may be unable to switch providers quickly, because rockets and satellites need long preparation and the choice of providers is limited {C.p("dillow2015")}, which would weaken the competitive effect in the short run. Or investors may treat a failure mainly as news about the failed firm and its rocket rather than about the industry. A short-lived market-wide mood effect of the kind found after air crashes {C.p("kaplanski2010")} would be removed by the market model, because it moves the benchmark index as well. Separating these explanations would need customer-level data on contracts that moved between providers, launch backlogs, or a much larger sample of listed competitors.</p>
+<p>For investors, the results suggest that, in this sample, a launch failure is mainly a risk for the firm whose rocket failed rather than for the listed industry as a whole. The evidence is too weak, however, to treat competitors' shares as unaffected, and the conclusion may change as more launch firms list and the number of independent events grows.</p></section>
+
+<section id="s10"><h2>10. Limitations</h2>
+{limitations}</section>
+
+<section id="s11"><h2>11. Conclusion</h2>
+<p>{"When an orbital rocket fails, its listed maker loses a large share of its value within two days in every case observed." if all_fell else "The reactions of listed makers vary across the few listed cases."} For listed competitors, the average two-day reaction is {pct(p['mean_car'], 2)}, with an interval from {pct(p['ci_low'], 2)} to {pct(p['ci_high'], 2)}. The data do not establish contagion or competitive gains, and they do not rule out either at magnitudes of a few percent.</p>
+<p>The study is useful as a transparent and reproducible starting point. Every number can be recomputed from the published data ({apx("D")}), and the rules were fixed before the results ({apx("G")}). Adding more listed firms, including firms that have since delisted, and adding SpaceX as its price history grows, would sharpen the answer without changing the prespecified test.</p></section>
+
+<section class="refs-sec newpage" id="refs"><h2>References</h2><div class="refs">REFLIST</div></section>
+
+<div class="appendices newpage" id="apx">
+<section id="apx-a"><h2>Appendix A. Competitor event list</h2>
+<p>{X("tab", "events")} lists every competitor reaction in the confirmatory test, in date order, with the model used, the source of the disclosure time, any news flag, the two-day CAR and its standard deviation.</p>
+{_ttable(num, "All competitor reactions, CAR " + t("primary"), ["Failure", "Rocket", "T0", "Ticker", "Cluster", "Model", "Timing", "Flag", "CAR", "SD"], ev_rows, "Model: MM market model, MA market-adjusted fallback. SD: prediction-error standard deviation of the CAR.", "small", key="events")}
+</section>
+<section id="apx-b"><h2>Appendix B. Firm mapping and competitor criteria</h2>
+<p>Competitors are classified point in time from two hand-built files. The firm map (<code>data/manual/firm_map.csv</code>) records, for each firm and period, the listing dates, the ownership of each rocket, how important launch is to the firm, and the source of each fact. The size-and-market table (<code>data/manual/vehicle_segments.csv</code>) records the size class and customer market of each rocket. A Tier 1 competitor must be listed, have launch as a pure-play or major business, sell a rocket of the same size class to the same customer market as the failed rocket, and have flown that rocket in the previous 730 days. Tier 2 competitors are added case by case in <code>data/manual/rival_overrides.csv</code>, each with a source. Diversified aerospace groups are classified as having minor exposure to launch and enter only descriptive tiers, not the test.</p></section>
+<section id="apx-c"><h2>Appendix C. Additional exploratory results</h2>
+{(f'<p>{X("tab", "expl")} reports comparisons designed after the results were seen. Their p-values are adjusted with the Holm method, which raises each p-value to allow for the fact that several comparisons were made at once.</p>' + _ttable(num, "Exploratory comparisons (Holm-adjusted p-values)", ["Comparison", "Estimate", "p", "p (Holm)"], expl_rows, key="expl")) if expl_rows else "<p>There are no additional exploratory results.</p>"}
+</section>
+<section id="apx-d"><h2>Appendix D. Statistical verification</h2>
+<p>{verify_txt} The CARs themselves need licensed prices and are reproduced by running the pipeline again.</p></section>
+<section id="apx-e"><h2>Appendix E. Exclusions</h2>
+<p>Most failures do not enter the study because neither the maker nor any competitor was a listed launch firm at the time. {"The reasons are counted below." if why_rows or drop_rows else ""}</p>
+{_ttable(num, "Failures not in the study, by reason", ["Reason", "Failures"], why_rows, "A failure can have more than one reason, so the counts can add up to more than the number of excluded failures.", key="why") if why_rows else ""}
+{_ttable(num, "Firm-events dropped at the price-coverage step", ["Reason", "Firm-events"], drop_rows, key="drop") if drop_rows else ""}
+</section>
+<section id="apx-f"><h2>Appendix F. Reproduction guide</h2>
+<p>The full analysis can be reproduced with Python 3.11 or later. After installing the required packages with <code>pip install -r requirements.txt</code>, the script <code>pipeline/01_ingest_launches.py</code> downloads GCAT and classifies the launches, and <code>02_map_firms.py</code> applies the firm map. The script <code>03_pull_prices.py</code> downloads prices from Yahoo Finance, which are not redistributed, and <code>04_check_coverage.py</code> writes the feasibility check. The script <code>05_event_study.py</code> runs the prespecified analysis, and <code>06</code> and <code>09</code> run the exploratory checks. Finally, <code>07_export_site_data.py</code> exports the derived statistics, <code>08_build_html.py</code> builds the website and this paper, <code>python audit/verify_published.py</code> checks every published statistic again, and <code>python -m pytest tests</code> runs the test suite.</p></section>
+<section id="apx-g"><h2>Appendix G. Freeze record</h2>
+<p>The rules of the study (hypothesis, test, windows, sample criteria and checks) were committed to the public repository before the first results were computed. {(X("tab", "freeze") + " lists the commits.") if freeze_rows else "The repository history records the commits."}{commit_txt} Exploratory analyses added later (E1 to E3, R9b and the audit diagnostics) are labelled wherever they appear.</p>
+{_ttable(num, "Commit record", ["Item", "Commit", "Time (+06:00)"], freeze_rows, key="freeze") if freeze_rows else ""}
+</section>
+</div>
+"""
+    sections = resolve_xrefs(sections, num).replace("REFLIST", C.reference_list())
     body = f"""<a class="skip-link" href="#main">Skip to the paper</a>
 {SC.header("paper", "", bool(pdf_name), meta.get("repo_url"))}
 <header class="paper-head"><div class="wrap ph-in">
@@ -599,7 +1022,7 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
   <dl class="ph-meta screen-only">
     <div><dt>Status</dt><dd>Paper, not peer reviewed</dd></div>
     <div><dt>Version</dt><dd>Analysis rules v{e(str(plan_v))} · results {e(updated)}</dd></div>
-    <div><dt>Sample</dt><dd>{f['n_failures']} failures · {p['n_firm_events']} rival reactions · {f['n_clusters']} independent events</dd></div>
+    <div><dt>Sample</dt><dd>{f['n_failures']} failures · {p['n_firm_events']} competitor reactions · {f['n_clusters']} independent events</dd></div>
     <div><dt>Formats</dt><dd>{f'<a class="btn small" href="{e(pdf_name)}" download>Download PDF</a> ' if pdf_name else ''}<a href="methods.html#replicate">Replication</a></dd></div>
   </dl>
 </div></header>
@@ -607,171 +1030,7 @@ def build(data: dict, meta: dict, root: Path, css: str, pdf_name: str | None) ->
 <aside class="paper-toc screen-only" aria-label="Contents"><nav aria-label="Paper contents"><p class="pt-h">Contents</p><ol>{toc_items}</ol></nav></aside>
 <details class="toc-mobile screen-only"><summary>Contents</summary><nav aria-label="Paper contents"><ol>{toc_items}</ol></nav></details>
 <main id="main" class="article cs">
-<section class="abstract-sec"><h2>Abstract</h2><p>{e(abstract)}</p>
-<p class="keywords"><strong>Keywords:</strong> event study; industry spillovers; contagion; competitive effects; launch failures. <strong>JEL:</strong> G14, L13.</p></section>
-
-<aside class="inshort screen-only"><h2>In short</h2><ul>{"".join(f"<li>{b}</li>" for b in inshort)}</ul></aside>
-
-<section id="s1"><h2>1. Introduction</h2>
-<p>When a rocket fails, the company that built it loses hardware, often a customer's satellite, and usually months of flights while the cause is investigated. Its competitors face a less obvious outcome. Investors may read the failure as a reminder that spaceflight is risky for every provider, which lowers rivals' values (contagion), or they may expect customers to move to providers whose rockets work, which raises them (competitive gain). The two channels push in opposite directions, so the net reaction of rivals is an empirical question.</p>
-<p>This paper measures both reactions with a short-window event study. Launch failures suit the method: they are sudden, public, precisely timed, and unrelated to the rivals' own decisions. The confirmatory hypothesis (H2) is that the average two-day abnormal return of listed rivals is zero. All rules were fixed and committed to the project repository before any abnormal return was computed (Appendix G).</p>
-<p>The answer is limited by the sample. Only {f['n_rival_firms']} listed launch firms qualify as direct rivals at the time of a failure, so the study observes {f['n_clusters']} independent rival events{f", every one of which involves {e(f['top_firm'])}" if top_all else ""}. {"The average reaction is not distinguishable from zero, but the interval is wide enough to contain economically meaningful losses and gains." if not detect else "The average reaction is distinguishable from zero."} The contribution is therefore a carefully documented, reproducible estimate with its uncertainty stated in full, rather than a general claim about the launch industry.</p>
-<p>Section 2 describes the industry; section 3 relates the study to earlier work; sections 4 and 5 describe data and methods; sections 6 to 8 report results, robustness and confounding news; sections 9 to 11 discuss, list limitations and conclude.</p></section>
-
-<section id="s2"><h2>2. Institutional background</h2>
-<p><strong>A concentrated market.</strong> Orbital launch is supplied by a small number of providers, many of them state agencies, state-owned firms or privately held companies. Launch contracts are usually signed years ahead, and a satellite is designed for a particular rocket, so customers cannot switch providers quickly. This limits how much business a rival can win in the days after a failure.</p>
-<p><strong>Reliability.</strong> New rockets fail more often than mature ones, and a failure normally grounds the vehicle until an investigation is complete. For the maker, the loss includes the hardware, possible penalties or re-flights, delay of other launches and reputation.</p>
-<p><strong>Ownership and listing.</strong> Few launch companies have been publicly traded with launch as a major business. Large aerospace groups that build rockets are diversified, so a launch failure is a small part of their value; the study therefore counts them only when launch is a major part of the business. The listed pure-play or launch-heavy firms in the sample listed only in the last decade, so the sample of listed rival events starts late. SpaceX listed in June 2026 and has too little price history to enter.</p>
-<p><strong>Disclosure.</strong> Most launches are broadcast live, so a failure becomes public at launch time. Where a failure is confirmed later, the first public company statement dates the event.</p></section>
-
-<section id="s3"><h2>3. Related literature</h2>
-<p><strong>Event-study method.</strong> The design follows MacKinlay (1997) and Brown and Warner (1985) for daily returns. The standardized test of Boehmer, Musumeci and Poulsen (1991) allows the event to raise return variance, and Kolari and Pynnönen (2010) show that cross-sectional correlation among event-day abnormal returns biases standard tests, and propose the adjustment used here. Corrado (1989) supplies a rank-based alternative.</p>
-<p><strong>Contagion and competitive effects.</strong> Lang and Stulz (1992) find that bankruptcy announcements lower the value of a portfolio of competitors by about 1% on average, so contagion dominates in that setting. Bosch, Eckard and Singal (1998) study rival airlines after air crashes, testing whether customers switch carriers or fly less.</p>
-<p><strong>Disasters and investor sentiment.</strong> Kaplanski and Levy (2010) report market-wide losses after aviation disasters that reverse within days, consistent with sentiment rather than fundamentals. For spaceflight, Blose et al. (1996) and Maloney and Mulherin (2003) study the Challenger disaster: NASA contractors fell together on the day, and within days the market singled out the firm whose component failed.</p>
-<p><strong>Launch markets.</strong> Abramov and Kiang (2015) study how launch delays and failures affect satellite operators, the launch customers. Do et al. (2023) show that US satellite launch days draw investor attention away from firm-specific news. This paper studies a different group, the failed provider's listed competitors, over a multi-year sample.</p></section>
-
-<section id="s4"><h2>4. Data and sample construction</h2>
-<p><strong>Launch records.</strong> Every orbital launch attempt comes from GCAT (McDowell). A launch is a failure when its GCAT success score is below 0.75; pad explosions before launch are kept separately. Launch times come from GCAT's launch date field; where the company confirmed a failure later, the documented disclosure time is used and its confidence is recorded.</p>
-<p><strong>Firms.</strong> Each failure is linked by hand, point in time, to its maker if listed and to listed rivals. A Tier 1 rival is listed, has launch as a pure-play or major business, sells a rocket of the same size class to the same customer market, and has flown that rocket in the previous 730 days. Firm-map rows used in tests are verified against filings or exchange notices.</p>
-<p><strong>Prices.</strong> Daily adjusted closes from Yahoo Finance, used locally only; benchmarks are each firm's home market index. Prices from before a firm's real listing (a pre-merger shell) are dropped. Only derived statistics are published.</p>
-<p><strong>Event dates and clusters.</strong> Day 0 (T0) is the first trading session at or after the failure became public, on the stock's own exchange calendar. Failures less than {st.get("cluster_gap", 5)} trading days apart that share a firm form one cluster.</p>
-{_figure(num, "sample", "Sample construction", fig_sample(nodes, edges), f"Each box gives a count and its unit, and the unit changes along the way. Failures: GCAT success score below 0.75. In the study: the failure has a listed maker or a listed Tier 1-2 rival (one failure has both). Rival reactions: one per listed rival per failure. Independent events: failures that share a firm within {st.get('cluster_gap', 5)} trading days are grouped. Source: GCAT (J. McDowell) and the project pipeline.")}
-<h3>Event timing verification</h3>
-<p>Day 0 depends on when a failure became public relative to the exchange close. For each event the disclosure time is either a sourced company statement (with high or low confidence) or GCAT's recorded launch time. GCAT times are used only where day 0 would not change if the true disclosure came 10 minutes earlier or up to 180 minutes later; events failing that check need a sourced time. {pct(prov_share, 0, False)} of rival reactions ({tm['rival_reactions']['counts'].get('provisional', 0)} of {tm['rival_reactions']['n']}) and {tm['maker_cases']['counts'].get('provisional', 0)} of {tm['maker_cases']['n']} maker cases rely on GCAT launch times that were not separately verified against a company statement; {tm['rival_reactions']['counts'].get('low', 0)} rival reaction{"s" if tm['rival_reactions']['counts'].get('low', 0) != 1 else ""} rely on a low-confidence sourced time (covered by checks R5a and R5b).</p>
-{_ttable(num, "Disclosure-time sources", ["Source of the disclosure time", "Rival reactions", "Rival failures", "Maker cases"],
-         [[lab, str(tm["rival_reactions"]["counts"].get(k, 0)), str(tm["rival_failures"]["counts"].get(k, 0)), str(tm["maker_cases"]["counts"].get(k, 0))]
-          for k, lab in (("high", "Company statement, high confidence"), ("low", "Company statement, low confidence"), ("provisional", "GCAT launch time (not separately verified)"))])}
-{_figure(num, "timing", "Event timing verification", fig_timing(tm), f"Share of events by disclosure-time source. Rival reactions: n = {tm['rival_reactions']['n']}; maker cases: n = {tm['maker_cases']['n']}. Source: data/manual/disclosure_times.csv and GCAT.")}
-{_figure(num, "years", "Orbital launch failures per year", fig_years(fails), f"Outline: all orbital launch failures, {e(span)}. Filled: failures that enter the study.")}
-{_ttable(num, "Rival reactions by firm, CAR " + t("primary"), ["Firm", "Ticker", "Reactions", "Clusters", "Mean", "Median", "Range"], desc_rows, f"Clusters: independent events in which the firm appears; {f['n_clusters']} in total.")}
-{_figure(num, "exposure", "Which rival is present in each independent event", fig_exposure(firm_names, exp_rows), "Columns: independent events in date order. Filled: the firm is a rival in that event; a number means it appears more than once (two close failures).")}
-</section>
-
-<section id="s5"><h2>5. Empirical methodology</h2>
-<p>For each stock and failure a market model is estimated by ordinary least squares on trading days {-est[0]} to {-est[1]} before day 0 (at least {st.get("min_obs", 100)} returns; with 30 to 99 returns a market-adjusted model with α = 0 and β = 1 is used and flagged):</p>
-{eqs[0]}
-<p>Abnormal returns and cumulative abnormal returns over an event window [τ<sub>1</sub>, τ<sub>2</sub>] are</p>
-{eqs[1]}
-<p>Returns are simple, and CARs are sums of simple abnormal returns. The variance of each CAR includes the prediction error of the estimated model (Campbell, Lo and MacKinlay, 1997), where <i>L</i> is the window length, <i>T</i> the number of estimation days, <i>W</i> the event window and <i>E</i> the estimation window:</p>
-{eqs[2]}
-<p>The confirmatory test is the standardized test of Boehmer, Musumeci and Poulsen (1991), which uses the cross-sectional spread of standardized CARs and so allows the failure to raise variance:</p>
-{eqs[3]}
-<p>Because one failure can hit several rivals, the statistic is adjusted as in Kolari and Pynnönen (2010). Correlation is non-zero only within a cluster <i>c</i>; for a pair it is the correlation of estimation-window residuals, scaled by the share of event-window days ℓ<sub><i>ij</i></sub> the two windows have in common. p-values use a t distribution with <i>G</i> − 1 degrees of freedom, where <i>G</i> is the number of independent clusters:</p>
-{eqs[4]}
-{eqs[5]}
-<h3>5.1 Estimands</h3>
-<p>Let <i>i</i> = 1, …, <i>N</i> index rival reactions (one per listed rival per failure), <i>g</i> = 1, …, <i>G</i> independent events, and <i>k</i> = 1, …, <i>K</i> firms, with <i>N</i><sub><i>g</i></sub> and <i>N</i><sub><i>k</i></sub> reactions in event <i>g</i> and firm <i>k</i>, and <i>s</i><sub><i>i</i></sub> = √Var(<i>CAR</i><sub><i>i</i></sub>). Four averages answer different questions:</p>
-{_eq(num, "<i>θ</i><sub>obs</sub> = (1/<i>N</i>) Σ<sub><i>i</i></sub> <i>CAR</i><sub><i>i</i></sub>, &nbsp; <i>θ</i><sub>event</sub> = (1/<i>G</i>) Σ<sub><i>g</i></sub> (1/<i>N</i><sub><i>g</i></sub>) Σ<sub><i>i</i>∈<i>g</i></sub> <i>CAR</i><sub><i>i</i></sub>, &nbsp; <i>θ</i><sub>prec</sub> = Σ<sub><i>i</i></sub> <i>CAR</i><sub><i>i</i></sub>/<i>s</i><sub><i>i</i></sub> / Σ<sub><i>i</i></sub> 1/<i>s</i><sub><i>i</i></sub>, &nbsp; <i>θ</i><sub>firm</sub> = (1/<i>K</i>) Σ<sub><i>k</i></sub> (1/<i>N</i><sub><i>k</i></sub>) Σ<sub><i>i</i>∈<i>k</i></sub> <i>CAR</i><sub><i>i</i></sub>",
-     r"\theta_{obs} = \frac{1}{N}\sum_i CAR_i,\quad \theta_{event} = \frac{1}{G}\sum_g \frac{1}{N_g}\sum_{i\in g} CAR_i,\quad \theta_{prec} = \frac{\sum_i CAR_i/s_i}{\sum_i 1/s_i},\quad \theta_{firm} = \frac{1}{K}\sum_k \frac{1}{N_k}\sum_{i\in k} CAR_i")}
-<p><i>θ</i><sub>obs</sub> is the average reaction of a listed rival to a failure; <i>θ</i><sub>event</sub> treats every failure cluster equally; <i>θ</i><sub>prec</sub> gives more weight to calm stocks; <i>θ</i><sub>firm</sub> treats every firm equally. The confirmatory hypothesis H2 is stated for <i>θ</i><sub>obs</sub> (the published estimate and its cluster-robust interval, equation (6)). The prespecified test statistic is the standardized BMP-KP test, whose null is a zero mean standardized CAR; it coincides with <i>θ</i><sub>obs</sub> = 0 only when volatilities are similar, and is closest in spirit to <i>θ</i><sub>prec</sub>. Both tests are reported, each next to the estimand it matches. None of the weightings is preferred on statistical grounds; <i>θ</i><sub>obs</sub> stays primary because it was fixed in advance.</p>
-{_ttable(num, "Event windows", ["Window", "Days", "Role"], [["Main", t("primary"), "Confirmatory test (H2)"], ["Wider", t("robust"), "Robustness check"], ["One month", t("descriptive"), "Description only"]])}
-<p><strong>Prespecified checks.</strong> R1 one average per cluster (t-test and sign test); R2 plain t-test; R3 rank test with simulated p-value; R4 the wider window; R5 timing (drop or shift uncertain disclosure times); R6 drop market-adjusted fallbacks; R7 drop clusters with several failures; R8 leave one firm out; R9 a placebo on random non-event days. <strong>Exploratory analyses</strong>, designed after results were seen, are labelled wherever they appear and never replace H2.</p></section>
-
-<section id="s6"><h2>6. Main results</h2>
-<h3>6.1 The rocket's maker</h3>
-<p>{"In every listed case the maker's shares fell over the two days after the failure became public, after allowing for the market, and each 95% interval excludes zero." if all_fell and all(c["car_primary_ci"][1] < 0 for c in cases) else "The listed cases are reported individually below."} With {f['n_cases']} cases from {n_case_firms} firm{"s" if n_case_firms != 1 else ""}, these are case studies, not an estimate of an average effect.</p>
-{_ttable(num, "The rocket's maker: two-day abnormal returns", ["Rocket", "Failure", "Listed maker", f"CAR {t('primary')}", "95% interval", f"CAR {t('robust')}"], case_rows, "Intervals: CAR ± 1.96 × prediction-error standard deviation.")}
-{_figure(num, "paths", "The rocket's maker: cumulative abnormal return", fig_paths(cases), f"Cumulative abnormal return from T−5 to T+20, set to zero at the close before the failure (T−1), so the value at T+1 is the two-day result in the table. {f['n_cases']} cases, market model, simple returns, home-market index. Source: project pipeline (prices from Yahoo Finance, not published).")}
-<h3>6.2 Listed competitors</h3>
-<p>Table {num.tab + 1} reports the confirmatory test. The equal-weighted average two-day abnormal return of listed rivals is <strong>{pct(p['mean_car'], 2)}</strong> (95% interval {_ci(p['ci_low'], p['ci_high'])}{f"; cluster-robust p = {pval(et['A']['p'])}, wild cluster bootstrap p = {pval(et['A']['p_wild'])}" if et else ""}). The prespecified standardized test gives t = {p['stat']:.2f} (p = {pval(p['p'])}). {"H2 is not rejected at the 5% level under any of these tests." if not detect and (not et or et['A']['p'] >= 0.05) else "See the table for each test."}</p>
-{_ttable(num, "Confirmatory test of H2: listed competitors, CAR " + t("primary"), ["Quantity", "Value"], inf_rows, "Minimum detectable effect: two-sided 5% test, from the cluster-robust standard error implied by the interval.")}
-<p><strong>Precision.</strong> {f"With a cluster-robust standard error of {pct(pw['se'], 2, False)}, an average effect would need to be about {pct(pw['mde80'], 1, False)} to be detected with 80% probability; the probability of detecting a true 1% effect is {pw['power'][0.01]:.2f}. The 90% interval ({_ci(*pw['ci90'])}) would support an equivalence claim only for a margin of about ±{pct(max(abs(pw['ci90'][0]), abs(pw['ci90'][1])), 1, False)}, which is not economically negligible for a two-day return. The data therefore do not show that rivals are unaffected." if pw else ""}</p>
-<h3>6.3 Sample concentration, repeated firm exposure, and external validity</h3>
-<p>The rival sample is concentrated. {f"{e(f['top_firm'])} appears in every one of the {f['n_clusters']} independent events. " if top_all else ""}The same securities appear in many events, so the {f['n_clusters']} clusters are not {f['n_clusters']} independent draws from the launch industry: clustering by event handles rivals that react on the same day, but a firm-specific shock that persists across months (for example a change in how investors value one firm) links that firm's reactions across events. Clustering by firm would address this, but with {f['n_rival_firms']} firms such inference is not reliable.</p>
-{_ttable(num, "Contribution of each firm to the rival average", ["Firm", "Reactions", "Share of reactions", "Contribution to the mean", "Firm mean"],
-         [[e(c["firm"]), str(c["n"]), f'{c["share"] * 100:.0f}%', f'<span class="num">{pct(c["contribution"], 2)}</span>',
-           f'<span class="num">{pct(next(x["mean"] for x in firms if x["firm"] == c["firm"]), 2)}</span>'] for c in et["contrib"]] if et else [],
-         f"Contribution: the firm's summed CARs divided by all {p['n_firm_events']} reactions; contributions add up to the equal-weighted mean ({pct(p['mean_car'], 2)}).") if et else ""}
-<p>{f"The estimate is close to zero partly because offsetting firms cancel: {e(et['contrib'][-1]['firm'])}'s {et['contrib'][-1]['n']} reactions contribute {pct(et['contrib'][-1]['contribution'], 2)} to the mean, against {pct(et['contrib'][0]['contribution'], 2)} from {e(et['contrib'][0]['firm'])}'s {et['contrib'][0]['n']}. " if et and len(et['contrib']) > 1 else ""}Weighting each firm equally gives a different answer, and none of the weightings is statistically preferred (Table {num.tab + 1}, Figure {num.fig + 1}).</p>
-{_ttable(num, "The rival average under alternative weightings", ["Weighting (estimand)", "Estimate", "Note"], wt_rows, "Sensitivity analysis added after the audit; the prespecified estimate is the first row.") if wt_rows else ""}
-{_figure(num, "weights", "The rival average under alternative weightings", fig_weights([("Every reaction equal (prespecified)", w.get("observation_weighted"), "primary"), ("Every independent event equal", w.get("event_weighted"), ""), ("Inverse prediction-error SD", w.get("precision_weighted"), ""), ("Every firm equal", w.get("firm_balanced"), ""), ("Median reaction", w.get("median"), "")]) if w else "", f"CAR {t('primary')}, market model, simple returns; {p['n_firm_events']} reactions, {f['n_clusters']} events, {f['n_rival_firms']} firms. Shaded: the prespecified estimand.")}
-<p>{f"A firm-level view makes the limit concrete: the mean of the {et['firm']['k']} firm means is {pct(et['firm']['mean'], 2)}, with a 95% t interval of {_ci(*et['firm']['ci'], 1)} on {et['firm']['k'] - 1} degrees of freedom. " if et and et['firm']['ci'][0] is not None else ""}Leaving one firm out (R8, section 7) is the more informative check of firm dependence here. The results describe these listed firms, not private, state-owned or diversified aerospace companies, and they cannot be generalized to the launch industry as a whole.</p></section>
-
-<section id="s7"><h2>7. Robustness and sensitivity</h2>
-<p>{"None of the" if f["n_robust_sig"] == 0 else str(f["n_robust_sig"]) + " of the"} {len(robust)} prespecified checks {"detects" if f["n_robust_sig"] == 0 else "detect"} a significant average at the 5% level. Non-rejection is stable; the estimate is not: across checks the average ranges from {pct(rob_lo, 2)} ({e(_plain_name(f['rob_min_name']))}) to {pct(rob_hi, 2)} ({e(_plain_name(f['rob_max_name']))}).{" Leaving one firm out changes the sign." if r8_flip else ""}</p>
-{_figure(num, "forest", "Listed competitors: main test and prespecified checks", fig_forest(forest), f"Dots: average CAR {t('primary')} (except the wider-window check); lines: 95% cluster-robust intervals; tests without an interval are omitted. Full sample: {p['n_firm_events']} reactions, {f['n_clusters']} events. Shaded: the confirmatory estimate.")}
-{_ttable(num, "Prespecified robustness checks", ["Check", "Average", "95% interval", "p", "Reactions", "Clusters"], rob_rows)}
-<p><strong>Placebo.</strong> R9 repeats the calculation on {pl.get("draws")} sets of random ordinary trading days. The real result sits at the {ordinal(pl["actual_percentile"])} percentile (two-sided share {pl["two_sided_share"]:.3f}). Because R9 draws a separate date for each reaction, it ignores that rivals hit by one failure move on the same day, so its spread is too narrow; it is a benchmark, not an exact permutation test, and the percentile is not a probability that the effect is real.{f" An exploratory version with one shared date per cluster (R9b, {r9b['draws']} draws) places the real result at the {ordinal(r9b['actual_percentile'])} percentile (two-sided share {r9b['two_sided_share']:.3f})." if r9b else " A corrected version with one shared date per cluster (R9b) is specified as exploratory and is run by step 09."}</p>
-{_figure(num, "placebo", "Real result against random ordinary days (R9)", fig_placebo(pl), f"Average CAR {t('primary')} over {p['n_firm_events']} reactions on random non-event days, {pl.get('draws')} draws (fixed seed), one random day per reaction. Red: averages at least as far out as the real result. Black line: the real failures. A benchmark, not an exact permutation test.")}
-</section>
-
-<section id="s8"><h2>8. Confounding corporate announcements and sensitivity of the rival estimate</h2>
-<p>An event study attributes every unusual return in the window to the event. If a firm announces something else on the same days, its reaction mixes the two. The news around the largest rival reactions was therefore checked against public sources. Flagged reactions stay in the confirmatory test, because the rules fixed in advance do not allow removing events after results are seen.</p>
-{_ttable(num, "Rival reactions with other news in the window", ["Firm", "Failure", "CAR", "Verdict", "News"], flag_rows) if flag_rows else ""}
-<p>Each flagged announcement was checked for timing against the event window {t('primary')}: the news column gives what was announced and when, with its source. Announcements unrelated to the failure but inside the window mix two pieces of news in one reaction; this is a standard identification problem in event studies, and it cannot be fixed by the event-study model.</p>
-<p>The exploratory specifications below drop the flagged reactions. Dropping the {len(e1.get('dropped') or []) if e1 else 0} contract-news days changes the average from {pct(p['mean_car'], 2)} to {pct(e1['mean_car'], 2) if e1 else 'n/a'}{f", but the median moves only from {pct(w['median'], 2)} to {pct(w_e1['median'], 2)}: the change comes from removing {nw(n_e1)} large {e1_sign + " " if e1_sign else ""}move{"s" if n_e1 != 1 else ""}, not from a shift in the typical reaction" if w and w_e1 else ""}. The standardized test barely moves (p = {pval(e1['p']) if e1 else 'n/a'}), because it gives less weight to the volatile stocks behind those moves. The exploratory estimates are not more correct than the prespecified one: the choice of what to drop was made after seeing the data.</p>
-{_ttable(num, "Confounding-news sensitivity (exploratory)", ["Specification", "Average", "95% interval", "p", "Median", "Reactions", "Clusters"], conf_rows)}
-{_figure(num, "conf", "Confounding-news sensitivity", fig_forest(conf_forest), f"Average CAR {t('primary')} with 95% cluster-robust intervals. Shaded: the prespecified estimate ({p['n_firm_events']} reactions). Hollow: exploratory specifications, chosen after results, that drop reactions with other news. Sources for each flag: Table on announcements above.")}
-</section>
-
-<section id="s9"><h2>9. Discussion</h2>
-<p>The evidence supports two statements. First, {"listed makers lose substantial value when their rocket fails" if all_fell else "maker reactions vary"}, in a small set of cases. Second, the average reaction of listed rivals cannot be distinguished from zero in this sample.</p>
-<p>Several mechanisms are consistent with a small net rival reaction: contagion and competitive gain may both be present and offset each other; customers may be unable to switch quickly because contracts and satellites are tied to particular rockets; or investors may treat failures mainly as news about the failed firm. None of these mechanisms is identified here. Distinguishing them would require customer-level data on contract moves, launch backlogs, or a much larger sample of listed rivals. The results also say nothing about private, state-owned or diversified aerospace firms.</p></section>
-
-<section id="s10"><h2>10. Limitations</h2>
-<ul>
-<li><strong>Few listed firms.</strong> {f['n_rival_firms']} rival firms and {f['n_clusters']} independent events{f"; {e(f['top_firm'])} appears in all of them" if top_all else ""}. Repeated exposure of the same stock means clustering by event captures only part of the dependence, and with {f['n_rival_firms']} firms clustering by firm is not reliable.</li>
-<li><strong>Small maker sample.</strong> {f['n_cases']} cases from {n_case_firms} firm{"s" if n_case_firms != 1 else ""}: case studies, not an average effect.</li>
-<li><strong>Power.</strong> Average effects of about {pct(pw.get('mde80', 0), 1, False)} could go undetected; no equivalence claim is possible.</li>
-<li><strong>Weighting and outliers.</strong> {"The sign of the estimate depends on weighting" if sign_flips else "The estimate is sensitive to weighting"}{f" and on {nw(n_e1)} large reaction{'s' if n_e1 != 1 else ''} with contract news" if n_e1 else ""}.</li>
-<li><strong>Two estimands.</strong> The interval (equal-weighted mean) and the test (standardized mean) concern different quantities and can disagree.</li>
-<li><strong>Timing.</strong> {pct(prov_share, 0, False)} of rival reactions and {tm['maker_cases']['counts'].get('provisional', 0)} of {tm['maker_cases']['n']} maker cases use GCAT launch times not separately verified against a company statement (only where day 0 is insensitive to a −10 to +180 minute error); {nw(n_low)} failure{"s are" if n_low != 1 else " is"} dated by a low-confidence statement (R5 checks). Time-zone or clock errors beyond that band would shift day 0.</li>
-<li><strong>Model dependence.</strong> A one-factor market model with a home index; sector-wide moves on event days are not absorbed{f" ({nw(n_sector)} flagged case{'s' if n_sector != 1 else ''})" if n_sector else ""}.</li>
-<li><strong>Survivorship.</strong> Listed launch firms that later delisted (Orbital Sciences/Orbital ATK, Astra, Virgin Orbit) are missing because the free price source does not carry them.</li>
-<li><strong>External validity.</strong> The population is historically eligible, publicly traded launch-service competitors with comparable commercial exposure, not the launch industry.</li>
-<li><strong>Data quality.</strong> Yahoo adjusted prices and GCAT records are good but not audited sources; price-quality issues are logged in the pipeline.</li>
-<li><strong>Prespecification.</strong> The rules were committed to git before results (Appendix G) but not filed with an independent registry; git timestamps are set by the author.</li>
-</ul></section>
-
-<section id="s11"><h2>11. Conclusion</h2>
-<p>{"When an orbital rocket fails, its listed maker loses a large share of its value within two days in every case observed." if all_fell else "Maker reactions vary across the few listed cases."} For listed competitors, the average two-day reaction is {pct(p['mean_car'], 2)}, with an interval from {pct(p['ci_low'], 2)} to {pct(p['ci_high'], 2)}. The data do not establish contagion or competitive gains, and they do not rule out either at magnitudes of a few percent. The study is useful as a transparent, reproducible baseline: every number can be recomputed from the published data, and adding more listed firms, including delisted ones and SpaceX as its price history grows, would sharpen the answer without changing the prespecified test.</p></section>
-
-<section class="refs-sec"><h2>References</h2><ol class="refs">
-<li id="r1">Abramov, D. and Kiang, C. (2015). Effect of space launch delays and failures on stock market returns of commercial payload operators. International Astronautical Congress, IAC-15,E6,1,1,x29453.</li>
-<li id="r2">Blose, L. E., Bornkamp, R., Brier, M., Brown, K. and Frederick, J. (1996). Catastrophic events, contagion, and stock market efficiency: the case of the space shuttle Challenger. <em>Review of Financial Economics</em> 5(2), 117-129.</li>
-<li id="r3">Boehmer, E., Musumeci, J. and Poulsen, A. B. (1991). Event-study methodology under conditions of event-induced variance. <em>Journal of Financial Economics</em> 30(2), 253-272.</li>
-<li id="r4">Bosch, J.-C., Eckard, E. W. and Singal, V. (1998). The competitive impact of air crashes: stock market evidence. <em>Journal of Law and Economics</em> 41(2), 503-519.</li>
-<li id="r5">Brown, S. J. and Warner, J. B. (1985). Using daily stock returns: the case of event studies. <em>Journal of Financial Economics</em> 14(1), 3-31.</li>
-<li id="r6">Campbell, J. Y., Lo, A. W. and MacKinlay, A. C. (1997). <em>The Econometrics of Financial Markets</em>. Princeton University Press.</li>
-<li id="r7">Corrado, C. J. (1989). A nonparametric test for abnormal security-price performance in event studies. <em>Journal of Financial Economics</em> 23(2), 385-395.</li>
-<li id="r8">Do, H. X., Nguyen, N. H., Nguyen, Q. M. P. and Truong, C. (2023). Aerospace competition, investor attention, and stock return comovement. <em>Journal of Economic Behavior &amp; Organization</em> 215, 40-59.</li>
-<li id="r9">Kaplanski, G. and Levy, H. (2010). Sentiment and stock prices: the case of aviation disasters. <em>Journal of Financial Economics</em> 95(2), 174-201.</li>
-<li id="r10">Kolari, J. W. and Pynnönen, S. (2010). Event study testing with cross-sectional correlation of abnormal returns. <em>Review of Financial Studies</em> 23(11), 3996-4025.</li>
-<li id="r11">Lang, L. H. P. and Stulz, R. M. (1992). Contagion and competitive intra-industry effects of bankruptcy announcements. <em>Journal of Financial Economics</em> 32(1), 45-60.</li>
-<li id="r12">MacKinlay, A. C. (1997). Event studies in economics and finance. <em>Journal of Economic Literature</em> 35(1), 13-39.</li>
-<li id="r13">Maloney, M. T. and Mulherin, J. H. (2003). The complexity of price discovery in an efficient market: the stock market reaction to the Challenger crash. <em>Journal of Corporate Finance</em> 9(4), 453-479.</li>
-<li id="r14">McDowell, J. C. GCAT: General Catalog of Artificial Space Objects. planet4589.org/space/gcat.</li>
-</ol></section>
-
-<section id="apx"><h2>Appendix A. Rival event list</h2>
-{_ttable(num, "All rival reactions, CAR " + t("primary"), ["Failure", "Rocket", "T0", "Ticker", "Cluster", "Model", "Timing", "Flag", "CAR", "SD"], ev_rows, "Model: MM market model, MA market-adjusted fallback. SD: prediction-error standard deviation of the CAR.", "small")}
-</section>
-<section><h2>Appendix B. Firm mapping and rival criteria</h2>
-<p>Rivals are classified point in time from the hand-built firm map (<code>data/manual/firm_map.csv</code>) and the size-and-market table (<code>data/manual/vehicle_segments.csv</code>): listing dates, ownership, exposure and sources are recorded per row. Tier 1 requires the same size class and customer market, launch as a pure-play or major business, and a flight in the prior 730 days. Diversified aerospace groups are classified as minor exposure and enter only descriptive tiers.</p></section>
-<section><h2>Appendix C. Additional exploratory results</h2>
-{_ttable(num, "Exploratory comparisons (Holm-adjusted p-values)", ["Comparison", "Estimate", "p", "p (Holm)"], expl_rows) if expl_rows else "<p>None.</p>"}
-</section>
-<section><h2>Appendix D. Statistical verification</h2>
-<p>{f"An independent script (<code>audit/verify_published.py</code>) recomputes the published statistics from the published derived data without importing the pipeline; {verif[0]} of {verif[1]} quantities reproduce within tolerance (1e-9 for estimates and intervals, 1e-8 for t and p)." if verif else "An independent script (<code>audit/verify_published.py</code>) recomputes every published statistic from the published derived data without importing the pipeline."} The CARs themselves need licensed prices and are reproduced by re-running the pipeline.</p></section>
-<section><h2>Appendix E. Exclusions</h2>
-{_ttable(num, "Failures not in the study, by reason", ["Reason", "Failures"], why_rows, "A failure can have more than one reason, so the counts can add up to more than the number of excluded failures.") if why_rows else ""}
-{_ttable(num, "Firm-events dropped at the price-coverage step", ["Reason", "Firm-events"], drop_rows) if drop_rows else ""}
-</section>
-<section><h2>Appendix F. Reproduction guide</h2>
-<ol>
-<li>Install Python 3.11+ and <code>pip install -r requirements.txt</code>.</li>
-<li><code>python pipeline/01_ingest_launches.py</code> downloads GCAT and classifies launches; <code>02_map_firms.py</code> applies the firm map.</li>
-<li><code>03_pull_prices.py</code> downloads prices (Yahoo Finance; not redistributed); <code>04_check_coverage.py</code> writes the feasibility gate.</li>
-<li><code>05_event_study.py</code> runs the prespecified analysis; <code>06</code> and <code>09</code> run the exploratory checks.</li>
-<li><code>07_export_site_data.py</code> exports derived statistics; <code>08_build_html.py</code> builds the site and this paper; <code>python audit/verify_published.py</code> re-checks every statistic.</li>
-<li><code>python -m pytest tests</code> runs the test suite.</li>
-</ol></section>
-
-<section><h2>Appendix G. Freeze record</h2>
-<p>The rules (hypothesis, test, windows, sample criteria, checks) were committed to the public repository before the first results. Commits:</p>
-{_ttable(num, "Commit record", ["Item", "Commit", "Time (+06:00)"], freeze_rows) if freeze_rows else "<p>See the repository history.</p>"}
-<p>{f"The published statistics were exported from commit <code>{e(str(man['git']['commit'])[:7])}</code>" + (" (with uncommitted changes in the working tree)" if man['git'].get('uncommitted_changes') else "") + "." if (man.get('git') or {}).get('commit') else ""} Exploratory analyses added later (E1 to E3, R9b and the audit diagnostics) are labelled wherever they appear.</p></section>
-
+{sections}
 <section class="screen-only"><h2>Plain-language FAQ</h2>
 <dl class="faq">
 <dt>What is an abnormal return?</dt><dd>The part of a stock's move the market cannot explain: the actual return minus what the market model predicted for that day.</dd>

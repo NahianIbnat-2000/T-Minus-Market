@@ -75,6 +75,7 @@ def _find(n, pred):
 class _Conv:
     def __init__(self, figs, base_url=""):
         self.figs, self.fig_i, self.base = figs, 0, base_url.rstrip("/") + "/" if base_url else ""
+        self.anchor = None
 
     def inline(self, n) -> str:
         if isinstance(n, str):
@@ -88,16 +89,21 @@ class _Conv:
             return rf"\emph{{{inner}}}"
         if n.tag == "sup":
             return rf"\textsuperscript{{{inner.strip()}}}"
-        if n.tag == "code":
-            return rf"\texttt{{{inner}}}"
+        if n.tag == "code":                              # long file paths may break after / and _
+            return r"\texttt{" + inner.replace("/", r"/\allowbreak{}").replace(r"\_", r"\_\allowbreak{}") + "}"
         if n.tag == "span" and "num" in n.cls:
             return inner
         if n.tag == "br":
             return r"\\ "
         if n.tag == "a":
             href = n.attrs.get("href") or ""
-            if href.startswith("#") or not href:
+            if href.startswith("#") and len(href) > 1:        # in-text citation, table, figure, section or appendix link
+                return r"\hyperlink{" + href[1:] + "}{" + inner + "}"
+            if not href:
                 return inner
+            text = "".join(k for k in n.kids if isinstance(k, str)).strip()
+            if text == href and re.match(r"https?://", href):  # a printed address (reference list): let it break across lines
+                return r"\url{" + href.replace("%", r"\%").replace("#", r"\#") + "}"
             if not re.match(r"https?://", href):
                 if not self.base:
                     return inner
@@ -112,10 +118,30 @@ class _Conv:
         if "screen-only" in n.cls or n.tag in ("svg", "script", "style", "nav"):
             return ""
         t = n.tag
-        if t == "h2":
-            return rf"\section*{{{self.inline(n).strip()}}}" + "\n"
-        if t == "h3":
-            return rf"\subsection*{{{self.inline(n).strip()}}}" + "\n"
+        anchor = n.attrs.get("id")
+        if t in ("section", "div") and ("newpage" in n.cls or (anchor and "cs-table" not in n.cls)):
+            # sections, the reference list and the appendices: page break where asked, and a link target on the heading
+            pre = "\\clearpage\n" if "newpage" in n.cls else ""
+            heads = [k for k in n.kids if not isinstance(k, str) and k.tag in ("h2", "h3")]
+            if anchor and heads and t == "section" and "abstract-sec" not in n.cls:
+                self.anchor = anchor
+            elif anchor:
+                pre += r"\hypertarget{" + anchor + "}{}"
+            n2 = _Node(n.tag, {k: v for k, v in n.attrs.items() if k != "id"}); n2.kids = n.kids
+            n2.attrs["class"] = " ".join(c for c in n.cls if c != "newpage")
+            return pre + self.block(n2)
+        if t in ("h2", "h3"):
+            tgt = (r"\hypertarget{" + self.anchor + "}{}") if self.anchor else ""
+            self.anchor = None
+            cmd = "section" if t == "h2" else "subsection"
+            return "\\" + cmd + "*{" + tgt + self.inline(n).strip() + "}\n"
+        if t == "div" and "refs" in n.cls:
+            items = [k for k in n.kids if not isinstance(k, str) and k.tag == "p"]
+            out = ""
+            for k in items:                                  # APA: no numbers, hanging indent of 0.5 inch
+                out += ("\\noindent\\hypertarget{" + (k.attrs.get("id") or "") + "}{}\\hangindent=0.5in\\hangafter=1 "
+                        + self.inline(k).strip() + "\\par\n")
+            return "{\\raggedright\\setlength{\\parskip}{8pt}\n" + out + "}\n\n"
         if t == "p":
             txt = self.inline(n).strip()
             if "signoff" in n.cls:
@@ -143,12 +169,14 @@ class _Conv:
         if t == "table":
             return self.table(n, small="small" in n.cls)
         if t == "div" and "eq" in n.cls and n.attrs.get("data-tex"):
-            return "\\begin{equation}\n" + n.attrs["data-tex"] + "\n\\end{equation}\n\n"
+            tgt = (r"\hypertarget{" + n.attrs["id"] + "}{}") if n.attrs.get("id") else ""
+            return tgt + "\\begin{equation}\n" + n.attrs["data-tex"] + "\n\\end{equation}\n\n"
         if t == "div" and "cs-table" in n.cls:
             inner = "".join(self.block(k) for k in n.kids)
+            tgt = (r"\hypertarget{" + n.attrs["id"] + "}{}") if n.attrs.get("id") else ""
             if "xltabular" in inner:                         # long tables may break across pages
-                return inner
-            return "\\par\\noindent\\begin{minipage}{\\textwidth}\n" + inner + "\\end{minipage}\\par\\vspace{4pt}\n\n"
+                return tgt + inner
+            return "\\par\\noindent\\begin{minipage}{\\textwidth}" + tgt + "\n" + inner + "\\end{minipage}\\par\\vspace{4pt}\n\n"
         if t == "p" and "tcap" in n.cls:
             return "\\par\\vspace{6pt}\\noindent{\\small " + self.inline(n).strip() + "}\\par\\nopagebreak\n"
         if t == "section" and "abstract-sec" in n.cls:
@@ -164,12 +192,11 @@ class _Conv:
             f = self.figs.get(n.attrs.get("data-fig")) or self.figs.get(self.fig_i)      # by id, else by number
             if not f:
                 return ""
-            return ("\\begin{figure}[htbp]\\centering\n"
+            tgt = (r"\hypertarget{" + n.attrs["id"] + "}{}") if n.attrs.get("id") else ""
+            return ("\\begin{figure}[htbp]\\centering" + tgt + "\n"
                     f"\\caption*{{\\textbf{{Figure {self.fig_i}.}} {title}}}\n"
                     f"\\includegraphics[width=\\textwidth]{{{f}}}\n"
                     f"\\par\\vspace{{2pt}}{{\\footnotesize {cap}}}\n\\end{{figure}}\n\n")
-        if t == "ol" and "refs" in n.cls:
-            return self.block(_Node("ol", {}))
         return "".join(self.block(k) for k in n.kids)
 
     def table(self, n, small=False) -> str:
@@ -435,10 +462,12 @@ PREAMBLE = r"""\documentclass[12pt,a4paper]{article}
 \usepackage{textcomp}
 \usepackage[margin=2.5cm]{geometry}
 \usepackage{graphicx,booktabs,tabularx,xltabular,enumitem,xcolor,caption,amsmath}
-\usepackage[hidelinks]{hyperref}\urlstyle{same}
+\definecolor{linkblue}{HTML}{1F4E8C}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{}
+\usepackage[colorlinks=true,linkcolor=linkblue,urlcolor=linkblue,citecolor=linkblue]{hyperref}\urlstyle{same}
 \definecolor{boxbg}{HTML}{F3EEE4}
 \captionsetup{labelformat=empty,justification=raggedright,singlelinecheck=false,skip=4pt}
-\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
+\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}\setlength{\emergencystretch}{3em}
 \renewcommand{\arraystretch}{1.25}
 \usepackage{titlesec}
 \titleformat{\section}{\large\bfseries}{}{0pt}{}

@@ -112,3 +112,21 @@ body.paper { background: var(--paper); }
 }
 .paper-toc a[aria-current="location"], .toc-mobile a[aria-current="location"] { border-left-color: var(--bench); color: var(--bench-text); font-weight: 600; }
 .methods-page th[scope="row"] { font-family: var(--font-head); text-transform: none; letter-spacing: 0; color: var(--ink); font-weight: 600; font-size: 0.9rem; }
+
+/* Paper typography: Times New Roman, 12 pt, like the PDF */
+.cs, .cs p, .cs li, .cs dd, .cs h2, .cs h3, .cs td, .cs th, .cs td .num, .cs .tcap, .cs .cs-cap, .cs .cs-figtitle,
+.cs .cs-figtitle span, .cs .keywords, .cs .abstract-sec h2, .cs .eq, .cs .eq-no {
+  font-family: "Times New Roman", Times, "TeX Gyre Termes", "Liberation Serif", serif;
+  font-stretch: normal; letter-spacing: normal; text-transform: none;
+}
+.cs p, .cs li, .cs dd { font-size: 12pt; line-height: 1.6; }
+.cs h2 { font-size: 15pt; } .cs h3 { font-size: 13pt; }
+.cs .abstract-sec h2 { font-size: 13pt; font-weight: 700; }
+.cs .keywords { font-size: 12pt; color: inherit; margin: 0; text-indent: 0; padding: 0; }
+.cs .kw { margin: var(--space-2) 0 var(--space-4); }
+.cs a.cite, .cs a.xref { color: var(--bench-text); text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 2px; }
+.cs a.cite:hover, .cs a.xref:hover { text-decoration-style: solid; }
+.cs [id] { scroll-margin-top: 5.5rem; }
+.cs .refs .ref { padding-left: 0.5in; text-indent: -0.5in; margin: 0 0 0.6em; font-size: 12pt; }
+.cs .ref:target, .cs .cs-table:target, .cs .cs-fig:target { background: var(--paper-deep); outline: 2px solid var(--bench-text); outline-offset: 4px; }
+.cs .refs a { word-break: break-all; }
