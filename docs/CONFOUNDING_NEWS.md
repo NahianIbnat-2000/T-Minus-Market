@@ -59,3 +59,26 @@ exploratory sensitivity analysis (labelled exploratory, because it was designed 
 | Firm | Failure | Day | Date | News | Effect on results |
 | --- | --- | --- | --- | --- | --- |
 | RKLB | Electron, 19 Sep 2023 | -5 | 12 Sep 2023 | Founder filed to sell about $22M of shares; RKLB closed about 12% lower (TipRanks; Seeking Alpha, 12 Sep 2023) | None on [0,+1] or [-1,+3]; the estimation window ends at day -30. Shown as note (a) on the website's provider chart |
+
+## CRSP firms (plan v1.2): news check of all 12 new rival reactions
+
+Done after the CRSP CARs were seen. Every new tier 1 reaction was checked (not only the large ones) for company news
+in the [0,+1] window: earnings releases, contracts, deals, own launches. Flags are in `data/manual/crsp_confounded_events.csv`;
+only verdict `confounded` is dropped in S2, the same rule as E1.
+
+| Event | Firm | Day 0 | CAR [0,+1] | Finding | Verdict |
+| --- | --- | --- | --- | --- | --- |
+| 2005-F03 Rokot | ORB | 2005-10-10 | −3.0% | No company news found in the window | none |
+| 2006-F01 Falcon 1 | ORB | 2006-03-27 | +0.2% | No company news found | none |
+| 2006-F03 Dnepr | ORB | 2006-07-26 | −2.6% | Q2 2006 results were released 20 Jul, before the window | none |
+| 2007-F02 Falcon 1 | ORB | 2007-03-21 | −1.4% | Minotaur launch 20 Mar (routine success); Optus D3 order 29 Mar, after the window | none |
+| 2008-F01 Falcon 1 | ORB | 2008-08-04 | +2.8% | Q2 2008 results were released 17 Jul, before the window | none |
+| 2011-005 Rokot | ORB | 2011-02-01 | −0.4% | Q4 2010 results released 17 Feb, after the window | none |
+| 2014-050 Soyuz-ST-B | ORB | 2014-08-22 | +1.4% | No news in the window; note the ATK merger was pending (announced Apr 2014), so ORB partly traded with ATK | none |
+| 2017-F02 Electron | OA | 2017-05-25 | +0.1% | No company news found | none |
+| 2017-051 PSLV-XL | OA | 2017-08-31 | −0.6% | Window clean; Northrop Grumman takeover announced 18 Sep 2017 (day +11) | descriptive_window_only |
+| 2022-F03 Astra | VORB | 2022-06-13 | −22.9% | Market-wide selloff on day 0 (S&P 500 −3.9%, Nasdaq −4.7%); fallback model with beta 1 | sector_move |
+| 2023-F02 RS1 | VORB | 2023-01-11 | −2.6% | VORB's own LauncherOne failure on 9-10 Jan overlaps the window | confounded |
+| 2023-F04 Terran 1 | VORB | 2023-03-23 | +39.9% | USD 200m rescue-offer news (Matthew Brown), operations paused | confounded |
+
+Searches were done with a web search tool; "no news found" means none was found, not that none existed.

@@ -337,8 +337,9 @@ def report(o):
     L += ["", f"{m['negative']} of {m['n']} negative ({m['firms']} firms); mean {pct(m['mean'])}, median {pct(m['median'])}; "
               f"exact sign test p = {m['sign_test_p']:.4f} (descriptive: cases are few and not independent draws).", "",
           "## Caveats", "",
-          "- S2 is exploratory. The VORB flag (2023-F04) was found after the CRSP CARs were seen, by checking the largest "
-          "new reaction. The same news check has not yet been done for every new reaction, so S2 may be tilted.",
+          "- S2 is exploratory. The flags were set after the CRSP CARs were seen. All 12 new rival reactions were then "
+          "checked for company news with the same rule (docs/CONFOUNDING_NEWS.md); two are dropped as confounded, one positive "
+          "(Terran 1) and one negative (RS1, overlapping VORB's own failure).",
           "- CRSP returns (RET, with delisting returns) and Yahoo adjusted closes are different sources; the S&P 500 "
           "benchmark is the same index in both.",
           "- 2001-U01 ORB (maker case) is flagged possibly confounded: the first week of US trading after 11 Sep 2001.",

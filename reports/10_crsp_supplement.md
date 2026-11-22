@@ -12,15 +12,15 @@ Coverage: 129 of 137 CRSP events have a CAR; 8 dropped (fewer than 30 estimation
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | v1.0 sample (headline, unchanged) | 42 | 22 | 3 | +0.28% | -1.62% to +2.18% | 0.763 | 0.848 | 0.854 | 0.403 |
 | S1: v1.0 + CRSP firms | 54 | 30 | 6 | +0.42% | -1.96% to +2.80% | 0.721 | 0.760 | 0.786 | 0.438 |
-| S2 (exploratory): S1 without events flagged 'confounded' | 51 | 30 | 6 | -1.12% | -2.49% to +0.25% | 0.105 | 0.098 | -0.695 | 0.493 |
+| S2 (exploratory): S1 without events flagged 'confounded' | 50 | 30 | 6 | -1.09% | -2.50% to +0.32% | 0.126 | 0.131 | -0.661 | 0.514 |
 
-Other windows (BMP-KP p): S1 robust 0.189; S1 descriptive 0.503; S2 robust 0.528; S2 descriptive 0.717
+Other windows (BMP-KP p): S1 robust 0.189; S1 descriptive 0.503; S2 robust 0.497; S2 descriptive 0.697
 
 Firm level (S1): 6 firms, mean of firm means +0.11%, 95% CI -3.14% to +3.35%.
 
 Cross-source residual correlation (a CRSP firm and a v1.0 firm in one cluster) is not observable; it is set to 0.149, the mean of observed different-firm pairs with the same day 0. BMP-KP p for S1 with other values: 0.0: 0.430, 0.5: 0.458.
 
-Dropped in S2: 2023-202 RKLB, 2023-F04 VORB, 2024-F04 AVIO.MI.
+Dropped in S2: 2023-202 RKLB, 2023-F02 VORB, 2023-F04 VORB, 2024-F04 AVIO.MI.
 
 ## Robustness of S1
 
@@ -54,7 +54,7 @@ Orbital ATK events with a CAR: 19 (main rule) and 20 (with ATK history).
 
 ## Caveats
 
-- S2 is exploratory. The VORB flag (2023-F04) was found after the CRSP CARs were seen, by checking the largest new reaction. The same news check has not yet been done for every new reaction, so S2 may be tilted.
+- S2 is exploratory. The flags were set after the CRSP CARs were seen. All 12 new rival reactions were then checked for company news with the same rule (docs/CONFOUNDING_NEWS.md); two are dropped as confounded, one positive (Terran 1) and one negative (RS1, overlapping VORB's own failure).
 - CRSP returns (RET, with delisting returns) and Yahoo adjusted closes are different sources; the S&P 500 benchmark is the same index in both.
 - 2001-U01 ORB (maker case) is flagged possibly confounded: the first week of US trading after 11 Sep 2001.
 - 2017-051 OA: the Northrop Grumman takeover (announced 18 Sep 2017, day +11) lies inside the [0,+20] window only. After it, OA traded close to the cash offer, so OA events from late 2017 on (tier 3 and successes, none in H2) carry no information.
