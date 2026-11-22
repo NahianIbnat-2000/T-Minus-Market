@@ -360,122 +360,271 @@ a.read-card:hover, a.read-card:focus-visible { background: var(--paper-deep); ou
 .rc-dl::before, .dl-link::before { content: "\2193  "; }
 .dl-link { align-self: center; margin-left: var(--space-2); }
 
-/* Root article only: light "clear sky" theme, so the article reads differently from the cream archive report.
-   Contrast on --paper #F7F9FC (WCAG 2.2): ink 15.9, muted 7.3, signal-text 5.6, gain 6.4 (all text-safe). */
+/* Root article only: "launch control" theme. White page, signal red, navy ink, monospace countdown details.
+   Contrast on #FFFFFF (WCAG 2.2): ink 17.6, muted 7.6, red-text 6.0, blue 6.7, green 5.9 (all text-safe). */
 body.theme-sky {
-  --paper: #F7F9FC;
-  --paper-deep: #FFFFFF;
-  --ink: #14213D;
-  --muted: #4B5563;
-  --rule: #D8DEE8;
-  --signal: #EA580C;
-  --signal-text: #B3400F;
+  --paper: #FFFFFF;
+  --paper-deep: #F4F6F9;
+  --ink: #0B1324;
+  --muted: #475467;
+  --rule: #E3E7EE;
+  --signal: #E0301E;
+  --signal-text: #B42318;
   --gain: #1D4ED8;
+  --ok: #067647;
   --hairline: 1px solid var(--rule);
-  --inkline: 1.5px solid #C9D2E0;
-  background: var(--paper);
-  color: var(--ink);
+  --inkline: 1px solid #CDD4DF;
+  --font-body: "Source Serif 4", Georgia, serif;
+  background: var(--paper); color: var(--ink);
 }
-.theme-sky .masthead {
-  border-bottom: 1px solid var(--rule);
-  background: linear-gradient(180deg, #DCE8F8 0%, #EEF3FB 60%, #F7F9FC 100%);
-  padding-top: var(--space-6);
-}
-.theme-sky .masthead h1 { max-width: 20ch; letter-spacing: -0.01em; color: #0F1B33; }
-.theme-sky .masthead .kicker { color: var(--signal-text); }
-.theme-sky .masthead::after {             /* launch plume on the horizon */
-  content: ""; display: block; height: 3px; margin-top: var(--space-4);
-  background: linear-gradient(90deg, transparent, var(--signal) 45%, #F59E0B 50%, var(--signal) 55%, transparent);
-}
+.theme-sky .wrap { max-width: 72rem; }
 .theme-sky a { color: var(--gain); }
-.theme-sky .tiles { border-top: 0; border-bottom: 0; gap: var(--space-3); }
-.theme-sky .tile, .theme-sky .tile + .tile {
-  border: 1px solid var(--rule); border-radius: 8px; padding: var(--space-3) !important;
-  background: #FFFFFF; box-shadow: 0 1px 3px rgba(20, 33, 61, 0.06);
+
+/* top status bar */
+.theme-sky .topbar { background: var(--ink); color: #C9D1DE; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.theme-sky .tb { display: flex; justify-content: space-between; gap: var(--space-3); padding: 0.45rem 0; flex-wrap: wrap; }
+.theme-sky .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--signal); margin-right: 0.5rem; vertical-align: 1px; }
+
+/* brand row */
+.theme-sky .brand { border-bottom: 1px solid var(--rule); }
+.theme-sky .brand-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); padding: var(--space-3) 0; flex-wrap: wrap; }
+.theme-sky .logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: var(--ink); }
+.theme-sky .logo-mark { display: grid; place-items: center; width: 2.6rem; height: 2.6rem; background: var(--signal); color: #fff;
+  font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800; font-size: 1.05rem; border-radius: 3px; }
+.theme-sky .logo-text { display: flex; flex-direction: column; line-height: 1.15; }
+.theme-sky .logo-name { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800; font-size: 1.15rem; letter-spacing: 0.01em; text-transform: uppercase; }
+.theme-sky .logo-tag { font-family: var(--font-body); font-style: italic; color: var(--muted); font-size: 0.9rem; }
+.theme-sky .cd-nav { display: flex; gap: 0.25rem; flex-wrap: wrap; }
+.theme-sky .cd-nav a { font-family: var(--font-mono); font-size: 0.78rem; color: var(--ink); text-decoration: none; padding: 0.4rem 0.6rem; border-radius: 3px; }
+.theme-sky .cd-nav a b { font-weight: 500; color: var(--signal-text); margin-right: 0.3rem; }
+.theme-sky .cd-nav a:hover, .theme-sky .cd-nav a:focus-visible { background: var(--paper-deep); }
+
+/* ticker */
+.theme-sky .ticker { display: flex; align-items: stretch; border-bottom: 1px solid var(--rule); background: var(--paper-deep); font-family: var(--font-mono); font-size: 0.8rem; overflow: hidden; }
+.theme-sky .ticker-label { flex: none; background: var(--signal); color: #fff; padding: 0.5rem 0.9rem; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.72rem; display: flex; align-items: center; }
+.theme-sky .ticker-track { overflow: hidden; flex: 1; display: flex; align-items: center; }
+.theme-sky .ticker-run { display: inline-flex; white-space: nowrap; animation: tm-tick 70s linear infinite; }
+.theme-sky .tk { padding: 0 1.4rem; border-right: 1px solid var(--rule); }
+.theme-sky .tk-d { color: var(--muted); }
+.theme-sky .tk-role { font-size: 0.68rem; text-transform: uppercase; color: var(--muted); border: 1px solid var(--rule); padding: 0 0.3rem; border-radius: 2px; }
+.theme-sky .dn { color: var(--signal-text); font-weight: 500; }
+.theme-sky .up { color: var(--ok); font-weight: 500; }
+@keyframes tm-tick { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .theme-sky .ticker-run { animation: none; } }
+
+/* hero */
+.theme-sky .hero { padding: var(--space-6) 0 var(--space-5);
+  background: radial-gradient(60rem 22rem at 85% 0%, #EEF3FB 0%, rgba(255,255,255,0) 70%); }
+.theme-sky .hero-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: var(--space-5); align-items: start; }
+.theme-sky .eyebrow { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--signal-text); margin: 0 0 var(--space-2); }
+.theme-sky .eyebrow::before { content: ""; display: inline-block; width: 1.2rem; height: 2px; background: var(--signal); margin-right: 0.5rem; vertical-align: 0.25em; }
+.theme-sky .hero h1 { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800; font-size: clamp(2.4rem, 1.6rem + 3.4vw, 4.4rem);
+  line-height: 1.02; letter-spacing: -0.02em; margin: 0 0 var(--space-3); max-width: 14ch; }
+.theme-sky .dek { font-size: var(--step-1); line-height: 1.45; max-width: 36ch; margin: 0 0 var(--space-3); }
+.theme-sky .byline { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); }
+.theme-sky .cta { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; margin-top: var(--space-4); }
+.theme-sky .btn { background: var(--ink); color: #fff; border: 1px solid var(--ink); border-radius: 3px; text-transform: uppercase; letter-spacing: 0.04em; padding: 0.7rem 1.1rem; }
+.theme-sky .btn.ghost { background: #fff; color: var(--ink); border-color: #CDD4DF; }
+.theme-sky .dl-link { font-family: var(--font-mono); font-size: 0.8rem; margin-left: var(--space-2); }
+.theme-sky .dl-link::before { content: "\2193  "; }
+
+/* status panel */
+.theme-sky .status { border: 1px solid var(--rule); border-top: 3px solid var(--signal); border-radius: 4px; background: #fff; box-shadow: 0 8px 24px rgba(11, 19, 36, 0.06); }
+.theme-sky .st-head { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding: 0.7rem 1rem; border-bottom: 1px solid var(--rule); }
+.theme-sky .st-head span:first-child { color: var(--signal-text); }
+.theme-sky .status ul { list-style: none; margin: 0; padding: 0 1rem; }
+.theme-sky .status li { display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto; padding: 0.6rem 0; border-bottom: 1px solid var(--rule); }
+.theme-sky .status li:last-child { border-bottom: 0; }
+.theme-sky .st-k { font-family: var(--font-head); font-size: 0.9rem; }
+.theme-sky .st-v { font-family: var(--font-mono); font-size: 1.3rem; grid-row: span 2; align-self: center; }
+.theme-sky .st-n { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); }
+.theme-sky .st-note { font-size: 0.8rem; color: var(--muted); margin: 0; padding: 0.7rem 1rem; border-top: 1px solid var(--rule); background: var(--paper-deep); }
+
+/* sections */
+.theme-sky main section { padding: var(--space-6) 0; margin: 0; }
+.theme-sky .band { background: var(--paper-deep); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.theme-sky h2 { font-family: var(--font-head); font-stretch: var(--head-stretch); font-weight: 800; font-size: var(--step-2); letter-spacing: -0.01em; margin: 0 0 var(--space-4); }
+.theme-sky h3 { font-family: var(--font-head); font-weight: 700; }
+.theme-sky .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); gap: var(--space-5); }
+.theme-sky .lede-text p { font-size: var(--step-0); line-height: 1.6; margin-top: 0; }
+.theme-sky .muted { color: var(--muted); }
+
+/* findings */
+.theme-sky .find-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
+.theme-sky .panel { border: 1px solid var(--rule); border-radius: 6px; padding: var(--space-4); background: #fff; }
+.theme-sky .loss-panel { border-top: 3px solid var(--signal); }
+.theme-sky .panel-kicker { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin: 0; }
+.theme-sky .big { font-family: var(--font-mono); font-size: clamp(2rem, 1.4rem + 2.4vw, 3.2rem); line-height: 1.1; margin: var(--space-2) 0; color: var(--signal-text); letter-spacing: -0.03em; }
+.theme-sky .big.neutral { color: var(--ink); }
+.theme-sky .panel > p { line-height: 1.55; }
+.theme-sky .small { font-size: 0.9rem; color: var(--muted); }
+.theme-sky figure { margin: var(--space-3) 0 0; }
+.theme-sky figcaption { font-size: 0.82rem; color: var(--muted); margin-top: var(--space-2); line-height: 1.45; }
+.theme-sky .chart { width: 100%; height: auto; display: block; }
+.theme-sky .chart .grid { stroke: #EEF1F5; } .theme-sky .chart .zero { stroke: #98A2B3; stroke-width: 1.2; }
+.theme-sky .chart .ax { font-family: var(--font-mono); font-size: 11px; fill: #475467; }
+.theme-sky .chart .lab { font-family: var(--font-mono); font-size: 11px; fill: #0B1324; }
+.theme-sky .chart .win { fill: #FDECEA; }
+.theme-sky .chart .mk { fill: none; stroke: #E0301E; stroke-width: 2; }
+.theme-sky .chart .mkd { fill: #E0301E; }
+.theme-sky .chart .ci { stroke: #0B1324; stroke-width: 2; }
+.theme-sky .chart .pt { fill: #1D4ED8; }
+.theme-sky .chart .mde { fill: #EEF3FB; stroke: #C7D7F2; stroke-dasharray: 3 3; }
+
+/* steps */
+.theme-sky .steps { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); counter-reset: none; }
+.theme-sky .steps li { background: #fff; border: 1px solid var(--rule); border-radius: 6px; padding: var(--space-4); }
+.theme-sky .step-n { font-family: var(--font-mono); font-size: 0.8rem; color: #fff; background: var(--ink); width: 1.8rem; height: 1.8rem; border-radius: 50%; display: inline-grid; place-items: center; }
+.theme-sky .steps h3 { margin: var(--space-2) 0 var(--space-1); font-size: 1.1rem; }
+.theme-sky .steps p { margin: 0; line-height: 1.5; font-size: 0.98rem; }
+
+/* details */
+.theme-sky details.more { margin-top: var(--space-4); border: 1px solid var(--rule); border-radius: 6px; background: #fff; padding: 0 var(--space-4); }
+.theme-sky details.more summary { cursor: pointer; font-family: var(--font-mono); font-size: 0.85rem; padding: var(--space-3) 0; color: var(--ink); }
+.theme-sky details.more summary::marker { color: var(--signal); }
+.theme-sky details.more[open] { padding-bottom: var(--space-3); }
+.theme-sky details.more p, .theme-sky details.more li { line-height: 1.6; }
+.theme-sky details.more figure { background: #fff; }
+
+/* meaning */
+.theme-sky .mean-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); }
+.theme-sky .mean-card { border-left: 3px solid var(--rule); padding: 0 0 0 var(--space-3); }
+.theme-sky .mean-card h3 { margin: 0 0 var(--space-2); font-size: 1.05rem; }
+.theme-sky .mean-card p { margin: 0; line-height: 1.55; }
+.theme-sky .mean-card.ok { border-color: var(--ok); } .theme-sky .mean-card.no { border-color: var(--signal); } .theme-sky .mean-card.why { border-color: var(--gain); }
+
+/* explore */
+.theme-sky .explore-grid { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: var(--space-4); }
+.theme-sky .card { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--rule); border-radius: 6px; padding: var(--space-4); color: var(--ink); text-decoration: none; }
+.theme-sky a.card:hover, .theme-sky a.card:focus-visible { border-color: var(--ink); }
+.theme-sky .card.feature { background: var(--ink); color: #fff; border-color: var(--ink); }
+.theme-sky .card.feature .card-k { color: #FF9B8F; } .theme-sky .card.feature .card-go { color: #fff; }
+.theme-sky .card-k { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--signal-text); }
+.theme-sky .card h3 { font-size: 1.3rem; margin: var(--space-2) 0; }
+.theme-sky .card p { flex: 1; line-height: 1.5; margin: 0 0 var(--space-3); }
+.theme-sky .card-go { font-family: var(--font-mono); font-size: 0.85rem; text-decoration: none; }
+.theme-sky .card-go::after { content: " \2192"; }
+.theme-sky .card-actions { display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: baseline; }
+.theme-sky .evidence { margin-top: var(--space-4); font-size: 0.9rem; color: var(--muted); }
+
+/* footer */
+.theme-sky .site-foot { background: var(--ink); color: #C9D1DE; border-top: 0; padding: var(--space-5) 0; }
+.theme-sky .site-foot h3 { color: #fff; font-size: 0.8rem; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.1em; }
+.theme-sky .site-foot p { font-size: 0.9rem; }
+.theme-sky .site-foot .mono { font-size: 0.8rem !important; }
+.theme-sky .foot-grid { display: grid; grid-template-columns: 1fr 1.4fr 2fr 1fr; gap: var(--space-4); }
+
+@media (max-width: 860px) {
+  .theme-sky .hero-grid, .theme-sky .two, .theme-sky .find-grid, .theme-sky .steps, .theme-sky .mean-grid, .theme-sky .explore-grid, .theme-sky .foot-grid { grid-template-columns: 1fr; }
+  .theme-sky .cd-nav { display: none; }
 }
-.theme-sky .tile-num { font-family: var(--font-mono); font-weight: 500; letter-spacing: -0.02em; }
-.theme-sky .article h2::before { content: "\25B2  "; color: var(--signal); font-size: 0.6em; vertical-align: 0.25em; }
-.theme-sky .btn { background: #14213D; color: #FFFFFF; border-color: #14213D; border-radius: 4px; }
-.theme-sky .btn.ghost { background: #FFFFFF; color: var(--ink); border-color: var(--rule); }
-.theme-sky .read-card { background: #FFFFFF; border: 1px solid var(--rule); border-radius: 8px; color: var(--ink);
-  box-shadow: 0 1px 3px rgba(20, 33, 61, 0.06); }
-.theme-sky a.read-card:hover, .theme-sky a.read-card:focus-visible { background: #EEF3FB; }
-.theme-sky .muted-card { border-style: dashed; box-shadow: none; }
-.theme-sky .article figure { background: #FFFFFF; border: 1px solid var(--rule); border-radius: 8px; padding: var(--space-3); }
-.theme-sky table th, .theme-sky table td { border-color: var(--rule); }
-.theme-sky footer { border-top: 1px solid var(--rule); background: #EEF3FB; }
 
 </style>
 </head>
 <body class="theme-sky">
 <a class="skip-link" href="#main">Skip to the article</a>
-<header class="masthead"><div class="wrap">
-  <div class="kicker"><span>T-Minus Markets</span><span>Research article · Event study</span></div>
-  <h1>When a rocket blows up, who loses money, and does anyone win?</h1>
-  <p class="dek">How stock markets react to orbital launch failures, 2000 to 2026.</p>
-  <p class="byline">Nahian Ibnat · Independent research · Updated Nov 2026</p>
+<div class="topbar"><div class="wrap tb">
+  <span><span class="dot" aria-hidden="true"></span>T-Minus Markets · research log</span>
+  <span>Results Nov 2026 · 138 failures · 42 rival reactions</span>
+</div></div>
+<header class="brand"><div class="wrap brand-row">
+  <a class="logo" href="index.html" aria-label="T-Minus Markets, home"><span class="logo-mark" aria-hidden="true">T&#8722;</span>
+    <span class="logo-text"><span class="logo-name">T-Minus Markets</span><span class="logo-tag">What a failed launch costs on the stock market</span></span></a>
+  <nav class="cd-nav" aria-label="Sections">
+    <a href="#question"><b>T&#8722;4</b> Question</a><a href="#findings"><b>T&#8722;3</b> Findings</a><a href="#method"><b>T&#8722;2</b> Method</a>
+    <a href="#meaning"><b>T&#8722;1</b> Meaning</a><a href="#explore"><b>T&#8722;0</b> Explore</a>
+  </nav>
 </div></header>
-<main id="main" class="wrap article">
-  <section class="tiles" aria-label="Key findings"><div class="tile loss"><div class="tile-num">−8.8% to −16.3%</div><p>two-day abnormal return of the rocket&#x27;s maker: a loss in each of the 4 listed cases</p></div><div class="tile neutral"><div class="tile-num">+0.28%</div><p>average two-day reaction of listed competitors; 95% interval −1.62% to +2.18%; not statistically detectable</p></div><div class="tile neutral"><div class="tile-num">61st</div><p>percentile of the real competitor result among 1000 random sets of ordinary trading days</p></div></section>
-
-  <section class="abstract"><h2>In short</h2><p>When an orbital rocket fails, does the stock market punish only the company that built it, or its listed competitors too? Using 138 orbital launch failures from 2000 to 2026, this study measures abnormal stock returns over the two trading days after each failure became public, with a market model and a prespecified event-study test. In the 4 cases where the rocket&#x27;s maker was listed, its shares fell by between 8.8% and 16.3% after allowing for the market. Across 24 failures with listed competitors (42 stock reactions, 3 firms, 22 independent events), the average reaction was +0.28% (95% interval −1.62% to +2.18%, p = 0.76; the prespecified standardized test gives p = 0.40). The data therefore do not establish either contagion or competitive gains among these firms. They also do not show that the effect is small: average reactions of about 2.7% in either direction could not have been reliably detected. The evidence comes from 3 listed firms, with Avio SpA in every independent event, and the sign of the average changes with how events and firms are weighted.</p>
-    <p class="cta"><a class="btn" href="site/index.html">Open the interactive report</a> <a class="btn ghost" href="case-study.html">Read the working paper</a> <a class="dl-link" href="case-study.pdf" download>Download PDF</a></p></section>
-
-  <section id="a1"><h2>1. The research question</h2>
-  <p>Orbital launch is a small industry with a handful of listed firms, and every launch is a public, all-or-nothing test. A failure destroys hardware and often a customer's satellite, so the rocket's maker should lose value. The open question is the competitors. If investors read a failure as a reminder that spaceflight is risky for everyone, rival launch stocks fall too: <strong>contagion</strong>. If they expect customers to move to a rocket that works, rivals rise: <strong>competitive gain</strong>. The two stories point in opposite directions, and both could operate at once.</p>
-  <p>The same question appears wherever one firm's bad news may spread to similar firms: bank failures, product recalls, sovereign debt crises. Launch failures are useful because they are sudden, public and easy to date.</p></section>
-
-  <section id="a2"><h2>2. What the data include</h2>
-  <p>The numbers below count different things, so they cannot be read as one shrinking funnel:</p>
-  <figure class="cs-fig"><svg viewBox="0 0 720 250" width="100%" role="img" aria-label="Sample construction: launches, failures, rival reactions and independent events, with the unit of each box." font-family="DM Mono, ui-monospace, monospace" font-size="11" fill="#1C1C1C"><title>Sample construction: launches, failures, rival reactions and independent events, with the unit of each box.</title><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1C1C1C"/></marker></defs><path d="M136.0,41.0 L154.0,41.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><path d="M282.0,41.0 L300.0,41.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><path d="M428.0,41.0 L446.0,41.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><path d="M364.0,70.0 L364.0,92.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><path d="M428.0,121.0 L446.0,121.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><path d="M574.0,121.0 L592.0,121.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><path d="M510.0,150.0 L592.0,201.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><rect x="8" y="12" width="128" height="58" fill="#F3EEE4" stroke="#1C1C1C"/><text x="16" y="34" font-size="16" font-weight="700">3,077</text><text x="16" y="49" font-size="9.5">Launch attempts</text><text x="16" y="62" font-size="8.5" fill="#5E574C">unit: launches</text><rect x="154" y="12" width="128" height="58" fill="#F3EEE4" stroke="#1C1C1C"/><text x="162" y="34" font-size="16" font-weight="700">138</text><text x="162" y="49" font-size="9.5">Failures</text><text x="162" y="62" font-size="8.5" fill="#5E574C">unit: launches</text><rect x="300" y="12" width="128" height="58" fill="#F3EEE4" stroke="#1C1C1C"/><text x="308" y="34" font-size="16" font-weight="700">27</text><text x="308" y="49" font-size="9.5">In the study</text><text x="308" y="62" font-size="8.5" fill="#5E574C">unit: failures</text><rect x="446" y="12" width="128" height="58" fill="#EBE4D6" stroke="#1C1C1C"/><text x="454" y="34" font-size="16" font-weight="700">4</text><text x="454" y="49" font-size="9.5">Listed maker</text><text x="454" y="62" font-size="8.5" fill="#5E574C">unit: failures; case studies</text><rect x="300" y="92" width="128" height="58" fill="#F3EEE4" stroke="#1C1C1C"/><text x="308" y="114" font-size="16" font-weight="700">24</text><text x="308" y="129" font-size="9.5">Listed rivals</text><text x="308" y="142" font-size="8.5" fill="#5E574C">unit: failures</text><rect x="446" y="92" width="128" height="58" fill="#F3EEE4" stroke="#1C1C1C"/><text x="454" y="114" font-size="16" font-weight="700">42</text><text x="454" y="129" font-size="9.5">Rival reactions</text><text x="454" y="142" font-size="8.5" fill="#5E574C">unit: firm x failure</text><rect x="592" y="92" width="128" height="58" fill="#EBE4D6" stroke="#1C1C1C"/><text x="600" y="114" font-size="16" font-weight="700">22</text><text x="600" y="129" font-size="9.5">Independent events</text><text x="600" y="142" font-size="8.5" fill="#5E574C">unit: clusters</text><rect x="592" y="172" width="128" height="58" fill="#F3EEE4" stroke="#1C1C1C"/><text x="600" y="194" font-size="16" font-weight="700">3</text><text x="600" y="209" font-size="9.5">Rival firms</text><text x="600" y="222" font-size="8.5" fill="#5E574C">unit: firms</text></svg><figcaption class="cs-cap">Each box gives a count and its unit. Source: GCAT and the project pipeline.</figcaption></figure>
-  <ul class="method">
-    <li><strong>Launch failures (138):</strong> every orbital launch from 2000 to 2026 that GCAT scores below 0.75.</li>
-    <li><strong>Listed-maker cases (4):</strong> failures whose rocket was built by a company listed on a stock exchange at the time.</li>
-    <li><strong>Rival-eligible failures (24):</strong> failures with at least one listed direct competitor (similar rocket size, same customers, launch a major business).</li>
-    <li><strong>Rival reactions (42):</strong> one per listed rival per failure; one failure can produce several.</li>
-    <li><strong>Independent events (22):</strong> failures that share a firm within a few trading days are grouped, because their reactions are not independent.</li>
-    <li><strong>Distinct rival firms (3):</strong> Avio SpA, Firefly Aerospace, Rocket Lab.</li>
-  </ul>
-  <p><strong>Method in brief.</strong> For each stock, a market model fitted on about a year of earlier data predicts the return given its home market index; the <em>abnormal return</em> is the actual return minus that prediction, summed over the two trading days after the failure became public. Only derived statistics are published, never stock prices. The rules were committed to the public repository before results (commit record in the working paper, Appendix G); they were not filed with an independent registry.</p></section>
-
-  <section id="a3"><h2>3. What happened to the rocket's maker?</h2>
-  <p>In every listed case the maker's shares fell over the two days after the failure became public, after allowing for the market. Two-day abnormal returns ranged from −8.8% to −16.3%. With 4 cases from 2 firms, these are case studies, not a general launch-provider effect, and abnormal returns are not exact monetary losses caused by the failure.</p></section>
-
-  <section id="a4"><h2>4. What happened to its competitors?</h2>
-  <p>The average two-day reaction was +0.28% (95% interval −1.62% to +2.18%, p = 0.76), which is not statistically detectable. The prespecified standardized test, which gives less weight to volatile stocks and so asks a slightly different question, also finds nothing detectable (p = 0.40). Each p-value is reported next to the quantity it tests.</p></section>
-
-  <section id="a5"><h2>5. How reliable is the result?</h2>
-  <p>The sample is small and concentrated: 3 firms, and Avio SpA is in every one of the 22 independent events, so the events are not independent draws from the whole industry.</p>
-  <p>With this sample, an average effect smaller than about 2.7% in either direction would usually go undetected (80% power at the 5% level); the chance of detecting a true 1% effect is about 18%. So "not detectable" here does not mean "no effect": the interval contains economically meaningful losses and gains.</p>
-  <p>The result is consistent with several explanations: contagion and competitive gain cancelling out, customers being unable to switch rockets quickly, or investors treating a failure mainly as news about the failed firm. The data cannot tell these apart.</p></section>
-
-  <section id="a6"><h2>6. What changes under robustness checks?</h2>
-  <p><strong>Prespecified checks.</strong> None of the 12 checks fixed in advance detects a significant average at the 5% level, but the estimates range from −0.15% to +1.84%: the lack of a detectable effect is stable, its direction and size are not. The real result sits at the 61st percentile of averages on random ordinary days.</p>
-  <p><strong>Weighting (sensitivity, added after the results).</strong> +0.28% with every reaction equal (the prespecified estimate), +0.21% with every event equal, +0.87% weighting calm stocks more, −1.16% with every firm equal. No weighting is statistically preferred.</p>
-  <p><strong>Exploratory.</strong> An exploratory check added after the results leaves out the 2 days when competitors announced large contracts: the average moves to −0.70% (95% interval −1.80% to +0.39%), while the median moves only from +0.28% to +0.09%, so the average is sensitive to a few large moves. It is exploratory and does not replace the main result.</p></section>
-
-  <section id="a7"><h2>7. What does the evidence establish?</h2>
-  <ul class="method">
-    <li><strong>Shown:</strong> large two-day abnormal losses for the listed maker in each observed case; no detectable average reaction among the 3 listed competitors studied.</li>
-    <li><strong>Not shown:</strong> that competitors systematically lose (contagion) or gain (competition); that the effect is negligible; that customers switch providers; that industry-wide reactions are absent; that the pattern holds for private, state-owned or diversified aerospace firms.</li>
-  </ul></section>
-
-  <section id="a8" aria-label="Read the research"><h2>8. Read the research</h2>
-  <div class="read-grid">
-    <div class="read-card"><span class="rc-kicker">Working paper</span><h3>The full study</h3><p><em>Rocket Launch Failures and Equity-Market Spillovers.</em> Methods, results, power, robustness, confounding news, limits and appendices. The same paper is available as a web page and as a PDF.</p><span class="rc-actions"><a class="rc-go" href="case-study.html">Read the paper</a><a class="rc-dl" href="case-study.pdf" download>Download PDF</a></span></div>
-    <a class="read-card" href="site/index.html"><span class="rc-kicker">Interactive</span><h3>The report</h3>
-      <p>Five countdown stages from the question to the checks, with four tools: Failure Timeline, Expected vs Actual, Event Study Lab and Placebo Simulator.</p><span class="rc-go">Open the report</span></a>
-    <a class="read-card" href="https://github.com/NahianIbnat-2000/T-Minus-Market"><span class="rc-kicker">GitHub</span><h3>Code and pipeline</h3><p>Python pipeline from raw launch records to the published statistics, with tests.</p><span class="rc-go">View the code</span></a>
+<div class="ticker" aria-hidden="true"><span class="ticker-label">Two-day abnormal returns</span><div class="ticker-track"><div class="ticker-run"><span class="tk"><span class="tk-d">2026-01-12</span> PSLV-DL fails <span class="tk-role">rival</span> FLY <span class="dn">−7.0%</span></span><span class="tk"><span class="tk-d">2025-12-23</span> HANBIT-NANO fails <span class="tk-role">rival</span> FLY <span class="dn">−6.1%</span></span><span class="tk"><span class="tk-d">2025-04-29</span> Firefly Alpha fails <span class="tk-role">rival</span> RKLB <span class="dn">−7.4%</span></span><span class="tk"><span class="tk-d">2025-03-31</span> Spectrum fails <span class="tk-role">rival</span> RKLB <span class="dn">−6.5%</span></span><span class="tk"><span class="tk-d">2024-12-18</span> Kairos fails <span class="tk-role">rival</span> AVIO.MI <span class="up">+14.5%</span></span><span class="tk"><span class="tk-d">2024-12-18</span> Kairos fails <span class="tk-role">rival</span> RKLB <span class="dn">−7.3%</span></span><span class="tk"><span class="tk-d">2023-12-27</span> Firefly Alpha fails <span class="tk-role">rival</span> AVIO.MI <span class="up">+6.4%</span></span><span class="tk"><span class="tk-d">2023-12-22</span> Firefly Alpha fails <span class="tk-role">rival</span> RKLB <span class="up">+25.3%</span></span><span class="tk"><span class="tk-d">2023-09-19</span> Electron fails <span class="tk-role">maker</span> RKLB <span class="dn">−10.5%</span></span><span class="tk"><span class="tk-d">2023-01-11</span> RS1 fails <span class="tk-role">rival</span> RKLB <span class="up">+7.3%</span></span><span class="tk"><span class="tk-d">2022-12-21</span> Vega C fails <span class="tk-role">maker</span> AVIO.MI <span class="dn">−8.8%</span></span><span class="tk"><span class="tk-d">2022-06-13</span> Astra Rocket 3.3 fails <span class="tk-role">rival</span> AVIO.MI <span class="dn">−7.3%</span></span><span class="tk"><span class="tk-d">2020-11-17</span> Vega fails <span class="tk-role">maker</span> AVIO.MI <span class="dn">−16.3%</span></span><span class="tk"><span class="tk-d">2019-07-11</span> Vega fails <span class="tk-role">maker</span> AVIO.MI <span class="dn">−12.3%</span></span><span class="tk"><span class="tk-d">2026-01-12</span> PSLV-DL fails <span class="tk-role">rival</span> FLY <span class="dn">−7.0%</span></span><span class="tk"><span class="tk-d">2025-12-23</span> HANBIT-NANO fails <span class="tk-role">rival</span> FLY <span class="dn">−6.1%</span></span><span class="tk"><span class="tk-d">2025-04-29</span> Firefly Alpha fails <span class="tk-role">rival</span> RKLB <span class="dn">−7.4%</span></span><span class="tk"><span class="tk-d">2025-03-31</span> Spectrum fails <span class="tk-role">rival</span> RKLB <span class="dn">−6.5%</span></span><span class="tk"><span class="tk-d">2024-12-18</span> Kairos fails <span class="tk-role">rival</span> AVIO.MI <span class="up">+14.5%</span></span><span class="tk"><span class="tk-d">2024-12-18</span> Kairos fails <span class="tk-role">rival</span> RKLB <span class="dn">−7.3%</span></span><span class="tk"><span class="tk-d">2023-12-27</span> Firefly Alpha fails <span class="tk-role">rival</span> AVIO.MI <span class="up">+6.4%</span></span><span class="tk"><span class="tk-d">2023-12-22</span> Firefly Alpha fails <span class="tk-role">rival</span> RKLB <span class="up">+25.3%</span></span><span class="tk"><span class="tk-d">2023-09-19</span> Electron fails <span class="tk-role">maker</span> RKLB <span class="dn">−10.5%</span></span><span class="tk"><span class="tk-d">2023-01-11</span> RS1 fails <span class="tk-role">rival</span> RKLB <span class="up">+7.3%</span></span><span class="tk"><span class="tk-d">2022-12-21</span> Vega C fails <span class="tk-role">maker</span> AVIO.MI <span class="dn">−8.8%</span></span><span class="tk"><span class="tk-d">2022-06-13</span> Astra Rocket 3.3 fails <span class="tk-role">rival</span> AVIO.MI <span class="dn">−7.3%</span></span><span class="tk"><span class="tk-d">2020-11-17</span> Vega fails <span class="tk-role">maker</span> AVIO.MI <span class="dn">−16.3%</span></span><span class="tk"><span class="tk-d">2019-07-11</span> Vega fails <span class="tk-role">maker</span> AVIO.MI <span class="dn">−12.3%</span></span></div></div></div>
+<main id="main">
+<section class="hero"><div class="wrap hero-grid">
+  <div>
+    <p class="eyebrow">Space · Finance · Event study</p>
+    <h1>When a rocket fails, who loses money?</h1>
+    <p class="dek">An event study of 138 orbital launch failures, 2000 to 2026: the stock of the company that built the rocket, and the stocks of its listed competitors.</p>
+    <p class="byline">Nahian Ibnat · Independent research · Updated Nov 2026</p>
+    <p class="cta"><a class="btn" href="site/index.html">Open the interactive report</a><a class="btn ghost" href="case-study.html">Read the working paper</a><a class="dl-link" href="case-study.pdf" download>Download PDF</a></p>
   </div>
-  <p class="evidence"><strong>Also:</strong> <a href="site/index.html#methods">Data and methods</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market#reproduction-and-verification">Replication instructions</a></p>
-  <p class="evidence"><strong>Evidence:</strong> <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/reports/04_feasibility_report.md">Feasibility report (before results)</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/reports/05_results.md">Results report</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/docs/CONFOUNDING_NEWS.md">Confounding-news checks</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/reports/06_confounding_sensitivity.md">Exploratory confounding sensitivity</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/audit/AUDIT_REPORT.md">Independent audit and verification</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/README.md">Reproduction guide</a></p></section>
+  <aside class="status" aria-label="Sample at a glance"><div class="st-head"><span>Mission data</span><span>from the pipeline</span></div>
+    <ul><li><span class="st-k">Launch failures</span><span class="st-v">138</span><span class="st-n">orbital, 2000 to 2026</span></li><li><span class="st-k">Listed-maker cases</span><span class="st-v">4</span><span class="st-n">2 firms</span></li><li><span class="st-k">Rival reactions</span><span class="st-v">42</span><span class="st-n">3 listed rivals</span></li><li><span class="st-k">Independent events</span><span class="st-v">22</span><span class="st-n">clusters</span></li><li><span class="st-k">Prespecified checks</span><span class="st-v">12</span><span class="st-n">none significant</span></li></ul><p class="st-note">Every number on this page is read from the published results. Prices are never published.</p></aside>
+</div></section>
 
-  <section class="cite"><h2>Cite</h2>
-  <p class="mono">Ibnat, N. (2026). When a rocket blows up, who loses money, and does anyone win? An event study of orbital launch failures. T-Minus Markets. https://nahianibnat-2000.github.io/T-Minus-Market/</p></section>
+<section id="question" class="band"><div class="wrap two">
+  <div><p class="eyebrow">T&#8722;4 · The question</p><h2>Contagion or a gain for rivals?</h2></div>
+  <div class="lede-text">
+    <p>A failed launch destroys a rocket and often a customer's satellite, so the builder should lose value. The open question is its <strong>listed competitors</strong>. If investors read a failure as a sign that spaceflight is risky for everyone, rival stocks fall: <strong>contagion</strong>. If they expect customers to move to a rocket that works, rival stocks rise: <strong>competitive gain</strong>.</p>
+    <p class="muted">The same question comes up when a bank fails or a product is recalled. Launch failures are useful because they are sudden, public and easy to date.</p>
+  </div>
+</div></section>
+
+<section id="findings" class="findings"><div class="wrap">
+  <p class="eyebrow">T&#8722;3 · What the data show</p><h2>Two findings</h2>
+  <div class="find-grid">
+    <article class="panel loss-panel"><p class="panel-kicker">01 · The rocket's maker</p>
+      <p class="big">−8.8% to −16.3%</p>
+      <p>In all 4 listed cases, the maker&#x27;s shares fell 8.8% to 16.3% more than the market in the two trading days after the failure.</p>
+      <figure><svg viewBox="0 0 560 250" class="chart" role="img" aria-label="Cumulative abnormal return of the rocket maker after each failure. Vega 2019: −12.3% over days 0 to 1; Vega 2020: −16.3% over days 0 to 1; Vega C 2022: −8.8% over days 0 to 1; Electron 2023: −10.5% over days 0 to 1"><line x1="44" x2="440" y1="16.0" y2="16.0" class="grid"/><text x="38" y="20.0" text-anchor="end" class="ax">+5%</text><line x1="44" x2="440" y1="56.8" y2="56.8" class="zero"/><text x="38" y="60.8" text-anchor="end" class="ax">0%</text><line x1="44" x2="440" y1="97.6" y2="97.6" class="grid"/><text x="38" y="101.6" text-anchor="end" class="ax">−5%</text><line x1="44" x2="440" y1="138.4" y2="138.4" class="grid"/><text x="38" y="142.4" text-anchor="end" class="ax">−10%</text><line x1="44" x2="440" y1="179.2" y2="179.2" class="grid"/><text x="38" y="183.2" text-anchor="end" class="ax">−15%</text><line x1="44" x2="440" y1="220.0" y2="220.0" class="grid"/><text x="38" y="224.0" text-anchor="end" class="ax">−20%</text><text x="80.0" y="240" text-anchor="middle" class="ax">Day 0</text><text x="116.0" y="240" text-anchor="middle" class="ax">+1</text><text x="260.0" y="240" text-anchor="middle" class="ax">+5</text><text x="440.0" y="240" text-anchor="middle" class="ax">+10</text><rect x="80.0" y="16" width="36.0" height="204" class="win"/><path d="M44.0,56.8 L80.0,179.4 L116.0,157.0 L152.0,140.1 L188.0,153.4 L224.0,154.6 L260.0,161.4 L296.0,155.3 L332.0,150.9 L368.0,159.8 L404.0,157.4 L440.0,153.5" class="mk"/><circle cx="440.0" cy="153.5" r="3" class="mkd"/><text x="448.0" y="157.5" class="lab">Vega 2019</text><path d="M44.0,56.8 L80.0,196.2 L116.0,189.5 L152.0,162.2 L188.0,171.2 L224.0,189.1 L260.0,204.1 L296.0,212.9 L332.0,207.2 L368.0,204.1 L404.0,198.9 L440.0,184.7" class="mk"/><circle cx="440.0" cy="184.7" r="3" class="mkd"/><text x="448.0" y="188.7" class="lab">Vega 2020</text><path d="M44.0,56.8 L80.0,139.2 L116.0,128.7 L152.0,152.4 L188.0,127.3 L224.0,140.2 L260.0,128.1 L296.0,135.6 L332.0,122.8 L368.0,97.6 L404.0,89.4 L440.0,79.9" class="mk"/><circle cx="440.0" cy="79.9" r="3" class="mkd"/><text x="448.0" y="83.9" class="lab">Vega C 2022</text><path d="M44.0,56.8 L80.0,115.2 L116.0,142.3 L152.0,104.8 L188.0,101.4 L224.0,132.1 L260.0,129.0 L296.0,118.2 L332.0,120.7 L368.0,109.2 L404.0,107.8 L440.0,126.6" class="mk"/><circle cx="440.0" cy="126.6" r="3" class="mkd"/><text x="448.0" y="130.6" class="lab">Electron 2023</text></svg><figcaption>Cumulative abnormal return from the day before (0%) to day +10. Shaded: the two-day window. 4 cases from 2 firms, so these are case studies.</figcaption></figure>
+    </article>
+    <article class="panel"><p class="panel-kicker">02 · Its listed competitors</p>
+      <p class="big neutral">+0.28%</p>
+      <p>Listed competitors moved +0.28% on average (95% interval −1.62% to +2.18%, p = 0.76). That is not statistically detectable. 22 independent events, 3 firms.</p>
+      <figure><svg viewBox="0 0 560 120" class="chart" role="img" aria-label="Average two-day reaction of listed competitors +0.28%, 95% interval −1.62% to +2.18%, which includes zero."><line x1="280.0" x2="280.0" y1="14" y2="90" class="zero"/><text x="72.0" y="110" text-anchor="middle" class="ax">−4%</text><text x="176.0" y="110" text-anchor="middle" class="ax">−2%</text><text x="384.0" y="110" text-anchor="middle" class="ax">+2%</text><text x="488.0" y="110" text-anchor="middle" class="ax">+4%</text><text x="280.0" y="110" text-anchor="middle" class="ax">0%</text><rect x="140.3" y="22" width="279.5" height="44" class="mde"/><line x1="195.7" x2="393.4" y1="44" y2="44" class="ci"/><line x1="195.7" x2="195.7" y1="37" y2="51" class="ci"/><line x1="393.4" x2="393.4" y1="37" y2="51" class="ci"/><circle cx="294.5" cy="44" r="6" class="pt"/></svg><figcaption>Dot: average two-day reaction. Bar: 95% interval. Shaded: average effects up to about 2.7% either way could not be reliably detected.</figcaption></figure>
+      <p class="small">The prespecified standardized test gives p = 0.40. On random ordinary days the real average sits at the 61st percentile.</p>
+    </article>
+  </div>
+</div></section>
+
+<section id="method" class="band"><div class="wrap">
+  <p class="eyebrow">T&#8722;2 · How it works</p><h2>Three steps</h2>
+  <ol class="steps">
+    <li><span class="step-n">1</span><h3>Find every failure</h3><p>138 orbital launch failures from GCAT, each dated to the first trading day after the news became public.</p></li>
+    <li><span class="step-n">2</span><h3>Predict a normal day</h3><p>A market model, fitted on about a year of earlier returns, predicts each stock's return from its home index.</p></li>
+    <li><span class="step-n">3</span><h3>Measure the gap</h3><p>The abnormal return is actual minus predicted, added up over the two trading days after the failure.</p></li>
+  </ol>
+  <details class="more"><summary>The sample in detail</summary><figure class="cs-fig"><svg viewBox="0 0 720 250" width="100%" role="img" aria-label="Sample construction: launches, failures, rival reactions and independent events, with the unit of each box." font-family="DM Mono, ui-monospace, monospace" font-size="11" fill="#1C1C1C"><title>Sample construction: launches, failures, rival reactions and independent events, with the unit of each box.</title><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1C1C1C"/></marker></defs><path d="M136.0,41.0 L154.0,41.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><path d="M282.0,41.0 L300.0,41.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><path d="M428.0,41.0 L446.0,41.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><path d="M364.0,70.0 L364.0,92.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><path d="M428.0,121.0 L446.0,121.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><path d="M574.0,121.0 L592.0,121.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><path d="M510.0,150.0 L592.0,201.0" stroke="#1C1C1C" fill="none" marker-end="url(#arr)"/><rect x="8" y="12" width="128" height="58" fill="#F3EEE4" stroke="#1C1C1C"/><text x="16" y="34" font-size="16" font-weight="700">3,077</text><text x="16" y="49" font-size="9.5">Launch attempts</text><text x="16" y="62" font-size="8.5" fill="#5E574C">unit: launches</text><rect x="154" y="12" width="128" height="58" fill="#F3EEE4" stroke="#1C1C1C"/><text x="162" y="34" font-size="16" font-weight="700">138</text><text x="162" y="49" font-size="9.5">Failures</text><text x="162" y="62" font-size="8.5" fill="#5E574C">unit: launches</text><rect x="300" y="12" width="128" height="58" fill="#F3EEE4" stroke="#1C1C1C"/><text x="308" y="34" font-size="16" font-weight="700">27</text><text x="308" y="49" font-size="9.5">In the study</text><text x="308" y="62" font-size="8.5" fill="#5E574C">unit: failures</text><rect x="446" y="12" width="128" height="58" fill="#EBE4D6" stroke="#1C1C1C"/><text x="454" y="34" font-size="16" font-weight="700">4</text><text x="454" y="49" font-size="9.5">Listed maker</text><text x="454" y="62" font-size="8.5" fill="#5E574C">unit: failures; case studies</text><rect x="300" y="92" width="128" height="58" fill="#F3EEE4" stroke="#1C1C1C"/><text x="308" y="114" font-size="16" font-weight="700">24</text><text x="308" y="129" font-size="9.5">Listed rivals</text><text x="308" y="142" font-size="8.5" fill="#5E574C">unit: failures</text><rect x="446" y="92" width="128" height="58" fill="#F3EEE4" stroke="#1C1C1C"/><text x="454" y="114" font-size="16" font-weight="700">42</text><text x="454" y="129" font-size="9.5">Rival reactions</text><text x="454" y="142" font-size="8.5" fill="#5E574C">unit: firm x failure</text><rect x="592" y="92" width="128" height="58" fill="#EBE4D6" stroke="#1C1C1C"/><text x="600" y="114" font-size="16" font-weight="700">22</text><text x="600" y="129" font-size="9.5">Independent events</text><text x="600" y="142" font-size="8.5" fill="#5E574C">unit: clusters</text><rect x="592" y="172" width="128" height="58" fill="#F3EEE4" stroke="#1C1C1C"/><text x="600" y="194" font-size="16" font-weight="700">3</text><text x="600" y="209" font-size="9.5">Rival firms</text><text x="600" y="222" font-size="8.5" fill="#5E574C">unit: firms</text></svg><figcaption class="cs-cap">Each box gives a count and its unit. Source: GCAT and the project pipeline.</figcaption></figure>
+    <ul class="method">
+      <li><strong>Listed-maker cases (4):</strong> failures whose rocket was built by a listed company.</li>
+      <li><strong>Rival-eligible failures (24):</strong> failures with at least one listed direct competitor.</li>
+      <li><strong>Rival reactions (42):</strong> one per listed rival per failure.</li>
+      <li><strong>Independent events (22):</strong> failures that share a firm within a few trading days count as one event.</li>
+      <li><strong>Rival firms (3):</strong> Avio SpA, Firefly Aerospace, Rocket Lab.</li>
+    </ul>
+    <p>The rules were committed to the public repository before the results (record in the working paper, Appendix G); they were not filed with an independent registry. Only derived statistics are published.</p></details>
+</div></section>
+
+<section id="meaning" class="meaning"><div class="wrap">
+  <p class="eyebrow">T&#8722;1 · What it means</p><h2>What the evidence can and cannot say</h2>
+  <div class="mean-grid">
+    <div class="mean-card ok"><h3>Shown</h3><p>Large two-day losses for the maker in every listed case. No detectable average reaction among the 3 listed competitors.</p></div>
+    <div class="mean-card no"><h3>Not shown</h3><p>That rivals lose or gain on average; that the effect is zero; that customers switch rockets; that the pattern holds for private or state-owned firms.</p></div>
+    <div class="mean-card why"><h3>Why so uncertain</h3><p>Only 3 listed rivals, and Avio SpA is in all 22 events. Effects below about 2.7% either way would usually be missed.</p></div>
+  </div>
+  <details class="more"><summary>Reliability and robustness</summary>
+    <p>With this sample, an average effect smaller than about 2.7% either way would usually go undetected (80% power at the 5% level); the chance of detecting a true 1% effect is about 18%. "Not detectable" here does not mean "no effect".</p>
+    <p><strong>Prespecified checks.</strong> None of the 12 checks fixed in advance detects a significant average at the 5% level; the estimates range from −0.15% to +1.84%, so the lack of an effect is stable but its direction and size are not.</p>
+    <p><strong>Weighting (added after the results).</strong> +0.28% with every reaction equal (prespecified), +0.21% with every event equal, +0.87% weighting calm stocks more, −1.16% with every firm equal.</p>
+    <p><strong>Exploratory.</strong> An exploratory check added after the results leaves out the 2 days when competitors announced large contracts: the average moves to −0.70% (95% interval −1.80% to +0.39%), while the median moves only from +0.28% to +0.09%, so the average is sensitive to a few large moves. It is exploratory and does not replace the main result.</p>
+    <p>Possible explanations the data cannot separate: contagion and competitive gain cancelling out, customers unable to switch quickly, or investors treating a failure as news about the failed firm only.</p></details>
+</div></section>
+
+<section id="explore" class="band"><div class="wrap">
+  <p class="eyebrow">T&#8722;0 · Explore</p><h2>Go deeper</h2>
+  <div class="explore-grid">
+    <a class="card feature" href="site/index.html"><span class="card-k">Interactive report</span><h3>Run the study yourself</h3>
+      <p>Failure Timeline, Expected vs Actual, Event Study Lab and Placebo Simulator, in five countdown stages.</p><span class="card-go">Open the report</span></a>
+    <div class="card"><span class="card-k">Working paper</span><h3>The full study</h3>
+      <p><em>Rocket Launch Failures and Equity-Market Spillovers.</em> Methods, results, robustness and appendices. The same paper as a web page and as a PDF.</p>
+      <span class="card-actions"><a class="card-go" href="case-study.html">Read the paper</a><a class="dl-link" href="case-study.pdf" download>Download PDF</a></span></div>
+    <div class="card"><span class="card-k">Code</span><h3>Pipeline and tests</h3>
+      <p>Python pipeline from raw launch records to every published number, with an independent verification.</p><a class="card-go" href="https://github.com/NahianIbnat-2000/T-Minus-Market">View the code</a></div>
+  </div>
+  <p class="evidence"><strong>Evidence:</strong> <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/reports/04_feasibility_report.md">Feasibility report (before results)</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/reports/05_results.md">Results report</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/docs/CONFOUNDING_NEWS.md">Confounding-news checks</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/reports/06_confounding_sensitivity.md">Exploratory confounding sensitivity</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/audit/AUDIT_REPORT.md">Independent audit and verification</a> · <a href="https://github.com/NahianIbnat-2000/T-Minus-Market/blob/master/README.md">Reproduction guide</a></p>
+</div></section>
 </main>
-<footer class="site-foot"><div class="wrap cols">
+<footer class="site-foot"><div class="wrap foot-grid">
   <div><h3>Author</h3><p>Nahian Ibnat</p></div>
   <div><h3>Sources</h3><p>Launch data: GCAT, J. McDowell, CC-BY. Prices: Yahoo Finance, used only to compute statistics.</p></div>
+  <div><h3>Cite</h3><p class="mono">Ibnat, N. (2026). When a rocket blows up, who loses money, and does anyone win? An event study of orbital launch failures. T-Minus Markets. https://nahianibnat-2000.github.io/T-Minus-Market/</p></div>
   <div><h3>Note</h3><p>Research, not investment advice.</p></div>
 </div></footer>
 </body>
