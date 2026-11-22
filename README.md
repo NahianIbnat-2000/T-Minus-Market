@@ -181,6 +181,7 @@ any abnormal return is computed.
 | 5 | `python pipeline/05_event_study.py` | prices (local only) |
 | 6 | `python pipeline/06_confounding_sensitivity.py` | prices; exploratory |
 | 9 | `python pipeline/09_audit_exploratory.py` | prices; exploratory (R9b) |
+| 10 | `python pipeline/10_crsp_supplement.py` | `data/crsp/` from the WRDS run (`wrds/tminus_crsp_extract.py`, not in git); CRSP supplement, plan v1.2 |
 | 7 | `python pipeline/07_export_site_data.py` | derived statistics only |
 | 8 | `python pipeline/08_build_html.py` | matplotlib; LaTeX for the PDF |
 | check | `python audit/verify_published.py` | published data only; recomputes every statistic independently; writes `audit/VERIFICATION.md` |

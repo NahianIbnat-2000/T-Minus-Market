@@ -7,3 +7,5 @@ casestudy/*.aux
 casestudy/*.log
 casestudy/*.out
 data/processed/firm_event_cars.csv
+# CRSP-derived files from the WRDS run: kept out of the public repo (licence); only aggregates are published
+data/crsp/

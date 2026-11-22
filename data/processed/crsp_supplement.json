@@ -1,0 +1,458 @@
+{
+  "plan_version": "1.2",
+  "status": "supplement: reported next to the v1.0 result, never instead",
+  "crsp_run": {
+    "script_version": "1.1 (22 Nov 2026)",
+    "run_utc": "2026-11-22T01:19:45+00:00",
+    "permnos": {
+      "ORB": 76139,
+      "OA": 76477,
+      "ASTR": 19835,
+      "VORB": 21321
+    },
+    "crsp_tables": {
+      "stock": "crsp.dsf",
+      "delist": "crsp.dsedelist",
+      "index": "crsp.dsi"
+    },
+    "benchmark": "crsp.dsi sprtrn (S&P 500)"
+  },
+  "coverage": {
+    "crsp_events": 137,
+    "with_car": 129,
+    "dropped_short_history": 8,
+    "new_rival_reactions": 12,
+    "fallback_model": 10
+  },
+  "imputed_cross_source_corr": 0.14941506110559474,
+  "rho_sensitivity": {
+    "0.0": {
+      "stat": 0.8009574879012705,
+      "p": 0.42966996252123674
+    },
+    "0.5": {
+      "stat": 0.752608991152768,
+      "p": 0.4577509732675251
+    }
+  },
+  "dropped_in_S2": [
+    "2023-202 RKLB",
+    "2023-F04 VORB",
+    "2024-F04 AVIO.MI"
+  ],
+  "rival": {
+    "v1_0": {
+      "label": "v1.0 sample (headline, unchanged)",
+      "n": 42,
+      "clusters": 22,
+      "failures": 24,
+      "firms": 3,
+      "bmp_kp": {
+        "primary": {
+          "mean": 0.0027963463885639322,
+          "ci_low": -0.01621905473115061,
+          "ci_high": 0.021811747508278474,
+          "stat": 0.8540615570649495,
+          "p": 0.4027087211023443,
+          "n": 42,
+          "clusters": 22,
+          "failures": 24,
+          "firms": 3,
+          "mean_corr": 0.15013876539272075
+        },
+        "robust": {
+          "mean": 0.018357896064561025,
+          "ci_low": -0.00414142978126995,
+          "ci_high": 0.040857221910392,
+          "stat": 1.397117087174885,
+          "p": 0.1769676319139723,
+          "n": 42,
+          "clusters": 22,
+          "failures": 24,
+          "firms": 3,
+          "mean_corr": 0.18319093900364927
+        },
+        "descriptive": {
+          "mean": 0.008339471346024157,
+          "ci_low": -0.038537271088518135,
+          "ci_high": 0.055216213780566445,
+          "stat": 0.5671648026843442,
+          "p": 0.5766153920787536,
+          "n": 42,
+          "clusters": 22,
+          "failures": 24,
+          "firms": 3,
+          "mean_corr": 0.22334421431725227
+        }
+      },
+      "cluster_robust": {
+        "estimate": 0.0027963463885639322,
+        "t": 0.3058216141589918,
+        "p": 0.7627515362696847,
+        "p_wild": 0.8482848284828483,
+        "draws": 9999,
+        "G": 22
+      },
+      "firm_level": {
+        "k": 3,
+        "mean": -0.011560721549807177,
+        "ci": [
+          -0.09131323068089911,
+          0.06819178758128475
+        ],
+        "p": 0.5964768388099442
+      },
+      "contrib": [
+        {
+          "firm": "Avio SpA",
+          "n": 24,
+          "share": 0.5714285714285714,
+          "contribution": 0.0034465678137925978
+        },
+        {
+          "firm": "Rocket Lab",
+          "n": 15,
+          "share": 0.35714285714285715,
+          "contribution": 0.0028223712830676103
+        },
+        {
+          "firm": "Firefly Aerospace",
+          "n": 3,
+          "share": 0.07142857142857142,
+          "contribution": -0.003472592708296277
+        }
+      ]
+    },
+    "S1": {
+      "label": "S1: v1.0 + CRSP firms",
+      "n": 54,
+      "clusters": 30,
+      "failures": 32,
+      "firms": 6,
+      "bmp_kp": {
+        "primary": {
+          "mean": 0.004189189511389139,
+          "ci_low": -0.019600001881958172,
+          "ci_high": 0.02797838090473645,
+          "stat": 0.7855735182948971,
+          "p": 0.43848896711416335,
+          "n": 54,
+          "clusters": 30,
+          "failures": 32,
+          "firms": 6,
+          "mean_corr": 0.1456836682587285
+        },
+        "robust": {
+          "mean": 0.013809457701982572,
+          "ci_low": -0.005659172411279114,
+          "ci_high": 0.03327808781524426,
+          "stat": 1.344229857990574,
+          "p": 0.18929597730076367,
+          "n": 54,
+          "clusters": 30,
+          "failures": 32,
+          "firms": 6,
+          "mean_corr": 0.17109051186173596
+        },
+        "descriptive": {
+          "mean": 0.008727852596173903,
+          "ci_low": -0.029133549425565237,
+          "ci_high": 0.046589254617913044,
+          "stat": 0.6785282105411031,
+          "p": 0.5028159740226413,
+          "n": 53,
+          "clusters": 30,
+          "failures": 32,
+          "firms": 6,
+          "mean_corr": 0.20615302968543
+        }
+      },
+      "cluster_robust": {
+        "estimate": 0.004189189511389139,
+        "t": 0.36015745232940116,
+        "p": 0.7213392794646504,
+        "p_wild": 0.7601760176017601,
+        "draws": 9999,
+        "G": 30
+      },
+      "firm_level": {
+        "k": 6,
+        "mean": 0.0010503738138883424,
+        "ci": [
+          -0.031366898234921864,
+          0.03346764586269854
+        ],
+        "p": 0.9368518377339078
+      },
+      "contrib": [
+        {
+          "firm": "Avio SpA",
+          "n": 24,
+          "share": 0.4444444444444444,
+          "contribution": 0.0026806638551720202
+        },
+        {
+          "firm": "Rocket Lab",
+          "n": 15,
+          "share": 0.2777777777777778,
+          "contribution": 0.0021951776646081415
+        },
+        {
+          "firm": "Orbital Sciences Corp",
+          "n": 7,
+          "share": 0.12962962962962962,
+          "contribution": -0.0005459393928129485
+        },
+        {
+          "firm": "Firefly Aerospace",
+          "n": 3,
+          "share": 0.05555555555555555,
+          "contribution": -0.0027009054397859936
+        },
+        {
+          "firm": "Virgin Orbit",
+          "n": 3,
+          "share": 0.05555555555555555,
+          "contribution": 0.0026588073624466105
+        },
+        {
+          "firm": "Orbital ATK Inc",
+          "n": 2,
+          "share": 0.037037037037037035,
+          "contribution": -9.861453823869106e-05
+        }
+      ]
+    },
+    "S2": {
+      "label": "S2 (exploratory): S1 without events flagged 'confounded'",
+      "n": 51,
+      "clusters": 30,
+      "failures": 32,
+      "firms": 6,
+      "bmp_kp": {
+        "primary": {
+          "mean": -0.011190891576559291,
+          "ci_low": -0.024873865510180712,
+          "ci_high": 0.0024920823570621295,
+          "stat": -0.6950193380711256,
+          "p": 0.49257488412032313,
+          "n": 51,
+          "clusters": 30,
+          "failures": 32,
+          "firms": 6,
+          "mean_corr": 0.1526357864421437
+        },
+        "robust": {
+          "mean": 0.004439739181109238,
+          "ci_low": -0.010644961681953578,
+          "ci_high": 0.019524440044172052,
+          "stat": 0.6381123983553039,
+          "p": 0.5284076616175182,
+          "n": 51,
+          "clusters": 30,
+          "failures": 32,
+          "firms": 6,
+          "mean_corr": 0.18146087733689875
+        },
+        "descriptive": {
+          "mean": 0.0038117424792460156,
+          "ci_low": -0.033489538554970916,
+          "ci_high": 0.04111302351346295,
+          "stat": 0.36600835253244557,
+          "p": 0.7170154090083507,
+          "n": 51,
+          "clusters": 30,
+          "failures": 32,
+          "firms": 6,
+          "mean_corr": 0.2177733161882329
+        }
+      },
+      "cluster_robust": {
+        "estimate": -0.011190891576559291,
+        "t": -1.6727316214520174,
+        "p": 0.10513616523393876,
+        "p_wild": 0.09820982098209821,
+        "draws": 9999,
+        "G": 30
+      },
+      "firm_level": {
+        "k": 6,
+        "mean": -0.032143279497955535,
+        "ci": [
+          -0.08483703726289316,
+          0.020550478266982086
+        ],
+        "p": 0.17765456146481007
+      },
+      "contrib": [
+        {
+          "firm": "Avio SpA",
+          "n": 23,
+          "share": 0.45098039215686275,
+          "contribution": -6.882166575609236e-06
+        },
+        {
+          "firm": "Rocket Lab",
+          "n": 14,
+          "share": 0.27450980392156865,
+          "contribution": -0.002631215053764237
+        },
+        {
+          "firm": "Orbital Sciences Corp",
+          "n": 7,
+          "share": 0.13725490196078433,
+          "contribution": -0.0005780534747431219
+        },
+        {
+          "firm": "Firefly Aerospace",
+          "n": 3,
+          "share": 0.058823529411764705,
+          "contribution": -0.0028597822303616403
+        },
+        {
+          "firm": "Orbital ATK Inc",
+          "n": 2,
+          "share": 0.0392156862745098,
+          "contribution": -0.0001044153934292023
+        },
+        {
+          "firm": "Virgin Orbit",
+          "n": 2,
+          "share": 0.0392156862745098,
+          "contribution": -0.0050105432576854824
+        }
+      ]
+    }
+  },
+  "makers": {
+    "cases": [
+      {
+        "launch_tag": "2001-U01",
+        "ticker": "ORB",
+        "firm": "Orbital Sciences Corp",
+        "vehicle": "Taurus 2110",
+        "day0": "2001-09-21",
+        "car": -0.20100450767624628,
+        "z": -2.8787222953586644,
+        "p": 0.003992897661206878,
+        "source": "crsp"
+      },
+      {
+        "launch_tag": "2009-F01",
+        "ticker": "ORB",
+        "firm": "Orbital Sciences Corp",
+        "vehicle": "Taurus 3110",
+        "day0": "2009-02-24",
+        "car": -0.07091456130129659,
+        "z": -2.1905968593575595,
+        "p": 0.028480978630375513,
+        "source": "crsp"
+      },
+      {
+        "launch_tag": "2011-F01",
+        "ticker": "ORB",
+        "firm": "Orbital Sciences Corp",
+        "vehicle": "Taurus 3110",
+        "day0": "2011-03-04",
+        "car": -0.030576454443030514,
+        "z": -1.510111552995152,
+        "p": 0.13101496205457747,
+        "source": "crsp"
+      },
+      {
+        "launch_tag": "2014-F02",
+        "ticker": "ORB",
+        "firm": "Orbital Sciences Corp",
+        "vehicle": "Antares 130",
+        "day0": "2014-10-29",
+        "car": -0.14617792661548623,
+        "z": -5.4757305874747635,
+        "p": 4.3571017154031614e-08,
+        "source": "crsp"
+      },
+      {
+        "launch_tag": "2019-F05",
+        "ticker": "AVIO.MI",
+        "firm": "Avio SpA",
+        "vehicle": "Vega",
+        "day0": "2019-07-11",
+        "car": -0.12285353088260523,
+        "z": -6.6254208789815054,
+        "p": 3.4626016341061386e-11,
+        "source": "v1.0"
+      },
+      {
+        "launch_tag": "2020-U01",
+        "ticker": "AVIO.MI",
+        "firm": "Avio SpA",
+        "vehicle": "Vega",
+        "day0": "2020-11-17",
+        "car": -0.16257806589374169,
+        "z": -5.657122262566738,
+        "p": 1.5393211218918122e-08,
+        "source": "v1.0"
+      },
+      {
+        "launch_tag": "2022-F01",
+        "ticker": "ASTR",
+        "firm": "Astra Space",
+        "vehicle": "Astra Rocket 3.3",
+        "day0": "2022-02-10",
+        "car": -0.3480607627342874,
+        "z": -3.8681410573487454,
+        "p": 0.00010966822171017594,
+        "source": "crsp"
+      },
+      {
+        "launch_tag": "2022-F03",
+        "ticker": "ASTR",
+        "firm": "Astra Space",
+        "vehicle": "Astra Rocket 3.3",
+        "day0": "2022-06-13",
+        "car": -0.13114717505493684,
+        "z": -1.5934146590902591,
+        "p": 0.11106719931518794,
+        "source": "crsp"
+      },
+      {
+        "launch_tag": "2022-F06",
+        "ticker": "AVIO.MI",
+        "firm": "Avio SpA",
+        "vehicle": "Vega C",
+        "day0": "2022-12-21",
+        "car": -0.08806893443975267,
+        "z": -2.4262941408580705,
+        "p": 0.015253901535580454,
+        "source": "v1.0"
+      },
+      {
+        "launch_tag": "2023-F01",
+        "ticker": "VORB",
+        "firm": "Virgin Orbit",
+        "vehicle": "LauncherOne",
+        "day0": "2023-01-10",
+        "car": -0.1526249316238949,
+        "z": -1.6866179955114222,
+        "p": 0.09167682941973725,
+        "source": "crsp"
+      },
+      {
+        "launch_tag": "2023-F08",
+        "ticker": "RKLB",
+        "firm": "Rocket Lab",
+        "vehicle": "Electron",
+        "day0": "2023-09-19",
+        "car": -0.10474233818972972,
+        "z": -2.254197096812277,
+        "p": 0.02418377135887457,
+        "source": "v1.0"
+      }
+    ],
+    "n": 11,
+    "firms": 5,
+    "negative": 11,
+    "mean": -0.14170447171409165,
+    "median": -0.13114717505493684,
+    "sign_test_p": 0.0009765625
+  }
+}

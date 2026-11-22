@@ -496,7 +496,7 @@ def compile_pdf(tex: Path, pdf_out: Path) -> bool:
     cmd = [*eng, "-interaction=nonstopmode", "-halt-on-error", tex.name]
     try:
         for _ in range(2):                                            # twice, so page layout settles
-            r = subprocess.run(cmd, cwd=tex.parent, capture_output=True, text=True, timeout=300)
+            r = subprocess.run(cmd, cwd=tex.parent, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=300)
         if r.returncode != 0:
             log = (tex.parent / "case-study.log")
             tail = log.read_text(errors="ignore")[-1500:] if log.exists() else r.stdout[-1500:]

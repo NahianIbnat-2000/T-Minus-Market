@@ -27,8 +27,14 @@ def text_of(path: Path) -> str | None:
     if path.suffix == ".pdf":
         if not shutil.which("pdftotext"):
             return None
-        out = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True).stdout
-        return re.sub(r"\s+", " ", out.replace("−", "−"))
+        # -enc UTF-8 and encoding="utf-8": on Windows Python would otherwise decode with cp1252 and turn the
+        # minus sign into mojibake, so every negative number in the PDF would fail the check
+        out = subprocess.run(["pdftotext", "-enc", "UTF-8", "-layout", str(path), "-"], capture_output=True,
+                             text=True, encoding="utf-8", errors="replace").stdout
+        # PDF fonts map the minus sign differently (U+2212, hyphen, en dash, or a separate glyph followed by a
+        # space). Normalise any dash directly before a number to U+2212 so the check compares numbers, not glyphs.
+        out = re.sub(r"\s+", " ", out)
+        return re.sub(r"[\-\u2010\u2011\u2012\u2013\u2014\u2212]\s?(?=\d)", "\u2212", out)
     raw = path.read_text(encoding="utf-8")
     raw = re.sub(r"<(style|script)[^>]*>.*?</\1>", " ", raw, flags=re.S)
     raw = re.sub(r'<script type="application/json"[^>]*>.*?</script>', " ", raw, flags=re.S)
